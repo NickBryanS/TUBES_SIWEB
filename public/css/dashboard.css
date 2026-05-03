@@ -1,0 +1,494 @@
+/* ===== DASHBOARD PAGE ===== */
+.dashboard-page {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+.dash-header {
+    margin-bottom: 28px;
+}
+
+.dash-greeting {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--green-dark);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+}
+
+.dash-greeting-sub {
+    font-size: 0.88rem;
+    color: var(--text-light);
+}
+
+/* ===== STATS CARDS ===== */
+.dash-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.stat-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.icon-green { background: #e8f5e9; color: var(--green-dark); }
+.icon-amber { background: #fff8e1; color: #f57f17; }
+.icon-blue { background: #e3f2fd; color: #1565c0; }
+.icon-red { background: #fce4ec; color: #c62828; }
+
+.stat-card-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-card-label {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    margin-bottom: 2px;
+}
+
+.stat-card-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.stat-card-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 4px;
+    width: fit-content;
+}
+
+.badge-urgent {
+    background: #fce4ec;
+    color: #c62828;
+}
+
+/* ===== CONTENT GRID ===== */
+.dash-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    margin-bottom: 36px;
+}
+
+.dash-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.dash-section-header h2,
+.dash-right h2,
+.dash-transactions h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.see-all-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--green-dark);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+}
+
+.see-all-link:hover {
+    color: var(--green-accent);
+}
+
+.see-all-link i {
+    font-size: 0.7rem;
+    transition: transform 0.2s;
+}
+
+.see-all-link:hover i {
+    transform: translateX(3px);
+}
+
+/* ===== ACTIVE RENTAL ===== */
+.active-rental-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.rental-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.rental-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    display: block;
+}
+
+.rental-ref {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.rental-status {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-active {
+    background: #e8f5e9;
+    color: var(--green-dark);
+}
+
+.status-active i {
+    font-size: 0.45rem;
+}
+
+.rental-items-list {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.rental-item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.85rem;
+    color: var(--text-medium);
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.rental-item-row:last-child {
+    border-bottom: none;
+}
+
+.rental-item-row i {
+    color: var(--green-dark);
+    margin-right: 8px;
+    width: 16px;
+}
+
+.rental-period-bar {
+    padding: 16px 20px;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+}
+
+.period-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.period-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.period-dates {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.period-dates i {
+    color: var(--green-dark);
+    margin-right: 6px;
+}
+
+.period-days {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.progress-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--green-dark);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.progress-pct {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.rental-actions {
+    display: flex;
+    gap: 10px;
+    padding: 16px 20px;
+}
+
+.btn-rental-action {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-extend {
+    background: var(--green-dark);
+    color: white;
+    border: none;
+}
+
+.btn-extend:hover {
+    background: var(--green-primary);
+}
+
+.btn-nota {
+    background: white;
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+}
+
+.btn-nota:hover {
+    border-color: var(--green-dark);
+    color: var(--green-dark);
+}
+
+/* ===== ADVENTURE CARD ===== */
+.dash-right h2 {
+    margin-bottom: 16px;
+}
+
+.adventure-card {
+    background: var(--olive-dark);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    color: white;
+}
+
+.adventure-image {
+    height: 160px;
+    overflow: hidden;
+}
+
+.adventure-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.adventure-card:hover .adventure-image img {
+    transform: scale(1.05);
+}
+
+.adventure-info {
+    padding: 20px;
+}
+
+.adventure-info h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.adventure-info p {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.adventure-info p i {
+    width: 14px;
+    color: rgba(255,255,255,0.5);
+}
+
+.adventure-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 20px;
+    background: var(--green-accent);
+    color: white;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.adventure-btn:hover {
+    background: var(--green-btn);
+    transform: translateY(-1px);
+}
+
+/* ===== TRANSACTION TABLE ===== */
+.dash-transactions {
+    margin-top: 8px;
+}
+
+.dash-transactions h2 {
+    margin-bottom: 16px;
+}
+
+.transaction-table-wrapper {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transaction-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+}
+
+.transaction-table td {
+    padding: 14px 16px;
+    font-size: 0.82rem;
+    color: var(--text-medium);
+    border-bottom: 1px solid var(--border);
+}
+
+.transaction-table tr:last-child td {
+    border-bottom: none;
+}
+
+.order-id {
+    font-weight: 600;
+    color: var(--text-dark) !important;
+}
+
+.price-col {
+    font-weight: 600;
+    color: var(--text-dark) !important;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.status-approved { background: #e8f5e9; color: var(--green-dark); }
+.status-shipped { background: #e3f2fd; color: #1565c0; }
+.status-done { background: #f3f3f3; color: var(--text-medium); }
+.status-pending { background: #fce4ec; color: #c62828; }
+
+.table-link {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--green-dark);
+    transition: var(--transition);
+    margin-right: 10px;
+}
+
+.table-link:hover {
+    color: var(--green-accent);
+    text-decoration: underline;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .dash-stats { grid-template-columns: repeat(2, 1fr); }
+    .dash-content-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .dashboard-page { padding: 16px; }
+    .dash-stats { grid-template-columns: 1fr; }
+    .dash-greeting { font-size: 1.5rem; }
+    .transaction-table-wrapper { overflow-x: auto; }
+}

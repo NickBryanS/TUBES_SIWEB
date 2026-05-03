@@ -1,0 +1,470 @@
+/* ===== KATALOG PAGE ===== */
+.katalog-page {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 32px 32px;
+    min-height: calc(100vh - 64px);
+}
+
+/* ===== FILTER SIDEBAR ===== */
+.filter-sidebar {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    height: fit-content;
+    position: sticky;
+    top: 96px;
+}
+
+.filter-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 24px;
+}
+
+.filter-group {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.filter-group:last-of-type {
+    border-bottom: none;
+}
+
+.filter-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--text-medium);
+    margin-bottom: 10px;
+    cursor: pointer;
+    position: relative;
+    padding-left: 28px;
+}
+
+.filter-checkbox input {
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.filter-checkbox .checkmark {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    background: var(--white);
+    transition: var(--transition);
+}
+
+.filter-checkbox input:checked ~ .checkmark {
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+}
+
+.filter-checkbox input:checked ~ .checkmark::after {
+    content: '✓';
+    color: white;
+    font-size: 0.7rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.price-range {
+    margin-top: 12px;
+}
+
+.range-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    outline: none;
+}
+
+.range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--green-dark);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.price-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.72rem;
+    color: var(--text-light);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.toggle-slider {
+    width: 40px;
+    height: 22px;
+    background: var(--border);
+    border-radius: 11px;
+    position: relative;
+    transition: var(--transition);
+}
+
+.toggle-slider::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: var(--transition);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--green-dark);
+}
+
+.toggle-switch input:checked + .toggle-slider::after {
+    transform: translateX(18px);
+}
+
+.filter-apply-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--green-dark);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.filter-apply-btn:hover {
+    background: var(--green-primary);
+    transform: translateY(-1px);
+}
+
+/* ===== KATALOG MAIN ===== */
+.katalog-main {
+    padding-left: 32px;
+}
+
+.katalog-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+
+.katalog-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    letter-spacing: -0.02em;
+}
+
+.katalog-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-top: 4px;
+}
+
+.katalog-sort {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-light);
+    letter-spacing: 0.05em;
+}
+
+.sort-select {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: var(--white);
+    cursor: pointer;
+    outline: none;
+}
+
+.sort-select:focus {
+    border-color: var(--green-dark);
+}
+
+/* ===== PRODUCT GRID ===== */
+.katalog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.katalog-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.katalog-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.katalog-card-image {
+    position: relative;
+    background: var(--cream);
+    padding: 16px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.katalog-card-image img {
+    max-height: 150px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.4s ease;
+}
+
+.katalog-card:hover .katalog-card-image img {
+    transform: scale(1.06);
+}
+
+.katalog-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.badge-professional {
+    background: var(--green-dark);
+    color: white;
+}
+
+.badge-toprated {
+    background: #f5a623;
+    color: white;
+}
+
+.katalog-card-info {
+    padding: 14px 16px 16px;
+}
+
+.katalog-card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.katalog-card-title-row h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.katalog-rating {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.katalog-rating i {
+    color: #f5a623;
+    font-size: 0.68rem;
+}
+
+.katalog-card-desc {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.katalog-card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.tag {
+    padding: 3px 8px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.65rem;
+    color: var(--text-medium);
+    font-weight: 500;
+}
+
+.katalog-card-footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.katalog-price-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.katalog-price-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.katalog-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.katalog-cart-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--text-medium);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.katalog-cart-btn:hover {
+    background: var(--green-dark);
+    color: white;
+    border-color: var(--green-dark);
+}
+
+/* ===== PAGINATION ===== */
+.katalog-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 36px;
+    padding-bottom: 20px;
+}
+
+.page-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-medium);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.page-btn:hover {
+    border-color: var(--green-dark);
+    color: var(--green-dark);
+}
+
+.page-btn.active {
+    background: var(--green-dark);
+    color: white;
+    border-color: var(--green-dark);
+}
+
+.page-btn i {
+    font-size: 0.7rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .katalog-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .katalog-page {
+        grid-template-columns: 1fr;
+    }
+    .filter-sidebar {
+        position: static;
+        margin-bottom: 24px;
+    }
+    .katalog-main {
+        padding-left: 0;
+    }
+    .katalog-grid { grid-template-columns: 1fr; }
+}

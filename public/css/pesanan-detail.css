@@ -1,0 +1,474 @@
+/* ===== PESANAN DETAIL PAGE ===== */
+.pesanan-page {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+/* Breadcrumb */
+.pesanan-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-bottom: 16px;
+}
+
+.pesanan-breadcrumb a {
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.pesanan-breadcrumb a:hover {
+    color: var(--green-dark);
+}
+
+.pesanan-breadcrumb i {
+    font-size: 0.6rem;
+}
+
+.pesanan-breadcrumb span {
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.pesanan-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+
+.pesanan-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.02em;
+}
+
+.btn-invoice {
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-invoice:hover {
+    border-color: var(--green-dark);
+    color: var(--green-dark);
+}
+
+/* ===== TRACKING STEPPER ===== */
+.tracking-stepper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 36px;
+    padding: 24px 0;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.track-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+    text-align: center;
+}
+
+.track-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--cream);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.track-step.completed .track-circle {
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+    color: white;
+}
+
+.track-step.active .track-circle {
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(45,90,39,0.15);
+}
+
+.track-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.track-step-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-medium);
+}
+
+.track-step.completed .track-step-title,
+.track-step.active .track-step-title {
+    color: var(--text-dark);
+}
+
+.track-step-date {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.track-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    margin-top: 20px;
+    max-width: 60px;
+}
+
+.completed-line {
+    background: var(--green-dark);
+}
+
+/* ===== MAIN GRID ===== */
+.pesanan-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+/* ===== STATUS BANNER ===== */
+.status-banner {
+    display: flex;
+    gap: 0;
+    background: var(--olive-dark);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.status-banner-left {
+    flex: 1;
+    padding: 28px;
+}
+
+.status-banner-label {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.status-banner h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 10px;
+}
+
+.status-banner p {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+.btn-confirm-receive {
+    padding: 12px 20px;
+    background: var(--green-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-confirm-receive:hover {
+    background: var(--green-btn);
+    transform: translateY(-1px);
+}
+
+.status-banner-img {
+    width: 200px;
+    min-width: 200px;
+}
+
+.status-banner-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ===== SECTIONS ===== */
+.pesanan-section {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.pesanan-section h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pesanan-section h3 i {
+    color: var(--green-dark);
+}
+
+/* Items List */
+.pesanan-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pesanan-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.pesanan-item:last-child {
+    border-bottom: none;
+}
+
+.pesanan-item-img {
+    width: 56px;
+    height: 56px;
+    background: var(--cream);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    flex-shrink: 0;
+}
+
+.pesanan-item-img img {
+    max-height: 44px;
+    width: auto;
+    object-fit: contain;
+}
+
+.pesanan-item-info {
+    flex: 1;
+}
+
+.pesanan-item-info h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 2px;
+}
+
+.pesanan-item-info p {
+    font-size: 0.72rem;
+    color: var(--text-light);
+}
+
+.pesanan-item-price {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* Payment Details */
+.pesanan-payment-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.payment-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-medium);
+    padding: 4px 0;
+}
+
+.payment-line.total {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    margin-top: 4px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--text-dark);
+}
+
+/* ===== RIGHT SIDE CARDS ===== */
+.pesanan-section-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.pesanan-section-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pesanan-section-card h3 i {
+    color: var(--green-dark);
+}
+
+/* Address */
+.address-info strong {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.address-info p {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 4px;
+}
+
+.phone-number {
+    margin-top: 10px;
+    color: var(--green-dark) !important;
+    font-weight: 500;
+}
+
+.phone-number i {
+    margin-right: 6px;
+}
+
+/* Courier */
+.courier-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.courier-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.courier-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.courier-info strong {
+    display: block;
+    font-size: 0.88rem;
+}
+
+.courier-role {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
+
+.courier-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-courier {
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.btn-chat {
+    background: var(--green-dark);
+    color: white;
+    border: none;
+}
+
+.btn-chat:hover {
+    background: var(--green-primary);
+}
+
+.btn-call {
+    background: white;
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+}
+
+.btn-call:hover {
+    border-color: var(--green-dark);
+    color: var(--green-dark);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .pesanan-grid { grid-template-columns: 1fr; }
+    .tracking-stepper { flex-wrap: wrap; padding: 16px; gap: 8px; }
+    .track-line { max-width: 30px; }
+}
+
+@media (max-width: 768px) {
+    .pesanan-page { padding: 16px; }
+    .pesanan-title { font-size: 1.3rem; }
+    .pesanan-header-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .status-banner { flex-direction: column; }
+    .status-banner-img { width: 100%; height: 160px; }
+    .tracking-stepper { overflow-x: auto; }
+}

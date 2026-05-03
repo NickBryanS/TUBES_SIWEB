@@ -1,0 +1,481 @@
+/* ===== PRODUK DETAIL PAGE ===== */
+.produk-page {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+.produk-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: flex-start;
+}
+
+/* ===== IMAGES ===== */
+.produk-images {
+    position: sticky;
+    top: 96px;
+}
+
+.produk-main-image {
+    background: var(--cream);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.produk-main-image img {
+    max-height: 350px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.5s ease;
+}
+
+.produk-main-image:hover img {
+    transform: scale(1.05);
+}
+
+.produk-thumbnails {
+    display: flex;
+    gap: 10px;
+}
+
+.thumb {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--cream);
+    padding: 6px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thumb img {
+    max-height: 55px;
+    width: auto;
+    object-fit: contain;
+}
+
+.thumb:hover {
+    border-color: var(--green-light);
+}
+
+.thumb.active {
+    border-color: var(--green-dark);
+    box-shadow: 0 0 0 2px rgba(45,90,39,0.15);
+}
+
+/* ===== DETAILS ===== */
+.produk-details {
+    padding-top: 8px;
+}
+
+.produk-badge-label {
+    display: inline-block;
+    background: var(--green-dark);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.produk-name {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+}
+
+.produk-desc-short {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+/* ===== PRICE ===== */
+.produk-price-section {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+}
+
+.price-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.price-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.price-unit {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--text-light);
+}
+
+.price-right {
+    text-align: right;
+}
+
+.rating-display {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.rating-display i {
+    color: #f5a623;
+}
+
+.review-count {
+    font-size: 0.75rem;
+    color: var(--text-light);
+}
+
+/* ===== CALENDAR ===== */
+.calendar-section {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.calendar-header h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.calendar-nav {
+    display: flex;
+    gap: 6px;
+}
+
+.cal-nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--text-medium);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.cal-nav-btn:hover {
+    background: var(--cream);
+    border-color: var(--green-dark);
+    color: var(--green-dark);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+
+.cal-day-header {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-light);
+    padding: 6px 0;
+}
+
+.cal-day {
+    font-size: 0.8rem;
+    padding: 8px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-dark);
+}
+
+.cal-day:hover:not(.disabled) {
+    background: var(--cream);
+}
+
+.cal-day.disabled {
+    color: var(--text-muted);
+    cursor: default;
+}
+
+.cal-day.selected {
+    background: var(--green-dark);
+    color: white;
+    border-radius: 0;
+}
+
+.cal-day.selected:first-of-type,
+.cal-day.selected.active {
+    border-radius: 8px;
+}
+
+.cal-day.active {
+    background: var(--green-dark);
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* ===== QUANTITY ===== */
+.qty-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.qty-label {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px 8px;
+}
+
+.qty-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--text-medium);
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+}
+
+.qty-btn:hover {
+    background: var(--green-dark);
+    color: white;
+}
+
+.qty-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.btn-add-cart {
+    width: 100%;
+    padding: 14px;
+    background: var(--green-dark);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 10px;
+}
+
+.btn-add-cart:hover {
+    background: var(--green-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(45,90,39,0.3);
+}
+
+.btn-wishlist {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.btn-wishlist:hover {
+    border-color: var(--red-soft);
+    color: var(--red-soft);
+}
+
+/* ===== SPECS ===== */
+.specs-section {
+    margin-bottom: 28px;
+}
+
+.specs-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+}
+
+.specs-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.spec-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+}
+
+.spec-key {
+    color: var(--text-light);
+}
+
+.spec-val {
+    font-weight: 500;
+    color: var(--text-dark);
+    text-align: right;
+}
+
+/* ===== FEATURES ===== */
+.features-section {
+    margin-bottom: 28px;
+}
+
+.features-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+}
+
+.feature-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 0.82rem;
+    color: var(--text-medium);
+    line-height: 1.6;
+}
+
+.feature-item i {
+    color: var(--green-accent);
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.feature-item strong {
+    color: var(--text-dark);
+}
+
+/* ===== WARRANTY ===== */
+.warranty-section {
+    display: flex;
+    gap: 14px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+}
+
+.warranty-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--green-dark);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.warranty-section h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.warranty-section p {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .produk-container {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+    .produk-images {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .produk-page {
+        padding: 16px;
+    }
+    .produk-name {
+        font-size: 1.5rem;
+    }
+    .produk-main-image {
+        min-height: 280px;
+    }
+}

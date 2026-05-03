@@ -1,0 +1,238 @@
+/* ===== RIWAYAT PAGE ===== */
+.riwayat-page {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+.riwayat-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.riwayat-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    margin-bottom: 28px;
+}
+
+/* ===== TABS ===== */
+.riwayat-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.riwayat-tab {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-medium);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.riwayat-tab:hover {
+    border-color: var(--green-dark);
+    color: var(--green-dark);
+}
+
+.riwayat-tab.active {
+    background: var(--green-dark);
+    color: white;
+    border-color: var(--green-dark);
+}
+
+/* ===== TRANSACTION CARDS ===== */
+.riwayat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.riwayat-card {
+    display: flex;
+    gap: 20px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    transition: var(--transition);
+}
+
+.riwayat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.riwayat-card-image {
+    width: 160px;
+    min-width: 160px;
+    height: 140px;
+    background: var(--cream);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.riwayat-card-image img {
+    max-height: 110px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.4s ease;
+}
+
+.riwayat-card:hover .riwayat-card-image img {
+    transform: scale(1.05);
+}
+
+.riwayat-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.riwayat-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.riwayat-ref {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+
+.riwayat-card-content h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.riwayat-items {
+    font-size: 0.78rem;
+    color: var(--text-light);
+}
+
+.riwayat-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-waiting {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.status-admin {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.status-done-badge {
+    background: #e8f5e9;
+    color: var(--green-dark);
+}
+
+.riwayat-card-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.riwayat-price-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.riwayat-price {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.riwayat-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-riwayat {
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+.btn-pay {
+    background: var(--green-dark);
+    color: white;
+    border: none;
+}
+
+.btn-pay:hover {
+    background: var(--green-primary);
+    transform: translateY(-1px);
+}
+
+.btn-extend {
+    background: var(--green-dark);
+    color: white;
+    border: none;
+}
+
+.btn-extend:hover {
+    background: var(--green-primary);
+}
+
+.btn-detail {
+    background: white;
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+}
+
+.btn-detail:hover {
+    border-color: var(--green-dark);
+    color: var(--green-dark);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .riwayat-page { padding: 16px; }
+    .riwayat-card { flex-direction: column; }
+    .riwayat-card-image { width: 100%; height: 160px; }
+    .riwayat-card-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .riwayat-title { font-size: 1.5rem; }
+    .riwayat-tabs { flex-wrap: wrap; }
+}
