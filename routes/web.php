@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -22,22 +23,26 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 });
 
-Route::get('/checkout', function () {
-    return view('checkout');
-});
+/*
+|--------------------------------------------------------------------------
+| Order & Transaction Routes (OrderController)
+|--------------------------------------------------------------------------
+| TODO: Tambahkan middleware('auth') saat sistem login sudah tersedia.
+| Contoh: Route::middleware('auth')->group(function () { ... });
+|
+*/
 
-Route::get('/pembayaran', function () {
-    return view('pembayaran');
-});
+// Checkout
+Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
 
-Route::get('/konfirmasi', function () {
-    return view('konfirmasi');
-});
+// Pembayaran
+Route::get('/pembayaran/{id}', [OrderController::class, 'pembayaran'])->name('pembayaran');
+Route::post('/pembayaran/{id}/upload', [OrderController::class, 'uploadBukti'])->name('pembayaran.upload');
 
-Route::get('/riwayat', function () {
-    return view('riwayat');
-});
+// Konfirmasi
+Route::get('/konfirmasi/{id}', [OrderController::class, 'konfirmasi'])->name('konfirmasi');
 
-Route::get('/pesanan/{id}', function ($id) {
-    return view('pesanan-detail');
-});
+// Riwayat & Detail
+Route::get('/riwayat', [OrderController::class, 'riwayat'])->name('riwayat');
+Route::get('/pesanan/{id}', [OrderController::class, 'detail'])->name('pesanan.detail');
