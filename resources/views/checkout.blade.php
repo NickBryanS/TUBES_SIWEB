@@ -179,7 +179,7 @@
 
 @section('scripts')
 <script>
-document.querySelectorAll('input[name="method"]').forEach(function(radio) {
+document.querySelectorAll('input[name="metode_pengambilan"]').forEach(function(radio) {
     radio.addEventListener('change', function() {
         document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
         this.closest('.method-card').classList.add('selected');
