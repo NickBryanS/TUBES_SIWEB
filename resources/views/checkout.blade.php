@@ -15,10 +15,9 @@
 
         <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST">
             @csrf
-            <!-- Hidden inputs to pass validation since they are not on this page -->
+            <!-- Hidden inputs untuk tanggal sewa -->
             <input type="hidden" name="tanggal_mulai" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
             <input type="hidden" name="tanggal_selesai" value="{{ \Carbon\Carbon::now()->addDays($carts->max('days') ?? 1)->format('Y-m-d') }}">
-            <input type="hidden" name="metode_pembayaran" value="transfer_bank">
         </form>
 
         <div class="checkout-grid">

@@ -10,7 +10,7 @@
                 <span>1</span>
             @endif
         </div>
-        <span class="step-label">RINGKASAN</span>
+        <span class="step-label">PEMESANAN</span>
     </div>
     <div class="step-line {{ $currentStep > 1 ? 'active-line' : '' }}"></div>
     <div class="step {{ $currentStep >= 2 ? ($currentStep > 2 ? 'completed' : 'active') : '' }}">
