@@ -9,10 +9,19 @@
             <li><a href="/riwayat" class="nav-link @yield('nav-rental')">Rental</a></li>
         </ul>
         <div class="nav-icons" id="nav-icons">
+            <a href="/wishlist" class="nav-icon" aria-label="Wishlist" style="position: relative; margin-right: 15px;">
+                <i class="far fa-heart"></i>
+                @php
+                    $userId = \Illuminate\Support\Facades\Auth::id() ?? 1;
+                    $wishlistCount = \App\Models\Wishlist::where('user_id', $userId)->count();
+                @endphp
+                @if($wishlistCount > 0)
+                    <span style="position: absolute; top: -5px; right: -10px; background-color: #e63946; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; line-height: 1;">{{ $wishlistCount }}</span>
+                @endif
+            </a>
             <a href="/keranjang" class="nav-icon" aria-label="Cart" style="position: relative;">
                 <i class="fas fa-shopping-cart"></i>
                 @php
-                    $userId = \Illuminate\Support\Facades\Auth::id() ?? 1;
                     $cartCount = \App\Models\Cart::where('user_id', $userId)->sum('quantity');
                 @endphp
                 @if($cartCount > 0)

@@ -13,6 +13,14 @@
         {{-- STEPPER (partial) --}}
         @include('partials.checkout-stepper', ['currentStep' => 1])
 
+        <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST">
+            @csrf
+            <!-- Hidden inputs to pass validation since they are not on this page -->
+            <input type="hidden" name="tanggal_mulai" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+            <input type="hidden" name="tanggal_selesai" value="{{ \Carbon\Carbon::now()->addDays($carts->max('days') ?? 1)->format('Y-m-d') }}">
+            <input type="hidden" name="metode_pembayaran" value="transfer_bank">
+        </form>
+
         <div class="checkout-grid">
             <!-- LEFT -->
             <div class="checkout-left">
@@ -20,37 +28,28 @@
                 <div class="checkout-section">
                     <h3 class="checkout-section-title"><i class="fas fa-box"></i> Item Sewa</h3>
                     
+                    @foreach($carts as $cart)
                     <div class="checkout-item">
                         <div class="checkout-item-img">
-                            <img src="{{ asset('images/tent-expedition.png') }}" alt="Alpine Summit Tent 4P">
+                            <img src="{{ $cart->product->url_gambar ?? asset('images/default.png') }}" alt="{{ $cart->product->nama_produk }}">
                         </div>
                         <div class="checkout-item-info">
-                            <h4>Alpine Summit Tent 4P</h4>
-                            <p class="item-period">Sewa: 3 Hari</p>
-                            <p class="item-price">Rp 750.000</p>
+                            <h4>{{ $cart->product->nama_produk }}</h4>
+                            <p class="item-period">Sewa: {{ $cart->days }} Hari</p>
+                            <p class="item-price">Rp {{ number_format($cart->product->harga_sewa * $cart->quantity * $cart->days, 0, ',', '.') }}</p>
                         </div>
                         <div class="item-qty-controls">
-                            <button class="qty-sm-btn"><i class="fas fa-minus"></i></button>
-                            <span>1</span>
-                            <button class="qty-sm-btn"><i class="fas fa-plus"></i></button>
+                            <form action="{{ route('cart.update', $cart->id) }}" method="POST" style="display:flex; align-items:center; gap:5px; margin:0;">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="days" value="{{ $cart->days }}">
+                                <button type="submit" name="quantity" value="{{ max(1, $cart->quantity - 1) }}" class="qty-sm-btn"><i class="fas fa-minus"></i></button>
+                                <span>{{ $cart->quantity }}</span>
+                                <button type="submit" name="quantity" value="{{ $cart->quantity + 1 }}" class="qty-sm-btn"><i class="fas fa-plus"></i></button>
+                            </form>
                         </div>
                     </div>
-
-                    <div class="checkout-item">
-                        <div class="checkout-item-img">
-                            <img src="{{ asset('images/backpack-product.png') }}" alt="Terrain Master 65L Pack">
-                        </div>
-                        <div class="checkout-item-info">
-                            <h4>Terrain Master 65L Pack</h4>
-                            <p class="item-period">Sewa: 3 Hari</p>
-                            <p class="item-price">Rp 500.000</p>
-                        </div>
-                        <div class="item-qty-controls">
-                            <button class="qty-sm-btn"><i class="fas fa-minus"></i></button>
-                            <span>1</span>
-                            <button class="qty-sm-btn"><i class="fas fa-plus"></i></button>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
 
                 <!-- METHOD -->
@@ -58,7 +57,7 @@
                     <h3 class="checkout-section-title">Metode Pemenuhan</h3>
                     <div class="method-options">
                         <label class="method-card" id="method-deliver">
-                            <input type="radio" name="method" value="deliver">
+                            <input type="radio" name="metode_pengambilan" value="deliver" form="checkout-form">
                             <div class="method-content">
                                 <i class="fas fa-truck"></i>
                                 <div>
@@ -68,7 +67,7 @@
                             </div>
                         </label>
                         <label class="method-card selected" id="method-pickup">
-                            <input type="radio" name="method" value="pickup" checked>
+                            <input type="radio" name="metode_pengambilan" value="pickup" checked form="checkout-form">
                             <div class="method-content">
                                 <i class="fas fa-store"></i>
                                 <div>
@@ -98,11 +97,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">NAMA PENERIMA</label>
-                            <input type="text" class="form-input" value="John Doe" id="nama-penerima">
+                            <input type="text" class="form-input" value="John Doe" id="nama-penerima" form="checkout-form">
                         </div>
                         <div class="form-group">
                             <label class="form-label">NOMOR HP</label>
-                            <input type="text" class="form-input" value="0812.5456.7890" id="nomor-hp">
+                            <input type="text" class="form-input" value="0812.5456.7890" id="nomor-hp" form="checkout-form">
                         </div>
                     </div>
                 </div>
@@ -113,16 +112,16 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">NAMA LENGKAP</label>
-                            <input type="text" class="form-input" value="John Doe">
+                            <input type="text" class="form-input" value="John Doe" form="checkout-form">
                         </div>
                         <div class="form-group">
                             <label class="form-label">NOMOR HP</label>
-                            <input type="text" class="form-input" value="0812.5456.7890">
+                            <input type="text" class="form-input" value="0812.5456.7890" form="checkout-form">
                         </div>
                     </div>
                     <div class="form-group full-width">
                         <label class="form-label">ALAMAT LENGKAP</label>
-                        <textarea class="form-textarea" rows="3">Jl. Rimba No. 12, Jakarta Selatan</textarea>
+                        <textarea class="form-textarea" name="alamat_pengiriman" rows="3" form="checkout-form">Jl. Rimba No. 12, Jakarta Selatan</textarea>
                     </div>
                 </div>
 
@@ -144,7 +143,7 @@
                     <h3>Ringkasan Pesanan</h3>
                     <div class="summary-line">
                         <span>Subtotal Alat</span>
-                        <span>Rp 1.250.000</span>
+                        <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
                     <div class="summary-line">
                         <span>Ongkos Kirim</span>
@@ -156,7 +155,7 @@
                     </div>
                     <div class="summary-total-line">
                         <span>Total Pembayaran</span>
-                        <span class="summary-total-price">Rp 1.250.000</span>
+                        <span class="summary-total-price">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
                     
                     <div class="return-notice">
@@ -164,9 +163,9 @@
                         <span>Pastikan wajib mengembalikan alat dalam keadaan bersih sesuai jadwal.</span>
                     </div>
 
-                    <a href="/pembayaran" class="btn-proceed" id="btn-proceed">
+                    <button type="submit" form="checkout-form" class="btn-proceed" id="btn-proceed" style="width: 100%; border: none; cursor: pointer;">
                         LANJUT KE PEMBAYARAN
-                    </a>
+                    </button>
                 </div>
 
                 <div class="secure-badge">
