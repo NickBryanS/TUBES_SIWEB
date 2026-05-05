@@ -15,9 +15,12 @@ Route::get('/produk/{id}', function ($id) {
     return view('produk-detail');
 });
 
-Route::get('/keranjang', function () {
-    return view('keranjang');
-});
+use App\Http\Controllers\CartController;
+
+Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
+Route::post('/keranjang/{product}', [CartController::class, 'store'])->name('cart.store');
+Route::put('/keranjang/{cart}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/keranjang/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
