@@ -21,24 +21,52 @@ class CartController extends Controller
     {
         $userId = Auth::id() ?? 1;
         
-        // Cek quantity, jika tidak ada dikirim, set default 1
         $quantity = $request->input('quantity', 1);
+        $days = $request->input('days', 1);
 
         $cart = Cart::where('user_id', $userId)->where('product_id', $product->id)->first();
 
         if ($cart) {
             $cart->update([
-                'quantity' => $cart->quantity + $quantity
+                'quantity' => $cart->quantity + $quantity,
+                'days' => $days // Update to latest requested days
             ]);
         } else {
             Cart::create([
                 'user_id' => $userId,
                 'product_id' => $product->id,
-                'quantity' => $quantity
+                'quantity' => $quantity,
+                'days' => $days
             ]);
         }
 
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
+    }
+
+    public function directCheckout(Request $request, Product $product)
+    {
+        $userId = Auth::id() ?? 1;
+        
+        $quantity = $request->input('quantity', 1);
+        $days = $request->input('days', 1);
+
+        $cart = Cart::where('user_id', $userId)->where('product_id', $product->id)->first();
+
+        if ($cart) {
+            $cart->update([
+                'quantity' => $cart->quantity + $quantity,
+                'days' => $days
+            ]);
+        } else {
+            Cart::create([
+                'user_id' => $userId,
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+                'days' => $days
+            ]);
+        }
+
+        return redirect()->route('checkout');
     }
 
     public function update(Request $request, Cart $cart)
@@ -50,12 +78,16 @@ class CartController extends Controller
         }
 
         $request->validate([
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
+            'days' => 'nullable|integer|min:1'
         ]);
 
-        $cart->update([
-            'quantity' => $request->quantity
-        ]);
+        $updateData = ['quantity' => $request->quantity];
+        if ($request->has('days')) {
+            $updateData['days'] = $request->days;
+        }
+
+        $cart->update($updateData);
 
         return redirect()->back()->with('success', 'Jumlah produk berhasil diupdate!');
     }

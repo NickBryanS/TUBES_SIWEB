@@ -24,7 +24,7 @@
             @php $totalPrice = 0; @endphp
 
             @forelse($carts as $cart)
-                @php $totalPrice += $cart->product->harga_sewa * $cart->quantity; @endphp
+                @php $totalPrice += $cart->product->harga_sewa * $cart->quantity * $cart->days; @endphp
                 <!-- Item {{ $cart->id }} -->
                 <div class="cart-item" id="cart-item-{{ $cart->id }}">
                     <div class="cart-item-image">
@@ -35,6 +35,7 @@
                             <div>
                                 <h3>{{ $cart->product->nama_produk }}</h3>
                                 <p class="cart-item-variant">{{ $cart->product->category->nama_kategori ?? 'Umum' }}</p>
+                                <p class="cart-item-date" style="font-size: 12px; color: #6c757d; margin-top: 5px;"><i class="fas fa-calendar"></i> Durasi Sewa: {{ $cart->days }} Hari</p>
                             </div>
                             <form action="{{ route('cart.destroy', $cart->id) }}" method="POST">
                                 @csrf
@@ -47,11 +48,12 @@
                                 @csrf
                                 @method('PUT')
                                 <input type="number" name="quantity" value="{{ $cart->quantity }}" min="1" max="{{ $cart->product->stok_tersedia }}" style="width: 60px; padding: 5px; text-align: center; border: 1px solid #ddd; border-radius: 4px;">
+                                <input type="hidden" name="days" value="{{ $cart->days }}">
                                 <button type="submit" style="background: none; border: none; color: #4361ee; cursor: pointer; font-size: 14px; font-weight: 600;"><i class="fas fa-sync-alt"></i> Update</button>
                             </form>
                             <div class="cart-item-price" style="text-align: right;">
-                                <span class="price-current" style="font-weight: bold; font-size: 1.1rem; color: #2b2d42;">Rp {{ number_format($cart->product->harga_sewa * $cart->quantity, 0, ',', '.') }}</span><br>
-                                <span class="price-period" style="font-size: 0.85rem; color: #8d99ae;">({{ $cart->quantity }} x Rp {{ number_format($cart->product->harga_sewa, 0, ',', '.') }})</span>
+                                <span class="price-current" style="font-weight: bold; font-size: 1.1rem; color: #2b2d42;">Rp {{ number_format($cart->product->harga_sewa * $cart->quantity * $cart->days, 0, ',', '.') }}</span><br>
+                                <span class="price-period" style="font-size: 0.85rem; color: #8d99ae;">({{ $cart->quantity }} unit x {{ $cart->days }} hari x Rp {{ number_format($cart->product->harga_sewa, 0, ',', '.') }})</span>
                             </div>
                         </div>
                     </div>

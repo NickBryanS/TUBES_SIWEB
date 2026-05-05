@@ -28,20 +28,15 @@ class OrderController extends Controller
      */
     public function checkout()
     {
-        // Ambil data keranjang dari session (format: [product_id => jumlah])
-        $cart = session('cart', []);
+        $userId = $this->getUserId();
+        $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
 
-        // Ambil data produk yang ada di keranjang
-        $items = Product::whereIn('id', array_keys($cart))->get();
-
-        // Hitung subtotal
         $subtotal = 0;
-        foreach ($items as $item) {
-            $item->jumlah = $cart[$item->id] ?? 1;
-            $subtotal += $item->harga_sewa * $item->jumlah;
+        foreach ($carts as $cart) {
+            $subtotal += $cart->product->harga_sewa * $cart->quantity * $cart->days;
         }
 
-        return view('checkout', compact('items', 'subtotal'));
+        return view('checkout', compact('carts', 'subtotal'));
     }
 
     /**
@@ -59,26 +54,21 @@ class OrderController extends Controller
             'metode_pembayaran'  => 'required|in:transfer_bank,qris,bayar_di_toko',
         ]);
 
-        // Ambil keranjang dari session
-        $cart = session('cart', []);
+        // Ambil keranjang dari database
+        $userId = $this->getUserId();
+        $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
 
-        if (empty($cart)) {
+        if ($carts->isEmpty()) {
             return redirect()->back()->with('error', 'Keranjang belanja kosong.');
         }
 
-        $userId = $this->getUserId();
-
         // Gunakan DB transaction untuk menjaga konsistensi data
-        $transaction = DB::transaction(function () use ($request, $cart, $userId) {
-
-            // Ambil produk dari database
-            $products = Product::whereIn('id', array_keys($cart))->get();
+        $transaction = DB::transaction(function () use ($request, $carts, $userId) {
 
             // Hitung total biaya
             $totalBiaya = 0;
-            foreach ($products as $product) {
-                $jumlah = $cart[$product->id] ?? 1;
-                $totalBiaya += $product->harga_sewa * $jumlah;
+            foreach ($carts as $cart) {
+                $totalBiaya += $cart->product->harga_sewa * $cart->quantity * $cart->days;
             }
 
             // 1. Simpan transaksi utama
@@ -93,11 +83,11 @@ class OrderController extends Controller
             ]);
 
             // 2. Simpan detail transaksi (setiap item di keranjang)
-            foreach ($products as $product) {
+            foreach ($carts as $cart) {
                 TransactionDetail::create([
                     'transaction_id' => $transaction->id,
-                    'product_id'     => $product->id,
-                    'jumlah'         => $cart[$product->id] ?? 1,
+                    'product_id'     => $cart->product_id,
+                    'jumlah'         => $cart->quantity,
                 ]);
             }
 
@@ -113,7 +103,7 @@ class OrderController extends Controller
         });
 
         // Kosongkan keranjang setelah checkout berhasil
-        session()->forget('cart');
+        \App\Models\Cart::where('user_id', $userId)->delete();
 
         // Redirect ke halaman konfirmasi
         return redirect()->route('konfirmasi', $transaction->id)

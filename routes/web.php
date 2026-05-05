@@ -11,16 +11,23 @@ Route::get('/katalog', function () {
     return view('katalog');
 });
 
-Route::get('/produk/{id}', function ($id) {
-    return view('produk-detail');
-});
-
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\WishlistController;
+use App\Models\Product;
 
 Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
 Route::post('/keranjang/{product}', [CartController::class, 'store'])->name('cart.store');
+Route::post('/keranjang/{product}/checkout', [CartController::class, 'directCheckout'])->name('cart.directCheckout');
 Route::put('/keranjang/{cart}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/keranjang/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
+
+Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+// Product Detail page mapping
+Route::get('/produk/{product}', function (Product $product) {
+    return view('produk-detail', compact('product'));
+})->name('produk.detail');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
