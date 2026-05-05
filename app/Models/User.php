@@ -28,6 +28,8 @@ class User extends Authenticatable
         'status_verifikasi',
         'dokumen_identitas',
         'status_akun',
+        'google_id',
+        'avatar',
     ];
 
     /**

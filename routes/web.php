@@ -1,11 +1,33 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Google OAuth (Socialite)
+Route::get('/auth/google', [SocialiteController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return view('home');
 });
@@ -15,49 +37,45 @@ Route::get('/katalog', function () {
     return view('katalog', compact('products'));
 });
 
-
-
-Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
-Route::post('/keranjang/{product}', [CartController::class, 'store'])->name('cart.store');
-Route::post('/keranjang/{product}/checkout', [CartController::class, 'directCheckout'])->name('cart.directCheckout');
-Route::put('/keranjang/{cart}', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/keranjang/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
-
-Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-
 // Product Detail page mapping
 Route::get('/produk/{product}', function (Product $product) {
     return view('produk-detail', compact('product'));
 })->name('produk.detail');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-});
-
 /*
 |--------------------------------------------------------------------------
-| Order & Transaction Routes (OrderController)
+| Authenticated Routes (dilindungi middleware auth)
 |--------------------------------------------------------------------------
-| TODO: Tambahkan middleware('auth') saat sistem login sudah tersedia.
-| Contoh: Route::middleware('auth')->group(function () { ... });
-|
 */
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
-// Step 1: Checkout (Pemesanan)
-Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
-Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+    Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/keranjang/{product}', [CartController::class, 'store'])->name('cart.store');
+    Route::post('/keranjang/{product}/checkout', [CartController::class, 'directCheckout'])->name('cart.directCheckout');
+    Route::put('/keranjang/{cart}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/keranjang/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
 
-// Step 2: Pembayaran (Metode Pembayaran)
-Route::get('/pembayaran', [OrderController::class, 'pembayaran'])->name('pembayaran');
-Route::post('/pembayaran', [OrderController::class, 'storePembayaran'])->name('pembayaran.store');
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
-// Upload bukti pembayaran (dari halaman terpisah / upload ulang)
-Route::post('/pembayaran/{id}/upload', [OrderController::class, 'uploadBukti'])->name('pembayaran.upload');
+    // Step 1: Checkout (Pemesanan)
+    Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
 
-// Step 3: Konfirmasi
-Route::get('/konfirmasi/{id}', [OrderController::class, 'konfirmasi'])->name('konfirmasi');
+    // Step 2: Pembayaran (Metode Pembayaran)
+    Route::get('/pembayaran', [OrderController::class, 'pembayaran'])->name('pembayaran');
+    Route::post('/pembayaran', [OrderController::class, 'storePembayaran'])->name('pembayaran.store');
 
-// Riwayat & Detail
-Route::get('/riwayat', [OrderController::class, 'riwayat'])->name('riwayat');
-Route::get('/pesanan/{id}', [OrderController::class, 'detail'])->name('pesanan.detail');
+    // Upload bukti pembayaran (dari halaman terpisah / upload ulang)
+    Route::post('/pembayaran/{id}/upload', [OrderController::class, 'uploadBukti'])->name('pembayaran.upload');
+
+    // Step 3: Konfirmasi
+    Route::get('/konfirmasi/{id}', [OrderController::class, 'konfirmasi'])->name('konfirmasi');
+
+    // Riwayat & Detail
+    Route::get('/riwayat', [OrderController::class, 'riwayat'])->name('riwayat');
+    Route::get('/pesanan/{id}', [OrderController::class, 'detail'])->name('pesanan.detail');
+});
