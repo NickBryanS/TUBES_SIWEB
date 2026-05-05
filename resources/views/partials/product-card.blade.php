@@ -24,7 +24,11 @@
                 <span class="katalog-price-label">SEWA PER HARI</span>
                 <span class="katalog-price">{{ $product['price'] }}</span>
             </div>
-            <button class="katalog-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+            <form action="{{ route('cart.store', $product['id'] ?? $product->id) }}" method="POST" style="margin:0;">
+                @csrf
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="katalog-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+            </form>
         </div>
     </div>
 </a>
