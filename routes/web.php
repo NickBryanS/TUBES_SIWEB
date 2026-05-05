@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\WishlistController;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,12 +11,11 @@ Route::get('/', function () {
 });
 
 Route::get('/katalog', function () {
-    return view('katalog');
+    $products = Product::with('category')->get();
+    return view('katalog', compact('products'));
 });
 
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\WishlistController;
-use App\Models\Product;
+
 
 Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
 Route::post('/keranjang/{product}', [CartController::class, 'store'])->name('cart.store');
