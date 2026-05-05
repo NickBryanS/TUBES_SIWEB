@@ -23,7 +23,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Tampilkan halaman checkout.
+     * Tampilkan halaman checkout (Step 1 - PEMESANAN).
      * Ambil data keranjang dari session dan tampilkan item beserta ringkasan.
      */
     public function checkout()
@@ -40,8 +40,8 @@ class OrderController extends Controller
     }
 
     /**
-     * Simpan transaksi baru (POST dari halaman checkout).
-     * Menyimpan data transaksi, detail item, dan membuat record pembayaran.
+     * Simpan data checkout ke session dan redirect ke halaman pembayaran (Step 2).
+     * Belum membuat transaksi — hanya menyimpan pilihan user sementara.
      */
     public function store(Request $request)
     {
@@ -51,35 +51,96 @@ class OrderController extends Controller
             'tanggal_selesai'    => 'required|date|after:tanggal_mulai',
             'metode_pengambilan' => 'required|in:pickup,deliver',
             'alamat_pengiriman'  => 'nullable|required_if:metode_pengambilan,deliver|string',
-            'metode_pembayaran'  => 'required|in:transfer_bank,qris,bayar_di_toko',
         ]);
+
+        // Simpan data checkout ke session (belum buat transaksi)
+        $request->session()->put('checkout_data', [
+            'tanggal_mulai'      => $request->tanggal_mulai,
+            'tanggal_selesai'    => $request->tanggal_selesai,
+            'metode_pengambilan' => $request->metode_pengambilan,
+            'alamat_pengiriman'  => $request->alamat_pengiriman,
+        ]);
+
+        // Redirect ke halaman pembayaran (Step 2)
+        return redirect()->route('pembayaran');
+    }
+
+    /**
+     * Tampilkan halaman pembayaran (Step 2 - PEMBAYARAN).
+     * Data diambil dari cart user + session checkout_data.
+     */
+    public function pembayaran(Request $request)
+    {
+        // Pastikan user sudah melalui step 1
+        if (!$request->session()->has('checkout_data')) {
+            return redirect()->route('checkout')->with('error', 'Silakan isi data pemesanan terlebih dahulu.');
+        }
+
+        $userId = $this->getUserId();
+        $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
+
+        if ($carts->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'Keranjang belanja kosong.');
+        }
+
+        $subtotal = 0;
+        foreach ($carts as $cart) {
+            $subtotal += $cart->product->harga_sewa * $cart->quantity * $cart->days;
+        }
+
+        $biayaAdmin = 2500;
+        $total = $subtotal + $biayaAdmin;
+
+        $checkoutData = $request->session()->get('checkout_data');
+
+        return view('pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'total', 'checkoutData'));
+    }
+
+    /**
+     * Proses pembayaran dan buat transaksi (POST dari halaman pembayaran Step 2).
+     * Di sinilah transaksi + detail + payment record benar-benar dibuat.
+     */
+    public function storePembayaran(Request $request)
+    {
+        // Validasi metode pembayaran
+        $request->validate([
+            'metode_pembayaran'  => 'required|in:transfer_bank,qris,bayar_di_toko',
+            'bukti_pembayaran'   => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
+
+        // Pastikan data checkout ada di session
+        $checkoutData = $request->session()->get('checkout_data');
+        if (!$checkoutData) {
+            return redirect()->route('checkout')->with('error', 'Sesi checkout telah berakhir. Silakan ulangi pemesanan.');
+        }
 
         // Ambil keranjang dari database
         $userId = $this->getUserId();
         $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
 
         if ($carts->isEmpty()) {
-            return redirect()->back()->with('error', 'Keranjang belanja kosong.');
+            return redirect()->route('cart.index')->with('error', 'Keranjang belanja kosong.');
         }
 
         // Gunakan DB transaction untuk menjaga konsistensi data
-        $transaction = DB::transaction(function () use ($request, $carts, $userId) {
+        $transaction = DB::transaction(function () use ($request, $carts, $userId, $checkoutData) {
 
             // Hitung total biaya
             $totalBiaya = 0;
             foreach ($carts as $cart) {
                 $totalBiaya += $cart->product->harga_sewa * $cart->quantity * $cart->days;
             }
+            $totalBiaya += 2500; // Biaya admin
 
             // 1. Simpan transaksi utama
             $transaction = Transaction::create([
                 'user_id'            => $userId,
-                'tanggal_mulai'      => $request->tanggal_mulai,
-                'tanggal_selesai'    => $request->tanggal_selesai,
+                'tanggal_mulai'      => $checkoutData['tanggal_mulai'],
+                'tanggal_selesai'    => $checkoutData['tanggal_selesai'],
                 'total_biaya'        => $totalBiaya,
                 'status_transaksi'   => 'menunggu',
-                'metode_pengambilan' => $request->metode_pengambilan,
-                'alamat_pengiriman'  => $request->alamat_pengiriman,
+                'metode_pengambilan' => $checkoutData['metode_pengambilan'],
+                'alamat_pengiriman'  => $checkoutData['alamat_pengiriman'],
             ]);
 
             // 2. Simpan detail transaksi (setiap item di keranjang)
@@ -91,38 +152,44 @@ class OrderController extends Controller
                 ]);
             }
 
-            // 3. Buat record pembayaran awal
+            // 3. Upload bukti pembayaran jika ada
+            $buktiPath = null;
+            if ($request->hasFile('bukti_pembayaran')) {
+                $buktiPath = $request->file('bukti_pembayaran')
+                                     ->store('bukti-pembayaran', 'public');
+            }
+
+            // 4. Buat record pembayaran
+            $statusPembayaran = 'menunggu';
+            if ($buktiPath) {
+                $statusPembayaran = 'menunggu_verifikasi';
+            }
+            if ($request->metode_pembayaran === 'bayar_di_toko') {
+                $statusPembayaran = 'menunggu';
+            }
+
             Payment::create([
                 'transaction_id'    => $transaction->id,
                 'metode_pembayaran' => $request->metode_pembayaran,
-                'status_pembayaran' => 'menunggu',
+                'status_pembayaran' => $statusPembayaran,
                 'jumlah_bayar'      => $totalBiaya,
+                'bukti_pembayaran'  => $buktiPath,
             ]);
 
             return $transaction;
         });
 
-        // Kosongkan keranjang setelah checkout berhasil
+        // Kosongkan keranjang dan session checkout setelah berhasil
         \App\Models\Cart::where('user_id', $userId)->delete();
+        $request->session()->forget('checkout_data');
 
-        // Redirect ke halaman konfirmasi
+        // Redirect ke halaman konfirmasi (Step 3)
         return redirect()->route('konfirmasi', $transaction->id)
                          ->with('success', 'Pesanan berhasil dibuat!');
     }
 
     /**
-     * Tampilkan halaman pembayaran untuk transaksi tertentu.
-     */
-    public function pembayaran($id)
-    {
-        $transaction = Transaction::with(['details.product', 'payment'])
-            ->findOrFail($id);
-
-        return view('pembayaran', compact('transaction'));
-    }
-
-    /**
-     * Upload bukti pembayaran (POST).
+     * Upload bukti pembayaran (POST) — untuk upload ulang dari halaman terpisah.
      */
     public function uploadBukti(Request $request, $id)
     {
@@ -157,7 +224,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Tampilkan halaman konfirmasi pesanan.
+     * Tampilkan halaman konfirmasi pesanan (Step 3 - SELESAI).
      */
     public function konfirmasi($id)
     {

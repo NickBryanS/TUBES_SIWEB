@@ -44,15 +44,18 @@ Route::get('/dashboard', function () {
 |
 */
 
-// Checkout
+// Step 1: Checkout (Pemesanan)
 Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
 Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
 
-// Pembayaran
-Route::get('/pembayaran/{id}', [OrderController::class, 'pembayaran'])->name('pembayaran');
+// Step 2: Pembayaran (Metode Pembayaran)
+Route::get('/pembayaran', [OrderController::class, 'pembayaran'])->name('pembayaran');
+Route::post('/pembayaran', [OrderController::class, 'storePembayaran'])->name('pembayaran.store');
+
+// Upload bukti pembayaran (dari halaman terpisah / upload ulang)
 Route::post('/pembayaran/{id}/upload', [OrderController::class, 'uploadBukti'])->name('pembayaran.upload');
 
-// Konfirmasi
+// Step 3: Konfirmasi
 Route::get('/konfirmasi/{id}', [OrderController::class, 'konfirmasi'])->name('konfirmasi');
 
 // Riwayat & Detail
