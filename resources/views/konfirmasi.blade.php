@@ -4,11 +4,15 @@
 @section('nav-katalog', 'active')
 
 @section('styles')
+<link rel="stylesheet" href="{{ asset('css/checkout.css') }}">
 <link rel="stylesheet" href="{{ asset('css/konfirmasi.css') }}">
 @endsection
 
 @section('content')
 <div class="konfirmasi-page">
+    <!-- Stepper -->
+    @include('partials.checkout-stepper', ['currentStep' => 3])
+
     <!-- Background Mountain -->
     <div class="konfirmasi-hero">
         <img src="{{ asset('images/hero-mountains.png') }}" alt="Mountains" class="konfirmasi-bg">
