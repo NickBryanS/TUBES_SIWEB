@@ -78,4 +78,13 @@ Route::middleware('auth')->group(function () {
     // Riwayat & Detail
     Route::get('/riwayat', [OrderController::class, 'riwayat'])->name('riwayat');
     Route::get('/pesanan/{id}', [OrderController::class, 'detail'])->name('pesanan.detail');
+
+    // Perpanjangan Sewa (FR-USR-033)
+    Route::get('/pesanan/{id}/perpanjangan', [OrderController::class, 'formPerpanjangan'])->name('perpanjangan.form');
+    Route::post('/pesanan/{id}/perpanjangan', [OrderController::class, 'ajukanPerpanjangan'])->name('perpanjangan.store');
+    Route::post('/pesanan/{id}/perpanjangan/approve', [OrderController::class, 'approvePerpanjangan'])->name('perpanjangan.approve');
+    Route::post('/pesanan/{id}/perpanjangan/reject', [OrderController::class, 'rejectPerpanjangan'])->name('perpanjangan.reject');
+
+    // Konfirmasi Pengembalian & Denda (FR-USR-034)
+    Route::post('/pesanan/{id}/pengembalian', [OrderController::class, 'konfirmasiPengembalian'])->name('pesanan.pengembalian');
 });
