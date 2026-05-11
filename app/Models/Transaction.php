@@ -21,10 +21,17 @@ class Transaction extends Model
         'user_id',
         'tanggal_mulai',
         'tanggal_selesai',
+        'tanggal_kembali_aktual',
         'total_biaya',
+        'denda',
+        'perpanjangan_hari',
+        'status_perpanjangan',
         'status_transaksi',
         'metode_pengambilan',
         'alamat_pengiriman',
+        'foto_ktp',
+        'jenis_jaminan',
+        'status_jaminan',
     ];
 
     /**
@@ -35,9 +42,12 @@ class Transaction extends Model
     protected function casts(): array
     {
         return [
-            'tanggal_mulai'  => 'date',
-            'tanggal_selesai' => 'date',
-            'total_biaya'    => 'decimal:2',
+            'tanggal_mulai'          => 'date',
+            'tanggal_selesai'        => 'date',
+            'tanggal_kembali_aktual' => 'date',
+            'total_biaya'            => 'decimal:2',
+            'denda'                  => 'decimal:2',
+            'perpanjangan_hari'      => 'integer',
         ];
     }
 

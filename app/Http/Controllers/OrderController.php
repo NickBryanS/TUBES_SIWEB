@@ -9,6 +9,7 @@ use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -255,5 +256,190 @@ class OrderController extends Controller
             ->findOrFail($id);
 
         return view('pesanan-detail', compact('transaction'));
+    }
+
+    // =========================================================================
+    // FR-USR-034: LOGIKA KALKULASI DENDA KETERLAMBATAN
+    // =========================================================================
+
+    /**
+     * Helper: Hitung denda keterlambatan berdasarkan selisih hari.
+     * Rumus: 50% x harga_sewa_harian x jumlah_item x jumlah_hari_telat
+     *
+     * @param Transaction $transaction
+     * @param Carbon $tanggalKembali
+     * @return float
+     */
+    private function hitungDenda(Transaction $transaction, Carbon $tanggalKembali): float
+    {
+        $tanggalSelesai = Carbon::parse($transaction->tanggal_selesai);
+
+        // Jika dikembalikan tepat waktu atau lebih awal, tidak ada denda
+        if ($tanggalKembali->lte($tanggalSelesai)) {
+            return 0;
+        }
+
+        // Hitung jumlah hari keterlambatan
+        $hariTelat = $tanggalKembali->diffInDays($tanggalSelesai);
+
+        // Hitung total denda dari semua item
+        $totalDenda = 0;
+        $transaction->load('details.product');
+
+        foreach ($transaction->details as $detail) {
+            $hargaHarian = $detail->product->harga_sewa;
+            // Denda = 50% dari harga sewa harian per item per hari keterlambatan
+            $dendaPerItem = ($hargaHarian * 0.5) * $detail->jumlah * $hariTelat;
+            $totalDenda += $dendaPerItem;
+        }
+
+        return $totalDenda;
+    }
+
+    /**
+     * Konfirmasi pengembalian barang (POST).
+     * Mencatat tanggal kembali aktual dan menghitung denda otomatis.
+     */
+    public function konfirmasiPengembalian(Request $request, $id)
+    {
+        $request->validate([
+            'tanggal_kembali_aktual' => 'required|date|after_or_equal:' . now()->format('Y-m-d'),
+        ]);
+
+        $transaction = Transaction::with('details.product')->findOrFail($id);
+
+        // Pastikan transaksi dalam status yang benar (sedang berjalan)
+        if (!in_array($transaction->status_transaksi, ['diproses', 'dikirim'])) {
+            return redirect()->back()->with('error', 'Pesanan ini tidak dalam status yang bisa dikembalikan.');
+        }
+
+        $tanggalKembali = Carbon::parse($request->tanggal_kembali_aktual);
+        $denda = $this->hitungDenda($transaction, $tanggalKembali);
+
+        $transaction->update([
+            'tanggal_kembali_aktual' => $tanggalKembali,
+            'denda'                  => $denda,
+            'status_transaksi'       => 'selesai',
+        ]);
+
+        $message = 'Pengembalian barang berhasil dicatat.';
+        if ($denda > 0) {
+            $message .= ' Denda keterlambatan: Rp ' . number_format($denda, 0, ',', '.');
+        }
+
+        return redirect()->route('pesanan.detail', $transaction->id)
+                         ->with('success', $message);
+    }
+
+    // =========================================================================
+    // FR-USR-033: FITUR PERPANJANGAN SEWA
+    // =========================================================================
+
+    /**
+     * Tampilkan form perpanjangan sewa.
+     */
+    public function formPerpanjangan($id)
+    {
+        $transaction = Transaction::with(['details.product', 'payment'])
+            ->findOrFail($id);
+
+        // Hanya bisa diperpanjang jika status masih aktif
+        if (!in_array($transaction->status_transaksi, ['diproses', 'dikirim'])) {
+            return redirect()->back()->with('error', 'Pesanan ini tidak bisa diperpanjang.');
+        }
+
+        // Jika sudah ada pengajuan pending, tampilkan pesan
+        if ($transaction->status_perpanjangan === 'pending') {
+            return redirect()->back()->with('info', 'Pengajuan perpanjangan Anda sedang menunggu persetujuan admin.');
+        }
+
+        return view('perpanjangan', compact('transaction'));
+    }
+
+    /**
+     * User mengajukan perpanjangan sewa (POST).
+     * Menyimpan jumlah hari tambahan yang diminta ke database.
+     */
+    public function ajukanPerpanjangan(Request $request, $id)
+    {
+        $request->validate([
+            'perpanjangan_hari' => 'required|integer|min:1|max:30',
+        ]);
+
+        $transaction = Transaction::findOrFail($id);
+
+        // Pastikan transaksi milik user yang login
+        $userId = $this->getUserId();
+        if ($transaction->user_id !== $userId) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        // Pastikan status masih aktif
+        if (!in_array($transaction->status_transaksi, ['diproses', 'dikirim'])) {
+            return redirect()->back()->with('error', 'Pesanan ini tidak bisa diperpanjang.');
+        }
+
+        // Simpan pengajuan perpanjangan
+        $transaction->update([
+            'perpanjangan_hari'    => $request->perpanjangan_hari,
+            'status_perpanjangan'  => 'pending',
+        ]);
+
+        return redirect()->route('pesanan.detail', $transaction->id)
+                         ->with('success', 'Pengajuan perpanjangan ' . $request->perpanjangan_hari . ' hari berhasil dikirim. Menunggu persetujuan admin.');
+    }
+
+    /**
+     * Admin menyetujui perpanjangan sewa (POST).
+     * Mengupdate tanggal_selesai dan total_biaya sesuai hari tambahan.
+     */
+    public function approvePerpanjangan($id)
+    {
+        $transaction = Transaction::with('details.product')->findOrFail($id);
+
+        if ($transaction->status_perpanjangan !== 'pending') {
+            return redirect()->back()->with('error', 'Tidak ada pengajuan perpanjangan yang menunggu.');
+        }
+
+        $hariTambahan = $transaction->perpanjangan_hari;
+
+        // Hitung biaya tambahan dari semua item
+        $biayaTambahan = 0;
+        foreach ($transaction->details as $detail) {
+            $biayaTambahan += $detail->product->harga_sewa * $detail->jumlah * $hariTambahan;
+        }
+
+        // Update tanggal selesai dan total biaya
+        $tanggalSelesaiBaru = Carbon::parse($transaction->tanggal_selesai)
+                                    ->addDays($hariTambahan);
+
+        $transaction->update([
+            'tanggal_selesai'      => $tanggalSelesaiBaru,
+            'total_biaya'          => $transaction->total_biaya + $biayaTambahan,
+            'status_perpanjangan'  => 'approved',
+        ]);
+
+        return redirect()->route('pesanan.detail', $transaction->id)
+                         ->with('success', 'Perpanjangan ' . $hariTambahan . ' hari disetujui. Biaya tambahan: Rp ' . number_format($biayaTambahan, 0, ',', '.'));
+    }
+
+    /**
+     * Admin menolak perpanjangan sewa (POST).
+     */
+    public function rejectPerpanjangan($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+
+        if ($transaction->status_perpanjangan !== 'pending') {
+            return redirect()->back()->with('error', 'Tidak ada pengajuan perpanjangan yang menunggu.');
+        }
+
+        $transaction->update([
+            'perpanjangan_hari'    => 0,
+            'status_perpanjangan'  => 'rejected',
+        ]);
+
+        return redirect()->route('pesanan.detail', $transaction->id)
+                         ->with('info', 'Pengajuan perpanjangan ditolak.');
     }
 }
