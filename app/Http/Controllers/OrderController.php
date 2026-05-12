@@ -26,6 +26,41 @@ class OrderController extends Controller
     }
 
     /**
+     * Tampilkan halaman dashboard user.
+     * Menampilkan stats, sewa aktif, dan transaksi terakhir dari database.
+     */
+    public function dashboard()
+    {
+        $userId = $this->getUserId();
+
+        // Query semua transaksi milik user
+        $allTransactions = Transaction::where('user_id', $userId)
+            ->with(['details.product', 'payment'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Stats
+        $sewaAktif = $allTransactions->whereIn('status_transaksi', ['diproses', 'dikirim'])->count();
+        $totalPesanan = $allTransactions->count();
+        $selesai = $allTransactions->where('status_transaksi', 'selesai')->count();
+        $menungguBayar = $allTransactions->where('status_transaksi', 'menunggu')->count();
+
+        // Sewa aktif pertama (untuk section "Sedang Disewa")
+        $activeRental = $allTransactions->whereIn('status_transaksi', ['diproses', 'dikirim'])->first();
+
+        // Semua transaksi aktif (untuk tombol perpanjang)
+        $activeRentals = $allTransactions->whereIn('status_transaksi', ['diproses', 'dikirim']);
+
+        // 5 transaksi terakhir
+        $recentTransactions = $allTransactions->take(5);
+
+        return view('dashboard', compact(
+            'sewaAktif', 'totalPesanan', 'selesai', 'menungguBayar',
+            'activeRental', 'activeRentals', 'recentTransactions'
+        ));
+    }
+
+    /**
      * Tampilkan halaman checkout (Step 1 - PEMESANAN).
      * Ambil data keranjang dari session dan tampilkan item beserta ringkasan.
      */
@@ -268,6 +303,23 @@ class OrderController extends Controller
             ->findOrFail($id);
 
         return view('pesanan-detail', compact('transaction'));
+    }
+
+    /**
+     * Tampilkan nota digital (receipt) yang bisa di-print.
+     */
+    public function downloadNota($id)
+    {
+        $transaction = Transaction::with(['details.product', 'payment', 'user'])
+            ->findOrFail($id);
+
+        // Pastikan transaksi milik user yang login
+        $userId = $this->getUserId();
+        if ($transaction->user_id !== $userId) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        return view('nota', compact('transaction'));
     }
 
     /**
