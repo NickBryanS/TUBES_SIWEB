@@ -156,6 +156,11 @@
     color: var(--green-dark);
 }
 
+.status-cancelled-badge {
+    background: #ffebee;
+    color: #c62828;
+}
+
 .riwayat-card-bottom {
     display: flex;
     align-items: flex-end;

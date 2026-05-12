@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function () {
     // Riwayat & Detail
     Route::get('/riwayat', [OrderController::class, 'riwayat'])->name('riwayat');
     Route::get('/pesanan/{id}', [OrderController::class, 'detail'])->name('pesanan.detail');
+    Route::post('/pesanan/{id}/batal', [OrderController::class, 'batalkanPesanan'])->name('pesanan.batal');
 
     // Perpanjangan Sewa (FR-USR-033)
     Route::get('/pesanan/{id}/perpanjangan', [OrderController::class, 'formPerpanjangan'])->name('perpanjangan.form');

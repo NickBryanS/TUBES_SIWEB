@@ -294,6 +294,19 @@
                         </form>
                         @endif
 
+                        {{-- Tombol Batal Pesanan (FR-USR-026) --}}
+                        @if(in_array($transaction->status_transaksi, ['menunggu', 'menunggu_admin']))
+                        <form action="{{ route('pesanan.batal', $transaction->id) }}" method="POST"
+                              onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?');"
+                              style="margin: 0;">
+                            @csrf
+                            <button type="submit"
+                                    style="width: 100%; padding: 12px; background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #e74c3c; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-bottom: 10px;">
+                                <i class="fas fa-ban"></i> Batalkan Pesanan
+                            </button>
+                        </form>
+                        @endif
+
                         {{-- Kembali ke Riwayat --}}
                         <a href="{{ route('riwayat') }}"
                            style="display: block; text-align: center; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); border-radius: 10px; text-decoration: none; font-size: 0.9rem;">
