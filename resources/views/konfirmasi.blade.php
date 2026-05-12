@@ -33,65 +33,73 @@
             <div class="order-card-header">
                 <div>
                     <span class="order-card-label">NOMOR REFERENSI</span>
-                    <span class="order-card-ref">GK-2024-8891-AD <button class="copy-sm"><i class="far fa-copy"></i></button></span>
+                    <span class="order-card-ref">GK-{{ str_pad($transaction->id, 4, '0', STR_PAD_LEFT) }} <button class="copy-sm"><i class="far fa-copy"></i></button></span>
                 </div>
                 <div>
                     <span class="order-card-label">STATUS PESANAN</span>
-                    <span class="order-status-badge"><i class="fas fa-check-circle"></i> Terkonfirmasi</span>
+                    @if($transaction->status_transaksi === 'menunggu')
+                        <span class="order-status-badge" style="background: #fff3e0; color: #e65100;"><i class="fas fa-clock"></i> Menunggu Pembayaran</span>
+                    @elseif($transaction->status_transaksi === 'menunggu_admin')
+                        <span class="order-status-badge"><i class="fas fa-check-circle"></i> Menunggu Verifikasi</span>
+                    @else
+                        <span class="order-status-badge"><i class="fas fa-check-circle"></i> Terkonfirmasi</span>
+                    @endif
                 </div>
             </div>
 
             <h3 class="order-card-section-title">Daftar Item</h3>
 
-            <div class="order-item-row">
-                <div class="order-item-img">
-                    <img src="{{ asset('images/stove-product.png') }}" alt="Apex Carbon Trekking Poles">
-                </div>
-                <div class="order-item-info">
-                    <h4>Apex Carbon Trekking Poles</h4>
-                    <p>Sewa: 3 Hari (10 - 13 Nov)</p>
-                </div>
-                <div class="order-item-price-col">
-                    <span class="order-item-price">Rp 450.000</span>
-                    <span class="order-item-qty">Qty: 1</span>
-                </div>
-            </div>
+            @php
+                $subtotal = 0;
+                $durasi = $transaction->tanggal_mulai->diffInDays($transaction->tanggal_selesai);
+            @endphp
 
-            <div class="order-item-row">
-                <div class="order-item-img">
-                    <img src="{{ asset('images/tent-expedition.png') }}" alt="Summit Shield 4-Person Tent">
+            @foreach($transaction->details as $detail)
+                @php
+                    $itemTotal = $detail->product->harga_sewa * $detail->jumlah * $durasi;
+                    $subtotal += $itemTotal;
+                @endphp
+                <div class="order-item-row">
+                    <div class="order-item-img">
+                        <img src="{{ asset($detail->product->url_gambar ?? 'images/placeholder.png') }}" alt="{{ $detail->product->nama_produk }}">
+                    </div>
+                    <div class="order-item-info">
+                        <h4>{{ $detail->product->nama_produk }}</h4>
+                        <p>Sewa: {{ $durasi }} Hari ({{ $transaction->tanggal_mulai->format('d M') }} - {{ $transaction->tanggal_selesai->format('d M') }})</p>
+                    </div>
+                    <div class="order-item-price-col">
+                        <span class="order-item-price">Rp {{ number_format($itemTotal, 0, ',', '.') }}</span>
+                        <span class="order-item-qty">Qty: {{ $detail->jumlah }}</span>
+                    </div>
                 </div>
-                <div class="order-item-info">
-                    <h4>Summit Shield 4-Person Tent</h4>
-                    <p>Sewa: 3 Hari (10 - 13 Nov)</p>
-                </div>
-                <div class="order-item-price-col">
-                    <span class="order-item-price">Rp 1.200.000</span>
-                    <span class="order-item-qty">Qty: 1</span>
-                </div>
-            </div>
+            @endforeach
+
+            @php
+                $biayaAdmin = 2500;
+                $total = $transaction->total_biaya;
+            @endphp
 
             <div class="order-totals">
                 <div class="order-total-row">
                     <span>Subtotal</span>
-                    <span>Rp 1.650.000</span>
+                    <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                 </div>
                 <div class="order-total-row">
-                    <span>Biaya Layanan</span>
-                    <span>Rp 25.000</span>
+                    <span>Biaya Admin</span>
+                    <span>Rp {{ number_format($biayaAdmin, 0, ',', '.') }}</span>
                 </div>
                 <div class="order-total-row total-final">
                     <span>Total Pembayaran</span>
-                    <span>Rp 1.675.000</span>
+                    <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
                 </div>
             </div>
 
             <div class="order-actions">
-                <a href="/riwayat" class="btn-track-order">
+                <a href="{{ route('pesanan.detail', $transaction->id) }}" class="btn-track-order">
                     <i class="fas fa-search"></i> Lacak Pesanan Saya
                 </a>
-                <a href="#" class="btn-download-order">
-                    <i class="fas fa-download"></i> Unduh Konfirmasi Pemesanan
+                <a href="{{ route('riwayat') }}" class="btn-download-order">
+                    <i class="fas fa-history"></i> Lihat Riwayat
                 </a>
             </div>
 
@@ -102,3 +110,4 @@
     </div>
 </div>
 @endsection
+

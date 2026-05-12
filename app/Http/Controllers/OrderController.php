@@ -6,6 +6,8 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use App\Notifications\OrderStatusUpdated;
+use App\Notifications\RentalReminder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -151,6 +153,7 @@ class OrderController extends Controller
                     'product_id'     => $cart->product_id,
                     'jumlah'         => $cart->quantity,
                 ]);
+                $cart->product->decrement('stok_tersedia', $cart->quantity);
             }
 
             // 3. Upload bukti pembayaran jika ada
@@ -177,12 +180,19 @@ class OrderController extends Controller
                 'bukti_pembayaran'  => $buktiPath,
             ]);
 
+            // Update status transaksi jika bukti sudah diupload
+            if ($buktiPath) {
+                $transaction->update(['status_transaksi' => 'menunggu_admin']);
+            }
+
             return $transaction;
         });
 
         // Kosongkan keranjang dan session checkout setelah berhasil
         \App\Models\Cart::where('user_id', $userId)->delete();
         $request->session()->forget('checkout_data');
+
+        $transaction->user->notify(new OrderStatusUpdated($transaction));
 
         // Redirect ke halaman konfirmasi (Step 3)
         return redirect()->route('konfirmasi', $transaction->id)
@@ -220,6 +230,8 @@ class OrderController extends Controller
             'status_transaksi' => 'menunggu_admin',
         ]);
 
+        $transaction->user->notify(new OrderStatusUpdated($transaction));
+
         return redirect()->route('konfirmasi', $transaction->id)
                          ->with('success', 'Bukti pembayaran berhasil diunggah!');
     }
@@ -256,6 +268,37 @@ class OrderController extends Controller
             ->findOrFail($id);
 
         return view('pesanan-detail', compact('transaction'));
+    }
+
+    /**
+     * User membatalkan pesanan.
+     */
+    public function batalkanPesanan($id)
+    {
+        $transaction = Transaction::with('details.product', 'user')->findOrFail($id);
+
+        $userId = $this->getUserId();
+        if ($transaction->user_id !== $userId) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        if (!in_array($transaction->status_transaksi, ['menunggu', 'menunggu_admin'])) {
+            return redirect()->back()->with('error', 'Pesanan ini tidak dapat dibatalkan.');
+        }
+
+        // Kembalikan stok
+        foreach ($transaction->details as $detail) {
+            $detail->product->increment('stok_tersedia', $detail->jumlah);
+        }
+
+        $transaction->update([
+            'status_transaksi' => 'dibatalkan',
+        ]);
+
+        $transaction->user->notify(new OrderStatusUpdated($transaction));
+
+        return redirect()->route('pesanan.detail', $transaction->id)
+                         ->with('success', 'Pesanan berhasil dibatalkan.');
     }
 
     // =========================================================================
@@ -321,6 +364,8 @@ class OrderController extends Controller
             'denda'                  => $denda,
             'status_transaksi'       => 'selesai',
         ]);
+
+        $transaction->user->notify(new OrderStatusUpdated($transaction));
 
         $message = 'Pengembalian barang berhasil dicatat.';
         if ($denda > 0) {
