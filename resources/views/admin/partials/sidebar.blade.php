@@ -17,7 +17,7 @@
             <i class="fas fa-th-large"></i>
             <span>Dashboard</span>
         </a>
-        <a href="#" class="sidebar-link @yield('sidebar-inventaris')" id="nav-inventaris">
+        <a href="{{ route('admin.inventory.index') }}" class="sidebar-link @yield('sidebar-inventaris')" id="nav-inventaris">
             <i class="fas fa-boxes-stacked"></i>
             <span>Inventaris</span>
         </a>
@@ -42,10 +42,10 @@
     {{-- ADMIN PROFILE (bottom) --}}
     <div class="sidebar-profile">
         <div class="sidebar-avatar">
-            <span>A</span>
+            <span>{{ strtoupper(substr(Auth::user()->nama_lengkap ?? 'A', 0, 1)) }}</span>
         </div>
         <div class="sidebar-profile-info">
-            <span class="sidebar-profile-name">Garkadala Admin</span>
+            <span class="sidebar-profile-name">{{ Auth::user()->nama_lengkap ?? 'Administrator' }}</span>
             <span class="sidebar-profile-role">ADMINISTRATOR</span>
         </div>
     </div>

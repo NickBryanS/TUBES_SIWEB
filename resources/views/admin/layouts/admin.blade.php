@@ -38,6 +38,12 @@
                 <a href="#" class="btn-ekspor" id="btn-ekspor">
                     <i class="fas fa-download"></i> Ekspor Data
                 </a>
+                <form action="{{ route('admin.logout') }}" method="POST" style="display: inline-block;">
+                    @csrf
+                    <button type="submit" class="btn-logout" aria-label="Logout" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
             </div>
         </header>
 
