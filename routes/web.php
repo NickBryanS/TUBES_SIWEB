@@ -5,6 +5,7 @@ use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -87,4 +88,15 @@ Route::middleware('auth')->group(function () {
 
     // Konfirmasi Pengembalian & Denda (FR-USR-034)
     Route::post('/pesanan/{id}/pengembalian', [OrderController::class, 'konfirmasiPengembalian'])->name('pesanan.pengembalian');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Routes (terpisah dari user)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::post('/transaksi/{id}/approve', [AdminDashboardController::class, 'approveTransaksi'])->name('admin.transaksi.approve');
+    Route::post('/transaksi/{id}/reject', [AdminDashboardController::class, 'rejectTransaksi'])->name('admin.transaksi.reject');
 });
