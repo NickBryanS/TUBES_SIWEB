@@ -48,9 +48,7 @@ Route::get('/produk/{product}', function (Product $product) {
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [OrderController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
     Route::post('/keranjang/{product}', [CartController::class, 'store'])->name('cart.store');
@@ -78,6 +76,7 @@ Route::middleware('auth')->group(function () {
     // Riwayat & Detail
     Route::get('/riwayat', [OrderController::class, 'riwayat'])->name('riwayat');
     Route::get('/pesanan/{id}', [OrderController::class, 'detail'])->name('pesanan.detail');
+    Route::get('/pesanan/{id}/nota', [OrderController::class, 'downloadNota'])->name('pesanan.nota');
     Route::post('/pesanan/{id}/batal', [OrderController::class, 'batalkanPesanan'])->name('pesanan.batal');
 
     // Perpanjangan Sewa (FR-USR-033)
