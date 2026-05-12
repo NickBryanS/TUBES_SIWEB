@@ -6,6 +6,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\InventoryController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -95,8 +96,14 @@ Route::middleware('auth')->group(function () {
 | Admin Routes (terpisah dari user)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->prefix('admin')->group(function () {
+Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::post('/transaksi/{id}/approve', [AdminDashboardController::class, 'approveTransaksi'])->name('admin.transaksi.approve');
     Route::post('/transaksi/{id}/reject', [AdminDashboardController::class, 'rejectTransaksi'])->name('admin.transaksi.reject');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
+
+    // Inventory Routes (export & bulk-delete harus sebelum resource agar tidak konflik)
+    Route::get('/inventory/export', [InventoryController::class, 'export'])->name('admin.inventory.export');
+    Route::post('/inventory/bulk-delete', [InventoryController::class, 'bulkDelete'])->name('admin.inventory.bulk-delete');
+    Route::resource('inventory', InventoryController::class)->names('admin.inventory');
 });

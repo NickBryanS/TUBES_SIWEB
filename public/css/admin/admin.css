@@ -242,6 +242,28 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 .btn-ekspor:hover { background: var(--admin-green-light); transform: translateY(-1px); }
 
+.btn-logout {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 16px;
+    background: #c62828;
+    color: #fff;
+    border: none;
+    border-radius: var(--admin-radius-sm);
+    font-size: 0.82rem; font-weight: 600;
+    cursor: pointer;
+    transition: var(--admin-transition);
+    margin-left: 8px;
+}
+
+.btn-logout:hover {
+    background: #d32f2f;
+    transform: translateY(-1px);
+}
+
+.btn-logout:active {
+    transform: translateY(0);
+}
+
 /* ===== CONTENT AREA ===== */
 .admin-content {
     padding: 28px;
