@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\TransactionController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -106,4 +107,12 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::get('/inventory/export', [InventoryController::class, 'export'])->name('admin.inventory.export');
     Route::post('/inventory/bulk-delete', [InventoryController::class, 'bulkDelete'])->name('admin.inventory.bulk-delete');
     Route::resource('inventory', InventoryController::class)->names('admin.inventory');
+
+    // Transaksi Routes
+    Route::get('/transaksi', [TransactionController::class, 'index'])->name('admin.transaksi.index');
+    Route::get('/transaksi/{id}', [TransactionController::class, 'show'])->name('admin.transaksi.show');
+    Route::post('/transaksi/{id}/approve', [TransactionController::class, 'approve'])->name('admin.transaksi.approve');
+    Route::post('/transaksi/{id}/reject', [TransactionController::class, 'reject'])->name('admin.transaksi.reject');
+    Route::post('/transaksi/{id}/status', [TransactionController::class, 'updateStatus'])->name('admin.transaksi.status');
+    Route::post('/transaksi/{id}/lunas', [TransactionController::class, 'konfirmasiLunas'])->name('admin.transaksi.lunas');
 });
