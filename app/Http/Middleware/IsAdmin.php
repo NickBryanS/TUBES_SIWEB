@@ -23,7 +23,7 @@ class IsAdmin
 
         // Jika bukan admin, redirect ke admin login
         if (!Auth::check()) {
-            return redirect()->route('admin.login')
+            return redirect()->route('login')
                 ->with('error', 'Silakan login sebagai admin terlebih dahulu.');
         }
 
@@ -32,7 +32,7 @@ class IsAdmin
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login')
+        return redirect()->route('login')
             ->with('error', 'Anda tidak memiliki akses admin.');
     }
 }
