@@ -1,0 +1,933 @@
+/* ===== TRANSAKSI PAGE ===== */
+.transaksi-page { padding: 0; }
+
+/* ===== HEADER ===== */
+.transaksi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    gap: 20px;
+}
+
+.transaksi-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0f1419;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.02em;
+}
+
+.transaksi-subtitle {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ===== STAT CARDS ===== */
+.transaksi-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: #fff;
+    border: 1px solid #e8e5df;
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    border-color: transparent;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+.stat-icon-total {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    color: #2D5A27;
+}
+
+.stat-icon-pending {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    color: #e65100;
+}
+
+.stat-icon-active {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+}
+
+.stat-icon-revenue {
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    color: #6a1b9a;
+}
+
+.stat-info { flex: 1; }
+
+.stat-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #9ca3af;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #0f1419;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.stat-value-currency {
+    font-size: 1.15rem;
+}
+
+/* ===== CONTENT CARD ===== */
+.transaksi-content {
+    background: #fff;
+    border: 1px solid #e8e5df;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.transaksi-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0eeeb;
+    gap: 16px;
+}
+
+.transaksi-subtitle-2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f1419;
+    margin: 0;
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toolbar-filters { display: flex; gap: 10px; }
+.filter-group { display: flex; }
+
+.filter-select {
+    padding: 8px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    background: #fff;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: auto;
+}
+
+.filter-select:hover, .filter-select:focus {
+    border-color: #2D5A27;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.08);
+}
+
+/* ===== TABLE ===== */
+.transaksi-table-wrapper {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+}
+
+.transaksi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+}
+
+.transaksi-table thead { background: #fafaf8; }
+
+.transaksi-table th {
+    padding: 14px 18px;
+    text-align: left;
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid #e8e5df;
+    white-space: nowrap;
+}
+
+.transaksi-table tbody tr {
+    border-bottom: 1px solid #f3f1ed;
+    transition: background-color 0.15s ease;
+}
+
+.transaksi-table tbody tr:last-child { border-bottom: none; }
+.transaksi-table tbody tr:hover { background-color: #fafaf8; }
+
+.transaksi-table td {
+    padding: 16px 18px;
+    vertical-align: middle;
+    color: #374151;
+}
+
+/* Order ID */
+.order-id {
+    font-weight: 700;
+    color: #1a3a17;
+    font-size: 0.85rem;
+    font-family: 'Inter', monospace;
+}
+
+/* Customer Cell */
+.customer-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.customer-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+}
+
+.customer-name {
+    font-weight: 600;
+    color: #111827;
+    font-size: 0.88rem;
+    display: block;
+}
+
+/* Date */
+.date-range {
+    font-size: 0.84rem;
+    color: #374151;
+    line-height: 1.4;
+}
+
+.date-range small {
+    color: #9ca3af;
+    font-size: 0.72rem;
+}
+
+/* Price */
+.price-cell {
+    font-weight: 700;
+    color: #111827;
+}
+
+/* ===== STATUS BADGES ===== */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-menunggu {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+.status-menunggu .status-dot { background: #ea580c; }
+
+.status-diproses {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+.status-diproses .status-dot { background: #3b82f6; }
+
+.status-dikirim {
+    background: #f5f3ff;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+}
+.status-dikirim .status-dot { background: #7c3aed; }
+
+.status-selesai {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+.status-selesai .status-dot { background: #10b981; }
+
+.status-dibatalkan {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+.status-dibatalkan .status-dot { background: #ef4444; }
+
+/* Payment Badge */
+.pay-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pay-menunggu {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.pay-lunas {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.pay-ditolak {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ===== ACTION BUTTONS (table) ===== */
+.action-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 0.82rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+}
+
+.btn-action:hover { border-color: #d1d5db; }
+
+.btn-view-trx:hover {
+    background: #ecfdf5;
+    border-color: #10b981;
+    color: #059669;
+}
+
+.btn-approve:hover {
+    background: #ecfdf5;
+    border-color: #10b981;
+    color: #059669;
+}
+
+.btn-reject:hover {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #dc2626;
+}
+
+/* ===== PAGINATION ===== */
+.pagination-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid #f3f1ed;
+}
+
+.pagination-info {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.pagination {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #374151;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: #fff;
+}
+
+.page-link:hover {
+    background: #f9fafb;
+    border-color: #2D5A27;
+    color: #2D5A27;
+}
+
+.page-item.active .page-link {
+    background: #1a3a17;
+    border-color: #1a3a17;
+    color: #fff;
+}
+
+.page-item.disabled .page-link {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    color: #d1d5db;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+/* ================================================================ */
+/*  MODAL: DETAIL / VERIFIKASI TRANSAKSI                             */
+/* ================================================================ */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: flex-start;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 40px 20px;
+    overflow-y: auto;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 640px;
+    max-height: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    animation: modalSlideIn 0.3s ease;
+    margin: auto 0;
+}
+
+.modal-box-lg {
+    max-width: 580px;
+}
+
+@keyframes modalSlideIn {
+    from { transform: translateY(20px) scale(0.97); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Modal Header */
+.modal-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e8e5df;
+}
+
+.modal-box-header h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-box-header h3 i {
+    color: #2D5A27;
+}
+
+.modal-order-id {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+.modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-status-badge {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.modal-close-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 8px;
+    color: #6b7280;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+}
+
+.modal-close-btn:hover { background: #e5e7eb; color: #374151; }
+
+/* Modal Body */
+.modal-box-body {
+    padding: 0;
+    max-height: 65vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+}
+
+.modal-loading {
+    text-align: center;
+    padding: 48px 24px;
+    color: #9ca3af;
+}
+
+.modal-loading i { font-size: 1.5rem; margin-bottom: 12px; display: block; }
+
+/* Modal Sections */
+.modal-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0eeeb;
+}
+
+.modal-section:last-child { border-bottom: none; }
+
+.modal-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.modal-section-header h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-section-header h4 i {
+    color: #6b7280;
+    font-size: 0.82rem;
+}
+
+.modal-link {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #2D5A27;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.modal-link:hover { color: #3b7a34; text-decoration: underline; }
+
+/* Info Grid */
+.modal-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.modal-info-item {}
+
+.modal-info-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #9ca3af;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.modal-info-value {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* KTP Image */
+.modal-ktp-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f9fafb;
+    border: 1px solid #e8e5df;
+}
+
+.modal-ktp-image {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+.modal-ktp-placeholder {
+    text-align: center;
+    padding: 32px 20px;
+    color: #9ca3af;
+}
+
+.modal-ktp-placeholder i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.modal-ktp-placeholder p {
+    margin: 0;
+    font-size: 0.82rem;
+}
+
+/* Items List (Penyewaan) */
+.modal-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 1px solid #f0eeeb;
+}
+
+.modal-item-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #e8e5df;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+.modal-item-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.modal-item-name {
+    display: block;
+    font-weight: 700;
+    font-size: 0.84rem;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-item-meta {
+    display: block;
+    font-size: 0.72rem;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.modal-item-price {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #111827;
+    white-space: nowrap;
+}
+
+/* Delivery Row */
+.modal-delivery-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: #fafaf8;
+    border-radius: 8px;
+    border: 1px solid #f0eeeb;
+}
+
+.modal-delivery-label {
+    font-size: 0.78rem;
+    color: #6b7280;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.modal-delivery-value {
+    font-size: 0.82rem;
+    color: #111827;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.modal-delivery-value i { color: #2D5A27; }
+
+/* Modal Footer */
+.modal-box-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid #e8e5df;
+    background: #fafaf8;
+    border-radius: 0 0 16px 16px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.modal-footer-left {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.modal-footer-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1a3a17, #2D5A27);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2D5A27, #3b7a34);
+    box-shadow: 0 4px 12px rgba(45,90,39,0.25);
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #047857, #059669);
+    box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+    transform: translateY(-1px);
+}
+
+.btn-outline-danger {
+    background: #fff;
+    color: #dc2626;
+    border: 1.5px solid #fca5a5;
+}
+
+.btn-outline-danger:hover {
+    background: #fef2f2;
+    border-color: #ef4444;
+}
+
+.btn-outline-dark {
+    background: #fff;
+    color: #374151;
+    border: 1.5px solid #d1d5db;
+}
+
+.btn-outline-dark:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+/* ===== TOAST ===== */
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    border-left: 4px solid #10b981;
+    font-size: 0.85rem;
+    font-weight: 500;
+    animation: toastIn 0.4s ease;
+    min-width: 280px;
+    transition: opacity 0.3s ease;
+}
+
+.toast-error { border-left-color: #ef4444; }
+
+@keyframes toastIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* ===== ANIMATIONS ===== */
+.stat-card, .transaksi-content {
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stat-card:nth-child(4) { animation-delay: 0.2s; }
+.transaksi-content { animation-delay: 0.25s; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .transaksi-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .transaksi-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .transaksi-stats { grid-template-columns: 1fr 1fr; }
+    .transaksi-toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar-filters { flex-direction: column; }
+    .pagination-wrapper { flex-direction: column; gap: 12px; }
+    .modal-box-lg { max-width: 100%; }
+    .modal-info-grid { grid-template-columns: 1fr; }
+    .modal-box-footer { flex-direction: column; }
+    .modal-footer-left, .modal-footer-right { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 576px) {
+    .transaksi-stats { grid-template-columns: 1fr; }
+    .customer-avatar { display: none; }
+}

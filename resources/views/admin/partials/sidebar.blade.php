@@ -21,7 +21,7 @@
             <i class="fas fa-boxes-stacked"></i>
             <span>Inventaris</span>
         </a>
-        <a href="#" class="sidebar-link @yield('sidebar-transaksi')" id="nav-transaksi">
+        <a href="{{ route('admin.transaksi.index') }}" class="sidebar-link @yield('sidebar-transaksi')" id="nav-transaksi">
             <i class="fas fa-receipt"></i>
             <span>Transaksi</span>
         </a>
