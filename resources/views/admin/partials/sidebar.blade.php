@@ -25,7 +25,7 @@
             <i class="fas fa-receipt"></i>
             <span>Transaksi</span>
         </a>
-        <a href="#" class="sidebar-link @yield('sidebar-pengguna')" id="nav-pengguna">
+        <a href="{{ route('admin.pengguna.index') }}" class="sidebar-link @yield('sidebar-pengguna')" id="nav-pengguna">
             <i class="fas fa-users"></i>
             <span>Pengguna</span>
         </a>
