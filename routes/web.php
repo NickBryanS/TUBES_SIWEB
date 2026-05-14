@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\ShippingController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -131,4 +132,9 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     // Notifikasi Routes
     Route::get('/notifikasi', [NotificationController::class, 'index'])->name('admin.notifikasi.index');
     Route::post('/notifikasi/mark-all-read', [NotificationController::class, 'markAllRead'])->name('admin.notifikasi.markAllRead');
+
+    // Pengiriman Routes
+    Route::get('/pengiriman', [ShippingController::class, 'index'])->name('admin.pengiriman.index');
+    Route::get('/pengiriman/{id}', [ShippingController::class, 'show'])->name('admin.pengiriman.show');
+    Route::post('/pengiriman/{id}/status', [ShippingController::class, 'updateStatus'])->name('admin.pengiriman.status');
 });
