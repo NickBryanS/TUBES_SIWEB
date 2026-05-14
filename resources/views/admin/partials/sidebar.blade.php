@@ -33,7 +33,7 @@
             <i class="fas fa-bell"></i>
             <span>Notifikasi</span>
         </a>
-        <a href="#" class="sidebar-link @yield('sidebar-pengiriman')" id="nav-pengiriman">
+        <a href="{{ route('admin.pengiriman.index') }}" class="sidebar-link @yield('sidebar-pengiriman')" id="nav-pengiriman">
             <i class="fas fa-truck"></i>
             <span>Pengiriman</span>
         </a>
