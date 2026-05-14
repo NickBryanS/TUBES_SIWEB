@@ -11,9 +11,17 @@ class AuthController extends Controller
 {
     /**
      * Tampilkan halaman login.
+     * Jika admin sudah login, langsung redirect ke admin dashboard.
      */
     public function showLoginForm()
     {
+        if (Auth::check()) {
+            if (Auth::user()->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect('/dashboard');
+        }
+
         return view('auth.login');
     }
 
@@ -56,9 +64,17 @@ class AuthController extends Controller
 
     /**
      * Tampilkan halaman register.
+     * Admin yang sudah login langsung redirect ke admin dashboard.
      */
     public function showRegisterForm()
     {
+        if (Auth::check()) {
+            if (Auth::user()->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect('/dashboard');
+        }
+
         return view('auth.register');
     }
 

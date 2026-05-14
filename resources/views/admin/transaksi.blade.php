@@ -46,13 +46,33 @@
                 <div class="stat-value">{{ number_format($sedangBerjalan) }}</div>
             </div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card stat-card-revenue" id="stat-revenue">
             <div class="stat-icon stat-icon-revenue">
                 <i class="fas fa-wallet"></i>
             </div>
             <div class="stat-info">
-                <div class="stat-label">PENDAPATAN BULAN INI</div>
-                <div class="stat-value stat-value-currency">Rp {{ number_format($pendapatanBulan, 0, ',', '.') }}</div>
+                <div class="stat-label-row">
+                    <span class="stat-label" id="revenue-label">
+                        PENDAPATAN {{ strtoupper($periodePendapatan === 'hari' ? 'HARI INI' : ($periodePendapatan === 'minggu' ? 'MINGGU INI' : 'BULAN INI')) }}
+                    </span>
+                    <div class="revenue-filter" id="revenue-filter">
+                        <button class="revenue-filter-btn" id="revenue-filter-btn" type="button" aria-label="Pilih periode">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="revenue-dropdown" id="revenue-dropdown">
+                            <button type="button" class="revenue-option {{ $periodePendapatan === 'hari' ? 'active' : '' }}" data-period="hari" data-value="{{ $pendapatanHari }}" data-label="PENDAPATAN HARI INI">
+                                <i class="fas fa-calendar-day"></i> Hari Ini
+                            </button>
+                            <button type="button" class="revenue-option {{ $periodePendapatan === 'minggu' ? 'active' : '' }}" data-period="minggu" data-value="{{ $pendapatanMinggu }}" data-label="PENDAPATAN MINGGU INI">
+                                <i class="fas fa-calendar-week"></i> Minggu Ini
+                            </button>
+                            <button type="button" class="revenue-option {{ $periodePendapatan === 'bulan' ? 'active' : '' }}" data-period="bulan" data-value="{{ $pendapatanBulan }}" data-label="PENDAPATAN BULAN INI">
+                                <i class="fas fa-calendar-alt"></i> Bulan Ini
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-value stat-value-currency" id="revenue-value">Rp {{ number_format($periodePendapatan === 'hari' ? $pendapatanHari : ($periodePendapatan === 'minggu' ? $pendapatanMinggu : $pendapatanBulan), 0, ',', '.') }}</div>
             </div>
         </div>
     </div>
@@ -259,6 +279,60 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+    // ── Revenue Period Filter (instant switch, no reload) ──
+    const revenueFilterBtn = document.getElementById('revenue-filter-btn');
+    const revenueDropdown = document.getElementById('revenue-dropdown');
+    const revenueLabel = document.getElementById('revenue-label');
+    const revenueValue = document.getElementById('revenue-value');
+
+    if (revenueFilterBtn && revenueDropdown) {
+        // Toggle dropdown
+        revenueFilterBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            revenueDropdown.classList.toggle('open');
+            revenueFilterBtn.classList.toggle('open');
+        });
+
+        // Option selection
+        document.querySelectorAll('.revenue-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const value = parseFloat(this.dataset.value) || 0;
+                const label = this.dataset.label;
+
+                // Update label
+                revenueLabel.textContent = label;
+
+                // Animate value change
+                revenueValue.style.transform = 'translateY(-4px)';
+                revenueValue.style.opacity = '0';
+                setTimeout(() => {
+                    revenueValue.textContent = 'Rp ' + value.toLocaleString('id-ID');
+                    revenueValue.style.transform = 'translateY(4px)';
+                    requestAnimationFrame(() => {
+                        revenueValue.style.transition = 'all 0.25s ease';
+                        revenueValue.style.transform = 'translateY(0)';
+                        revenueValue.style.opacity = '1';
+                    });
+                }, 150);
+
+                // Update active state
+                document.querySelectorAll('.revenue-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+
+                // Close dropdown
+                revenueDropdown.classList.remove('open');
+                revenueFilterBtn.classList.remove('open');
+            });
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function() {
+            revenueDropdown.classList.remove('open');
+            revenueFilterBtn.classList.remove('open');
+        });
+    }
 
     // ── Helpers ──
     function openModal(id) {

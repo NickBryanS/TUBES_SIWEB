@@ -31,6 +31,17 @@
     transform: translateY(-2px);
 }
 
+.stat-card-link {
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+}
+
+.stat-card-link:hover {
+    border-color: var(--admin-green-accent);
+    box-shadow: 0 4px 16px rgba(45, 90, 39, 0.12);
+}
+
 .stat-card-danger {
     background: #fff5f5;
     border-color: #fed7d7;

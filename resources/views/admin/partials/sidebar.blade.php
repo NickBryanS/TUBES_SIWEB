@@ -29,7 +29,7 @@
             <i class="fas fa-users"></i>
             <span>Pengguna</span>
         </a>
-        <a href="#" class="sidebar-link @yield('sidebar-notifikasi')" id="nav-notifikasi">
+        <a href="{{ route('admin.notifikasi.index') }}" class="sidebar-link @yield('sidebar-notifikasi')" id="nav-notifikasi">
             <i class="fas fa-bell"></i>
             <span>Notifikasi</span>
         </a>

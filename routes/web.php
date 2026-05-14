@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -30,28 +31,31 @@ Route::get('/auth/google/callback', [SocialiteController::class, 'handleGoogleCa
 /*
 |--------------------------------------------------------------------------
 | Public Routes
+| Admin yang sudah login akan otomatis redirect ke admin dashboard
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return view('home');
-});
+Route::middleware('redirect_if_admin')->group(function () {
+    Route::get('/', function () {
+        return view('home');
+    });
 
-Route::get('/katalog', function () {
-    $products = Product::with('category')->get();
-    return view('katalog', compact('products'));
-});
+    Route::get('/katalog', function () {
+        $products = Product::with('category')->get();
+        return view('katalog', compact('products'));
+    });
 
-// Product Detail page mapping
-Route::get('/produk/{product}', function (Product $product) {
-    return view('produk-detail', compact('product'));
-})->name('produk.detail');
+    // Product Detail page mapping
+    Route::get('/produk/{product}', function (Product $product) {
+        return view('produk-detail', compact('product'));
+    })->name('produk.detail');
+});
 
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes (dilindungi middleware auth)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
     Route::get('/dashboard', [OrderController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
@@ -123,4 +127,8 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::post('/pengguna/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('admin.pengguna.toggle-status');
     Route::post('/pengguna/{id}/verifikasi', [UserController::class, 'toggleVerifikasi'])->name('admin.pengguna.verifikasi');
     Route::delete('/pengguna/{id}', [UserController::class, 'destroy'])->name('admin.pengguna.destroy');
+
+    // Notifikasi Routes
+    Route::get('/notifikasi', [NotificationController::class, 'index'])->name('admin.notifikasi.index');
+    Route::post('/notifikasi/mark-all-read', [NotificationController::class, 'markAllRead'])->name('admin.notifikasi.markAllRead');
 });
