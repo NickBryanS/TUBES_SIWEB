@@ -36,7 +36,7 @@
             <div class="stat-label">PENYEWAAN AKTIF</div>
             <div class="stat-value">{{ $penyewaanAktif }} <span class="stat-value-unit">Pesanan</span></div>
         </div>
-        <div class="admin-stat-card">
+        <a href="{{ route('admin.transaksi.index', ['status' => 'menunggu']) }}" class="admin-stat-card stat-card-link">
             <div class="stat-card-top">
                 <div class="stat-icon stat-icon-teal"><i class="fas fa-shield-halved"></i></div>
                 @if($menungguVerifikasi > 0)
@@ -45,7 +45,7 @@
             </div>
             <div class="stat-label">MENUNGGU VERIFIKASI</div>
             <div class="stat-value">{{ $menungguVerifikasi }} <span class="stat-value-unit">Berkas</span></div>
-        </div>
+        </a>
         <div class="admin-stat-card stat-card-danger">
             <div class="stat-card-top">
                 <div class="stat-icon stat-icon-red"><i class="fas fa-triangle-exclamation"></i></div>
@@ -94,7 +94,7 @@
         <div class="admin-card action-card" id="action-card">
             <div class="card-header">
                 <h2 class="card-title">Transaksi Perlu Tindakan</h2>
-                <a href="#" class="card-link">Lihat Semua</a>
+                <a href="{{ route('admin.transaksi.index', ['status' => 'menunggu']) }}" class="card-link">Lihat Semua</a>
             </div>
             <table class="action-table" id="action-table">
                 <thead><tr><th>ID TRANSAKSI</th><th>PENYEWA</th><th>DURASI</th><th>STATUS</th><th>AKSI</th></tr></thead>
@@ -161,10 +161,10 @@
                 <div class="schedule-empty"><i class="fas fa-calendar-check"></i><p>Tidak ada jadwal pengembalian hari ini.</p></div>
                 @endforelse
             </div>
-            <button class="btn-verifikasi" id="btn-verifikasi">
+            <a href="{{ route('admin.transaksi.index') }}" class="btn-verifikasi" id="btn-verifikasi">
                 <span>Verifikasi Pengembalian Barang</span>
                 <div class="btn-verifikasi-icon"><i class="fas fa-plus"></i></div>
-            </button>
+            </a>
         </div>
     </div>
 </div>

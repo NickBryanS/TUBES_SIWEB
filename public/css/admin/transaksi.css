@@ -104,6 +104,118 @@
 
 .stat-value-currency {
     font-size: 1.15rem;
+    transition: all 0.25s ease;
+}
+
+/* ===== REVENUE PERIOD FILTER ===== */
+.stat-card-revenue {
+    position: relative;
+}
+
+.stat-label-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.stat-label-row .stat-label {
+    margin-bottom: 0;
+}
+
+.revenue-filter {
+    position: relative;
+}
+
+.revenue-filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fff;
+    color: #9ca3af;
+    font-size: 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.revenue-filter-btn:hover {
+    border-color: #6a1b9a;
+    color: #6a1b9a;
+    background: #f3e5f5;
+}
+
+.revenue-filter-btn.open {
+    border-color: #6a1b9a;
+    color: #6a1b9a;
+    background: #f3e5f5;
+    transform: rotate(180deg);
+}
+
+.revenue-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #fff;
+    border: 1px solid #e8e5df;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    min-width: 170px;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px) scale(0.97);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+.revenue-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.revenue-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: #374151;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.revenue-option:hover {
+    background: #f9f5ff;
+    color: #6a1b9a;
+}
+
+.revenue-option.active {
+    background: #f3e5f5;
+    color: #6a1b9a;
+    font-weight: 700;
+}
+
+.revenue-option i {
+    width: 16px;
+    text-align: center;
+    font-size: 0.78rem;
+}
+
+.revenue-option + .revenue-option {
+    border-top: 1px solid #f3f1ed;
 }
 
 /* ===== CONTENT CARD ===== */

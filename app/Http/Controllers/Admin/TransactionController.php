@@ -41,11 +41,24 @@ class TransactionController extends Controller
         $selesai = Transaction::where('status_transaksi', 'selesai')->count();
         $dibatalkan = Transaction::where('status_transaksi', 'dibatalkan')->count();
 
-        // Pendapatan bulan ini
-        $pendapatanBulan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
+        // Pendapatan (3 periode: hari ini, minggu ini, bulan ini)
+        $revenueBase = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai']);
+
+        $pendapatanHari = (clone $revenueBase)
+            ->whereDate('created_at', Carbon::today())
+            ->sum('total_biaya');
+
+        $pendapatanMinggu = (clone $revenueBase)
+            ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->sum('total_biaya');
+
+        $pendapatanBulan = (clone $revenueBase)
             ->whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
             ->sum('total_biaya');
+
+        // Periode aktif (dari query param, default: bulan)
+        $periodePendapatan = $request->get('periode', 'bulan');
 
         $transactions = $query->orderBy('created_at', 'desc')->paginate(10);
 
@@ -56,7 +69,10 @@ class TransactionController extends Controller
             'sedangBerjalan',
             'selesai',
             'dibatalkan',
-            'pendapatanBulan'
+            'pendapatanHari',
+            'pendapatanMinggu',
+            'pendapatanBulan',
+            'periodePendapatan'
         ));
     }
 
