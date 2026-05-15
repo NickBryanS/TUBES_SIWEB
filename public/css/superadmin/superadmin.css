@@ -1,0 +1,45 @@
+/* ===== SUPERADMIN GLOBAL OVERRIDES ===== */
+
+/* Sidebar bottom section */
+.sa-sidebar { display: flex; flex-direction: column; }
+.sa-sidebar .sidebar-nav { flex: 1; }
+
+.sa-sidebar-bottom {
+    border-top: 1px solid var(--admin-border);
+    padding-top: 12px; margin-top: auto;
+}
+
+.sa-sidebar-bottom form { display: block; }
+
+.sa-logout-link {
+    width: 100%; display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px; background: none; border: none;
+    color: var(--admin-text-lt); font-size: 0.85rem;
+    font-family: inherit; cursor: pointer; border-radius: 8px;
+    transition: var(--admin-transition);
+}
+
+.sa-logout-link:hover { background: rgba(0,0,0,0.04); color: #c62828; }
+
+.sa-logo-icon { background: #1a3a17 !important; }
+
+/* Topbar tweaks */
+.sa-crown-icon { color: #c8a951; font-size: 0.85rem; }
+
+.sa-topbar-label {
+    font-size: 0.72rem; font-weight: 700;
+    color: var(--admin-text-lt); letter-spacing: 0.08em;
+    margin-left: 6px;
+}
+
+.topbar-breadcrumb {
+    display: flex; align-items: center;
+    margin-right: 16px;
+}
+
+.sa-topbar-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #1a3a17; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.82rem; font-weight: 700;
+}

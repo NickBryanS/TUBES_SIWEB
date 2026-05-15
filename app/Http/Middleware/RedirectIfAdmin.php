@@ -18,6 +18,9 @@ class RedirectIfAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->isAdmin()) {
+            if (Auth::user()->isSuperAdmin()) {
+                return redirect()->route('superadmin.dashboard');
+            }
             return redirect()->route('admin.dashboard');
         }
 

@@ -33,6 +33,16 @@ class DatabaseSeeder extends Seeder
             'status_akun' => 'aktif',
         ]);
 
+        // Buat Super Admin (Pemilik)
+        User::create([
+            'nama_lengkap' => 'Pemilik GKDL',
+            'email' => 'superadmin@gmail.com',
+            'password' => Hash::make('super123'),
+            'peran' => 'superadmin',
+            'status_verifikasi' => true,
+            'status_akun' => 'aktif',
+        ]);
+
         $this->call([
             CategorySeeder::class,
             ProductSeeder::class,

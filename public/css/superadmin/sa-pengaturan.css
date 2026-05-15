@@ -1,0 +1,81 @@
+/* ===== SA PENGATURAN PAGE ===== */
+.sa-pengaturan { max-width: 1100px; }
+
+/* Header */
+.sa-set-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 20px; }
+.sa-set-label { font-size: 0.78rem; color: #6b7280; display: block; margin-bottom: 2px; }
+.sa-set-title { font-size: 1.5rem; font-weight: 800; color: #0f1419; margin: 0 0 4px; letter-spacing: -0.02em; }
+.sa-set-subtitle { font-size: 0.82rem; color: #6b7280; margin: 0; }
+.sa-set-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+/* Buttons */
+.sa-btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #1a3a17; color: #fff; border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+.sa-btn-primary:hover { background: #2D5A27; transform: translateY(-1px); }
+.sa-btn-sm { padding: 8px 14px; font-size: 0.78rem; }
+.sa-btn-secondary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #fff; color: #374151; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+.sa-btn-secondary:hover { border-color: #9ca3af; }
+.sa-btn-icon { width: 34px; height: 34px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #6b7280; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.sa-btn-icon:hover { border-color: #2D5A27; color: #2D5A27; }
+
+/* Cards / Sections */
+.sa-card { background: #fff; border: 1px solid #e8e5df; border-radius: 14px; padding: 24px; }
+.sa-set-section { margin-bottom: 20px; }
+.sa-set-section-title { font-size: 1rem; font-weight: 700; color: #0f1419; margin: 0 0 18px; display: flex; align-items: center; gap: 8px; }
+.sa-set-section-title i { color: #6b7280; font-size: 0.9rem; }
+.sa-set-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.sa-set-section-header .sa-set-section-title { margin-bottom: 0; }
+.sa-set-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* Forms */
+.sa-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sa-form-group { display: flex; flex-direction: column; }
+.sa-form-group.full { grid-column: 1 / -1; }
+.sa-form-label { font-size: 0.65rem; font-weight: 700; color: #9ca3af; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.sa-form-input { padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 0.85rem; font-family: inherit; color: #374151; background: #fafaf8; transition: all 0.2s; }
+.sa-form-input:focus { outline: none; border-color: #2D5A27; box-shadow: 0 0 0 3px rgba(45,90,39,0.08); }
+.sa-form-textarea { padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 0.85rem; font-family: inherit; color: #374151; background: #fafaf8; resize: vertical; }
+
+/* Counter */
+.sa-counter { display: flex; align-items: center; gap: 0; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; width: fit-content; }
+.sa-counter-btn { width: 36px; height: 36px; border: none; background: #f3f4f6; color: #374151; font-size: 1rem; cursor: pointer; transition: background 0.15s; font-family: inherit; }
+.sa-counter-btn:hover { background: #e5e7eb; }
+.sa-counter-val { width: 44px; text-align: center; font-size: 0.92rem; font-weight: 700; color: #111827; background: #fff; border-left: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; line-height: 36px; }
+
+/* Terms */
+.sa-terms-list { font-size: 0.78rem; color: #374151; line-height: 1.7; margin-bottom: 10px; }
+.sa-terms-list p { margin: 0 0 2px; }
+.sa-link-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: none; color: #2D5A27; font-size: 0.78rem; font-weight: 600; cursor: pointer; padding: 0; font-family: inherit; }
+.sa-link-btn:hover { text-decoration: underline; }
+
+/* Payment */
+.sa-pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.sa-check-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.sa-check-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #374151; cursor: pointer; }
+.sa-check-item input { accent-color: #2D5A27; width: 16px; height: 16px; }
+
+.sa-bank-card { background: linear-gradient(135deg, #2d3820, #1a3a17); border-radius: 14px; padding: 24px; color: #fff; position: relative; }
+.sa-bank-chip { font-size: 1.2rem; color: #c8a951; margin-bottom: 14px; }
+.sa-bank-label { font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; margin-bottom: 10px; }
+.sa-bank-number { font-size: 1.15rem; font-weight: 600; letter-spacing: 0.15em; margin-bottom: 14px; font-family: 'Inter', monospace; }
+.sa-bank-name { font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.8); letter-spacing: 0.06em; margin-bottom: 10px; }
+.sa-bank-status { font-size: 0.72rem; color: #8bc34a; display: flex; align-items: center; gap: 5px; }
+
+/* Team Table */
+.sa-team-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.sa-team-table thead { background: #fafaf8; }
+.sa-team-table th { padding: 12px 18px; text-align: left; font-weight: 600; color: #6b7280; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #e8e5df; }
+.sa-team-table td { padding: 16px 18px; border-bottom: 1px solid #f3f1ed; vertical-align: middle; }
+.sa-team-table tr:last-child td { border-bottom: none; }
+.sa-team-cell { display: flex; align-items: center; gap: 12px; }
+.sa-team-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+.sa-team-info { display: flex; flex-direction: column; }
+.sa-team-name { font-weight: 600; color: #111827; font-size: 0.85rem; }
+.sa-team-email { font-size: 0.72rem; color: #9ca3af; }
+.sa-team-role { display: inline-block; padding: 3px 10px; border-radius: 16px; font-size: 0.7rem; font-weight: 700; }
+.role-owner { background: #e8f5e9; color: #2D5A27; }
+.role-admin { background: #f3f4f6; color: #6b7280; }
+.sa-team-active { font-size: 0.82rem; color: #6b7280; }
+.sa-empty-text { text-align: center; color: #9ca3af; padding: 20px; font-size: 0.82rem; }
+
+/* Responsive */
+@media (max-width: 900px) { .sa-set-grid-2, .sa-pay-grid { grid-template-columns: 1fr; } .sa-set-header { flex-direction: column; } .sa-form-grid { grid-template-columns: 1fr; } }
