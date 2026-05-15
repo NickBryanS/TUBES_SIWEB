@@ -11,6 +11,9 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ShippingController;
+use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
+use App\Http\Controllers\SuperAdmin\LaporanController;
+use App\Http\Controllers\SuperAdmin\PengaturanController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -137,4 +140,16 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::get('/pengiriman', [ShippingController::class, 'index'])->name('admin.pengiriman.index');
     Route::get('/pengiriman/{id}', [ShippingController::class, 'show'])->name('admin.pengiriman.show');
     Route::post('/pengiriman/{id}/status', [ShippingController::class, 'updateStatus'])->name('admin.pengiriman.status');
+});
+
+/*
+|--------------------------------------------------------------------------
+| SuperAdmin Routes (Pemilik / Executive)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth', 'is_superadmin')->prefix('superadmin')->group(function () {
+    Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('superadmin.dashboard');
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('superadmin.laporan');
+    Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('superadmin.pengaturan');
+    Route::post('/pengaturan', [PengaturanController::class, 'update'])->name('superadmin.pengaturan.update');
 });

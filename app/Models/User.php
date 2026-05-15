@@ -57,11 +57,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Helper: cek apakah user adalah admin.
+     * Helper: cek apakah user adalah admin (termasuk superadmin).
      */
     public function isAdmin(): bool
     {
-        return $this->peran === 'admin';
+        return in_array($this->peran, ['admin', 'superadmin']);
+    }
+
+    /**
+     * Helper: cek apakah user adalah superadmin (pemilik).
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->peran === 'superadmin';
     }
 
     /**

@@ -46,6 +46,12 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
 
+            // Jika user adalah superadmin (pemilik), redirect ke executive dashboard
+            if ($user->isSuperAdmin()) {
+                return redirect()->intended('/superadmin/dashboard')
+                    ->with('success', 'Selamat datang, Pemilik!');
+            }
+
             // Jika user adalah admin, redirect ke admin dashboard
             if ($user->isAdmin()) {
                 return redirect()->intended('/admin/dashboard')
