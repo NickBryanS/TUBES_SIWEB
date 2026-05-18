@@ -38,6 +38,12 @@
                             <div style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">{{ Auth::user()->nama_lengkap ?? Auth::user()->email }}</div>
                             <div style="font-size:0.75rem;color:#9ca3af;margin-top:2px;">{{ Auth::user()->email }}</div>
                         </div>
+                        <a href="{{ route('user.profil') }}" style="display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:0.84rem;color:#374151;transition:background 0.2s;text-decoration:none;">
+                            <i class="fas fa-user-cog"></i> Profil & Pengaturan
+                        </a>
+                        <a href="{{ route('user.alamat') }}" style="display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:0.84rem;color:#374151;transition:background 0.2s;text-decoration:none;border-bottom:1px solid #f0f0f0;">
+                            <i class="fas fa-map-marker-alt"></i> Alamat Saya
+                        </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" style="width:100%;padding:12px 16px;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.84rem;color:#dc2626;font-family:inherit;transition:background 0.2s;">

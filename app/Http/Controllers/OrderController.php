@@ -36,7 +36,7 @@ class OrderController extends Controller
             $subtotal += $cart->product->harga_sewa * $cart->quantity * $cart->days;
         }
 
-        return view('checkout', compact('carts', 'subtotal'));
+        return view('user.checkout', compact('carts', 'subtotal'));
     }
 
     /**
@@ -93,7 +93,7 @@ class OrderController extends Controller
 
         $checkoutData = $request->session()->get('checkout_data');
 
-        return view('pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'total', 'checkoutData'));
+        return view('user.pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'total', 'checkoutData'));
     }
 
     /**
@@ -231,7 +231,7 @@ class OrderController extends Controller
         $transaction = Transaction::with(['details.product', 'payment'])
             ->findOrFail($id);
 
-        return view('konfirmasi', compact('transaction'));
+        return view('user.konfirmasi', compact('transaction'));
     }
 
     /**
@@ -243,7 +243,7 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('riwayat', compact('transactions'));
+        return view('user.riwayat', compact('transactions'));
     }
 
     /**
@@ -254,6 +254,6 @@ class OrderController extends Controller
         $transaction = Transaction::with(['details.product', 'payment', 'user'])
             ->findOrFail($id);
 
-        return view('pesanan-detail', compact('transaction'));
+        return view('user.pesanan-detail', compact('transaction'));
     }
 }

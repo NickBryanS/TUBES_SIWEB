@@ -14,7 +14,7 @@ class CartController extends Controller
     {
         $userId = Auth::id() ?? 1;
         $carts = Cart::where('user_id', $userId)->with('product')->get();
-        return view('keranjang', compact('carts'));
+        return view('user.keranjang', compact('carts'));
     }
 
     public function store(Request $request, Product $product)

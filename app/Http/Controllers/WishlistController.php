@@ -14,7 +14,7 @@ class WishlistController extends Controller
     {
         $userId = Auth::id() ?? 1;
         $wishlists = Wishlist::where('user_id', $userId)->with('product')->get();
-        return view('wishlist', compact('wishlists'));
+        return view('user.wishlist', compact('wishlists'));
     }
 
     public function toggle(Request $request, Product $product)
