@@ -16,9 +16,12 @@
             <h1 class="sa-lap-title">Ringkasan Performa Toko</h1>
         </div>
         <div class="sa-lap-actions">
-            <span class="sa-lap-status">Status Operasional:</span>
-            <button class="sa-export-btn" type="button"><i class="fas fa-file-excel"></i> Ekspor ke Excel</button>
-            <button class="sa-export-btn sa-export-pdf" type="button"><i class="fas fa-file-pdf"></i> Ekspor ke PDF</button>
+            <a href="{{ route('superadmin.laporan.excel', ['periode' => $periode]) }}" class="sa-export-btn">
+                <i class="fas fa-file-excel"></i> Ekspor Excel
+            </a>
+            <a href="{{ route('superadmin.laporan.pdf', ['periode' => $periode]) }}" target="_blank" class="sa-export-btn sa-export-pdf">
+                <i class="fas fa-file-pdf"></i> Ekspor PDF
+            </a>
         </div>
     </div>
 
@@ -114,9 +117,6 @@
                 @endforelse
             </tbody>
         </table>
-        <div class="sa-log-footer">
-            <a href="#" class="sa-link">LIHAT SEMUA LOG</a>
-        </div>
     </div>
 </div>
 @endsection

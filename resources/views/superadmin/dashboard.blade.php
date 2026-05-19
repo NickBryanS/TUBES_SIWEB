@@ -86,7 +86,7 @@
         </div>
     </div>
 
-    {{-- BOTTOM ROW: Fleet + Inventory Warning + Insight --}}
+    {{-- BOTTOM ROW: Fleet + Inventory Warning + Backup & Activities --}}
     <div class="sa-bottom-grid">
         <div class="sa-card sa-fleet-card">
             <div class="sa-card-header">
@@ -133,11 +133,42 @@
                 </div>
             </div>
 
-            <div class="sa-insight-card">
-                <div class="sa-insight-icon"><i class="fas fa-lightbulb"></i></div>
-                <h3 class="sa-insight-title">Business Insight</h3>
-                <p class="sa-insight-text">Pendapatan meningkat {{ abs($persenPendapatan) }}% di akhir pekan. Coba tambahkan paket di hari Sabtu untuk mendapatkan penyewaan lebih banyak dan optimalkan stok paling laris.</p>
-                <button class="sa-insight-btn" type="button">Lihat Rekomendasi</button>
+            {{-- DATABASE BACKUP & RECENT ACTIVITIES --}}
+            <div class="sa-backup-card">
+                <div class="sa-backup-header">
+                    <div class="sa-backup-icon"><i class="fas fa-database"></i></div>
+                    <div>
+                        <h3 class="sa-backup-title">Cadangan Database</h3>
+                        <p class="sa-backup-desc">Download file SQL backup seluruh data toko.</p>
+                    </div>
+                </div>
+                <form action="{{ route('superadmin.backup') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="sa-backup-btn">
+                        <i class="fas fa-download"></i> Download Backup SQL
+                    </button>
+                </form>
+            </div>
+
+            {{-- RECENT ACTIVITIES --}}
+            <div class="sa-card sa-recent-card">
+                <div class="sa-card-header">
+                    <h2 class="sa-card-title"><i class="fas fa-clock-rotate-left"></i> Aktivitas Terakhir</h2>
+                    <a href="{{ route('superadmin.activity-log') }}" class="sa-card-link">Lihat Semua</a>
+                </div>
+                <div class="sa-recent-list">
+                    @forelse($recentActivities as $act)
+                    <div class="sa-recent-item">
+                        <div class="sa-recent-dot"></div>
+                        <div class="sa-recent-info">
+                            <span class="sa-recent-desc">{{ Str::limit($act->deskripsi, 50) }}</span>
+                            <span class="sa-recent-time">{{ $act->created_at->diffForHumans() }} · {{ $act->user->nama_lengkap ?? 'System' }}</span>
+                        </div>
+                    </div>
+                    @empty
+                    <p class="sa-empty-text">Belum ada aktivitas.</p>
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>
@@ -225,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }, { threshold: 0.1 });
-    document.querySelectorAll('.sa-card, .sa-insight-card').forEach(c => {
+    document.querySelectorAll('.sa-card, .sa-insight-card, .sa-backup-card, .sa-recent-card').forEach(c => {
         c.style.opacity = '0'; c.style.transform = 'translateY(16px)'; obs.observe(c);
     });
 
