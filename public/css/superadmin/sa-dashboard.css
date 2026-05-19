@@ -90,6 +90,31 @@
 
 .sa-empty-text { font-size: 0.82rem; color: #9ca3af; text-align: center; padding: 20px 0; }
 
+/* Backup Card */
+.sa-backup-card { background: linear-gradient(135deg, #1a237e, #283593); border-radius: 14px; padding: 22px; color: #fff; position: relative; overflow: hidden; }
+.sa-backup-card::before { content: ''; position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+.sa-backup-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.sa-backup-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: #90caf9; flex-shrink: 0; }
+.sa-backup-title { font-size: 0.95rem; font-weight: 700; margin: 0 0 2px; }
+.sa-backup-desc { font-size: 0.72rem; color: rgba(255,255,255,0.6); margin: 0; }
+.sa-backup-btn { width: 100%; padding: 10px; border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.sa-backup-btn:hover { background: rgba(255,255,255,0.16); transform: translateY(-1px); }
+
+/* Recent Activities */
+.sa-recent-card { padding: 20px; }
+.sa-card-link { font-size: 0.75rem; font-weight: 600; color: #2D5A27; text-decoration: none; transition: color 0.2s; }
+.sa-card-link:hover { color: #1a3a17; text-decoration: underline; }
+.sa-card-header .sa-card-title i { color: #6b7280; font-size: 0.85rem; margin-right: 4px; }
+
+.sa-recent-list { display: flex; flex-direction: column; gap: 0; margin-top: 12px; }
+.sa-recent-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f3f1ed; position: relative; }
+.sa-recent-item:last-child { border-bottom: none; }
+.sa-recent-dot { width: 8px; height: 8px; border-radius: 50%; background: #2D5A27; flex-shrink: 0; margin-top: 6px; position: relative; }
+.sa-recent-item:not(:last-child) .sa-recent-dot::after { content: ''; position: absolute; top: 10px; left: 3px; width: 2px; height: calc(100% + 16px); background: #e8e5df; }
+.sa-recent-info { flex: 1; min-width: 0; }
+.sa-recent-desc { display: block; font-size: 0.78rem; font-weight: 500; color: #374151; line-height: 1.4; }
+.sa-recent-time { display: block; font-size: 0.68rem; color: #9ca3af; margin-top: 2px; }
+
 /* Responsive */
 @media (max-width: 1100px) { .sa-stats { grid-template-columns: repeat(2, 1fr); } .sa-middle-grid, .sa-bottom-grid { grid-template-columns: 1fr; } }
 @media (max-width: 768px) { .sa-stats { grid-template-columns: 1fr; } }

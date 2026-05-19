@@ -14,6 +14,8 @@ use App\Http\Controllers\Admin\ShippingController;
 use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\LaporanController;
 use App\Http\Controllers\SuperAdmin\PengaturanController;
+use App\Http\Controllers\SuperAdmin\ManajemenAdminController;
+use App\Http\Controllers\SuperAdmin\ActivityLogController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -149,7 +151,30 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
 */
 Route::middleware('auth', 'is_superadmin')->prefix('superadmin')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('superadmin.dashboard');
+    Route::post('/backup-database', [SuperAdminDashboardController::class, 'backupDatabase'])->name('superadmin.backup');
+
+    // Manajemen Admin (Staff)
+    Route::get('/admin', [ManajemenAdminController::class, 'index'])->name('superadmin.admin.index');
+    Route::post('/admin', [ManajemenAdminController::class, 'store'])->name('superadmin.admin.store');
+    Route::put('/admin/{id}', [ManajemenAdminController::class, 'update'])->name('superadmin.admin.update');
+    Route::delete('/admin/{id}', [ManajemenAdminController::class, 'destroy'])->name('superadmin.admin.destroy');
+    Route::post('/admin/{id}/toggle-status', [ManajemenAdminController::class, 'toggleStatus'])->name('superadmin.admin.toggle');
+
+    // Log Aktivitas (Audit Trail)
+    Route::get('/activity-log', [ActivityLogController::class, 'index'])->name('superadmin.activity-log');
+
+    // Laporan & Ekspor
     Route::get('/laporan', [LaporanController::class, 'index'])->name('superadmin.laporan');
+    Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('superadmin.laporan.pdf');
+    Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('superadmin.laporan.excel');
+
+    // Pengaturan
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('superadmin.pengaturan');
     Route::post('/pengaturan', [PengaturanController::class, 'update'])->name('superadmin.pengaturan.update');
+
+    // Pengaturan Pembayaran
+    Route::post('/pengaturan/payment', [PengaturanController::class, 'storePayment'])->name('superadmin.payment.store');
+    Route::put('/pengaturan/payment/{id}', [PengaturanController::class, 'updatePayment'])->name('superadmin.payment.update');
+    Route::delete('/pengaturan/payment/{id}', [PengaturanController::class, 'destroyPayment'])->name('superadmin.payment.destroy');
+    Route::post('/pengaturan/payment/{id}/toggle', [PengaturanController::class, 'togglePayment'])->name('superadmin.payment.toggle');
 });
