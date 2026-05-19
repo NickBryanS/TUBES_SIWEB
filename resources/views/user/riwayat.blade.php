@@ -24,58 +24,54 @@
         {{-- TRANSACTION LIST (using partial) --}}
         <div class="riwayat-list" id="riwayat-list">
             @php
-            $transactions = [
-                [
-                    'id' => 1, 'filterStatus' => 'active',
-                    'image' => 'images/tent-expedition.png',
-                    'ref' => 'GRK-20240521-199', 'name' => 'Paket Ekspedisi Everest Solo',
-                    'items' => 'Tenda Ultralight, Matras Angin, Sleeping Bag 0°C',
-                    'status' => 'Menunggu', 'statusClass' => 'status-waiting', 'statusIcon' => 'fas fa-clock',
-                    'price' => 'Rp 1.250.000',
-                    'actions' => [
-                        ['url' => '#', 'class' => 'btn-pay', 'label' => 'Bayar Sekarang'],
-                        ['url' => '/pesanan/1', 'class' => 'btn-detail', 'label' => 'Lihat Detail'],
-                    ]
-                ],
-                [
-                    'id' => 2, 'filterStatus' => 'active',
-                    'image' => 'images/backpack-product.png',
-                    'ref' => 'GRK-20240618-113', 'name' => 'Hiking Essentials Pack',
-                    'items' => 'Carrier 60L, Trekking Poles, Headlamp 600lm',
-                    'status' => 'Menunggu Admin', 'statusClass' => 'status-admin', 'statusIcon' => 'fas fa-hourglass-half',
-                    'price' => 'Rp 450.000',
-                    'actions' => [
-                        ['url' => '/pesanan/1', 'class' => 'btn-detail', 'label' => 'Lihat Detail'],
-                    ]
-                ],
-                [
-                    'id' => 3, 'filterStatus' => 'done',
-                    'image' => 'images/sleepingbag-product.png',
-                    'ref' => 'GRK-20240415-056', 'name' => 'Camping Weekend Set',
-                    'items' => 'Sleeping Bag, Matras, Hammock',
-                    'status' => 'Selesai', 'statusClass' => 'status-done-badge', 'statusIcon' => 'fas fa-check-circle',
-                    'price' => 'Rp 450.000',
-                    'actions' => [
-                        ['url' => '/riwayat', 'class' => 'btn-extend', 'label' => 'Perpanjang Sewa'],
-                        ['url' => '/pesanan/1', 'class' => 'btn-detail', 'label' => 'Lihat Detail'],
-                    ]
-                ],
-                [
-                    'id' => 4, 'filterStatus' => 'done',
-                    'image' => 'images/cooking-set.png',
-                    'ref' => 'GRK-20240415-096', 'name' => 'Cooking System Kit',
-                    'items' => 'Jetboil Stoves, Titanium Set, Fuel Canisters',
-                    'status' => 'Selesai', 'statusClass' => 'status-done-badge', 'statusIcon' => 'fas fa-check-circle',
-                    'price' => 'Rp 320.000',
-                    'actions' => [
-                        ['url' => '/riwayat', 'class' => 'btn-extend', 'label' => 'Perpanjang Sewa'],
-                        ['url' => '/pesanan/1', 'class' => 'btn-detail', 'label' => 'Lihat Detail'],
-                    ]
-                ],
-            ];
+            $mappedTransactions = [];
+            foreach($transactions as $t) {
+                $filterStatus = 'active';
+                if ($t->status_transaksi === 'selesai') $filterStatus = 'done';
+                if ($t->status_transaksi === 'dibatalkan') $filterStatus = 'cancelled';
+
+                $firstDetail = $t->details->first();
+                $image = $firstDetail && $firstDetail->product ? $firstDetail->product->url_gambar : 'images/placeholder.png';
+                $name = $firstDetail && $firstDetail->product ? $firstDetail->product->nama_produk : 'Pesanan';
+
+                $items = $t->details->map(function($d) {
+                    return $d->product ? $d->product->nama_produk . ' (x'.$d->jumlah.')' : 'Produk (x'.$d->jumlah.')';
+                })->implode(', ');
+
+                $statusMap = [
+                    'menunggu' => ['label' => 'Menunggu Pembayaran', 'class' => 'status-waiting', 'icon' => 'fas fa-clock'],
+                    'menunggu_admin' => ['label' => 'Menunggu Konfirmasi', 'class' => 'status-admin', 'icon' => 'fas fa-hourglass-half'],
+                    'diproses' => ['label' => 'Diproses', 'class' => 'status-admin', 'icon' => 'fas fa-box'],
+                    'dikirim' => ['label' => 'Dikirim / Bisa Diambil', 'class' => 'status-waiting', 'icon' => 'fas fa-truck'],
+                    'selesai' => ['label' => 'Selesai', 'class' => 'status-done-badge', 'icon' => 'fas fa-check-circle'],
+                    'dibatalkan' => ['label' => 'Dibatalkan', 'class' => 'status-cancelled-badge', 'icon' => 'fas fa-ban'],
+                ];
+
+                $statusInfo = $statusMap[$t->status_transaksi] ?? ['label' => str_replace('_', ' ', $t->status_transaksi), 'class' => 'status-waiting', 'icon' => 'fas fa-info-circle'];
+                
+                $actions = [];
+                if ($t->status_transaksi === 'menunggu') {
+                    $actions[] = ['url' => route('konfirmasi', $t->id), 'class' => 'btn-pay', 'label' => 'Bayar Sekarang'];
+                }
+                $actions[] = ['url' => route('pesanan.detail', $t->id), 'class' => 'btn-detail', 'label' => 'Lihat Detail'];
+
+                $mappedTransactions[] = [
+                    'id' => $t->id,
+                    'filterStatus' => $filterStatus,
+                    'image' => $image,
+                    'ref' => 'GK-' . str_pad($t->id, 4, '0', STR_PAD_LEFT),
+                    'name' => $name . ($t->details->count() > 1 ? ' + lainnya' : ''),
+                    'items' => $items,
+                    'status' => $statusInfo['label'],
+                    'statusClass' => $statusInfo['class'],
+                    'statusIcon' => $statusInfo['icon'],
+                    'price' => 'Rp ' . number_format($t->total_biaya + $t->denda, 0, ',', '.'),
+                    'actions' => $actions
+                ];
+            }
             @endphp
 
-            @foreach($transactions as $trx)
+            @foreach($mappedTransactions as $trx)
                 @include('partials.riwayat-card', ['trx' => $trx])
             @endforeach
         </div>

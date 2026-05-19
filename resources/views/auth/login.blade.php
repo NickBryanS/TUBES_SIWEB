@@ -136,6 +136,12 @@
                 <p class="auth-footer-text">
                     Belum punya akun? <a href="{{ url('/register') }}" class="auth-footer-link">Daftar di sini</a>
                 </p>
+
+                {{-- Admin Info --}}
+                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 12px; color: #999;">
+                    <i class="fas fa-shield-halved" style="color: #1a5f3f; margin-right: 4px;"></i>
+                    <span>Admin juga bisa login di halaman ini</span>
+                </div>
             </div>
 
             <div class="auth-copyright">

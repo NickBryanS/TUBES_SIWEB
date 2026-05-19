@@ -24,8 +24,14 @@
         <span class="step-label">PEMBAYARAN</span>
     </div>
     <div class="step-line {{ $currentStep > 2 ? 'active-line' : '' }}"></div>
-    <div class="step {{ $currentStep >= 3 ? 'active' : '' }}">
-        <div class="step-circle"><span>3</span></div>
+    <div class="step {{ $currentStep >= 3 ? 'completed' : '' }}">
+        <div class="step-circle">
+            @if($currentStep >= 3)
+                <i class="fas fa-check"></i>
+            @else
+                <span>3</span>
+            @endif
+        </div>
         <span class="step-label">SELESAI</span>
     </div>
 </div>

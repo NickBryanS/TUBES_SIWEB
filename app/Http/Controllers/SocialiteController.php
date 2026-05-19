@@ -57,6 +57,12 @@ class SocialiteController extends Controller
 
         Auth::login($user, true);
 
+        // Jika user adalah admin, redirect ke admin dashboard
+        if ($user->isAdmin()) {
+            return redirect('/admin/dashboard')
+                ->with('success', 'Selamat datang, Admin!');
+        }
+
         return redirect('/dashboard')
             ->with('success', 'Berhasil login dengan Google!');
     }

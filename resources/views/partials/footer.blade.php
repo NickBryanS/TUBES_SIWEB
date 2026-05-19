@@ -4,7 +4,7 @@
         <div class="footer-grid">
             <div class="footer-col">
                 <h3 class="footer-logo">Gardakala Outdoor</h3>
-                <p class="footer-address">Jl. Raya Soreang - Banjaran No.216, RT.021<br>RW.01 Cilucut, Kec. Cangkuang,<br>Kabupaten Bandung, Jawa Barat 40123</p>
+                <p class="footer-address">Jl. Raya Soreang - Banjaran No.216, RT.021<br>RW.01 Ciluncat, Kec. Cangkuang,<br>Kabupaten Bandung, Jawa Barat 40123</p>
             </div>
             <div class="footer-col">
                 <h4 class="footer-heading">Kontak Kami</h4>

@@ -11,9 +11,17 @@ class AuthController extends Controller
 {
     /**
      * Tampilkan halaman login.
+     * Jika admin sudah login, langsung redirect ke admin dashboard.
      */
     public function showLoginForm()
     {
+        if (Auth::check()) {
+            if (Auth::user()->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect('/dashboard');
+        }
+
         return view('auth.login');
     }
 
@@ -36,7 +44,21 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            $user = Auth::user();
 
+            // Jika user adalah superadmin (pemilik), redirect ke executive dashboard
+            if ($user->isSuperAdmin()) {
+                return redirect()->intended('/superadmin/dashboard')
+                    ->with('success', 'Selamat datang, Pemilik!');
+            }
+
+            // Jika user adalah admin, redirect ke admin dashboard
+            if ($user->isAdmin()) {
+                return redirect()->intended('/admin/dashboard')
+                    ->with('success', 'Selamat datang, Admin!');
+            }
+
+            // Jika user biasa, redirect ke user dashboard
             return redirect()->intended('/dashboard')
                 ->with('success', 'Selamat datang kembali!');
         }
@@ -48,9 +70,17 @@ class AuthController extends Controller
 
     /**
      * Tampilkan halaman register.
+     * Admin yang sudah login langsung redirect ke admin dashboard.
      */
     public function showRegisterForm()
     {
+        if (Auth::check()) {
+            if (Auth::user()->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect('/dashboard');
+        }
+
         return view('auth.register');
     }
 

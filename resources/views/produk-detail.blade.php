@@ -14,23 +14,11 @@
         <!-- LEFT: IMAGES -->
         <div class="produk-images">
             <div class="produk-main-image" id="main-product-image">
-                <img src="{{ asset('images/tent-expedition.png') }}" alt="Garkadala Expedition X-1" id="main-img">
+                <img src="{{ asset($product->url_gambar ?? 'images/placeholder.png') }}" alt="{{ $product->nama_produk }}" id="main-img">
             </div>
             <div class="produk-thumbnails">
                 <button class="thumb active" onclick="changeImage(this)">
-                    <img src="{{ asset('images/tent-expedition.png') }}" alt="View 1">
-                </button>
-                <button class="thumb" onclick="changeImage(this)">
-                    <img src="{{ asset('images/tent-product.png') }}" alt="View 2">
-                </button>
-                <button class="thumb" onclick="changeImage(this)">
-                    <img src="{{ asset('images/tent-expedition.png') }}" alt="View 3">
-                </button>
-                <button class="thumb" onclick="changeImage(this)">
-                    <img src="{{ asset('images/tent-product.png') }}" alt="View 4">
-                </button>
-                <button class="thumb" onclick="changeImage(this)">
-                    <img src="{{ asset('images/tent-expedition.png') }}" alt="View 5">
+                    <img src="{{ asset($product->url_gambar ?? 'images/placeholder.png') }}" alt="{{ $product->nama_produk }}">
                 </button>
             </div>
         </div>
@@ -135,22 +123,19 @@
             <div class="specs-section">
                 <h4 class="specs-title">Spesifikasi Teknik</h4>
                 <div class="specs-table">
+                    @php
+                        $specs = json_decode($product->spesifikasi_teknis ?? '{}', true) ?: [];
+                    @endphp
+                    @forelse($specs as $key => $val)
                     <div class="spec-row">
-                        <span class="spec-key">Kapasitas</span>
-                        <span class="spec-val">3-4 Orang</span>
+                        <span class="spec-key">{{ $key }}</span>
+                        <span class="spec-val">{{ $val }}</span>
                     </div>
+                    @empty
                     <div class="spec-row">
-                        <span class="spec-key">Berat Total</span>
-                        <span class="spec-val">3,8 kg</span>
+                        <span class="spec-key" style="color: var(--text-light);">Belum ada spesifikasi</span>
                     </div>
-                    <div class="spec-row">
-                        <span class="spec-key">Material Outer</span>
-                        <span class="spec-val">Ripstop Nylon 40D Sil-Poly</span>
-                    </div>
-                    <div class="spec-row">
-                        <span class="spec-key">Water Column</span>
-                        <span class="spec-val">5000 mm</span>
-                    </div>
+                    @endforelse
                 </div>
             </div>
 
