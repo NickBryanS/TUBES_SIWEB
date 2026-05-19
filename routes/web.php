@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ShippingController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\LaporanController;
 use App\Http\Controllers\SuperAdmin\PengaturanController;
@@ -117,6 +119,13 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::post('/inventory/bulk-delete', [InventoryController::class, 'bulkDelete'])->name('admin.inventory.bulk-delete');
     Route::resource('inventory', InventoryController::class)->names('admin.inventory');
 
+    // Kategori Routes
+    Route::resource('kategori', CategoryController::class)->names('admin.kategori');
+
+    // Ulasan Routes (hanya index & destroy untuk moderasi)
+    Route::get('/ulasan', [ReviewController::class, 'index'])->name('admin.ulasan.index');
+    Route::delete('/ulasan/{ulasan}', [ReviewController::class, 'destroy'])->name('admin.ulasan.destroy');
+
     // Transaksi Routes
     Route::get('/transaksi', [TransactionController::class, 'index'])->name('admin.transaksi.index');
     Route::get('/transaksi/{id}', [TransactionController::class, 'show'])->name('admin.transaksi.show');
@@ -124,6 +133,7 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::post('/transaksi/{id}/reject', [TransactionController::class, 'reject'])->name('admin.transaksi.reject');
     Route::post('/transaksi/{id}/status', [TransactionController::class, 'updateStatus'])->name('admin.transaksi.status');
     Route::post('/transaksi/{id}/lunas', [TransactionController::class, 'konfirmasiLunas'])->name('admin.transaksi.lunas');
+    Route::post('/transaksi/{id}/denda', [TransactionController::class, 'setDenda'])->name('admin.transaksi.denda');
 
     // Pengguna Routes
     Route::get('/pengguna', [UserController::class, 'index'])->name('admin.pengguna.index');

@@ -24,6 +24,7 @@ class Transaction extends Model
         'tanggal_kembali_aktual',
         'total_biaya',
         'denda',
+        'keterangan_denda',
         'perpanjangan_hari',
         'status_perpanjangan',
         'status_transaksi',
