@@ -89,7 +89,13 @@ class OrderController extends Controller
             'tanggal_selesai'    => 'required|date|after:tanggal_mulai',
             'metode_pengambilan' => 'required|in:pickup,deliver',
             'alamat_pengiriman'  => 'nullable|required_if:metode_pengambilan,deliver|string',
+            'foto_ktp'           => 'nullable|required_if:metode_pengambilan,deliver|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
+
+        $fotoKtpPath = null;
+        if ($request->hasFile('foto_ktp')) {
+            $fotoKtpPath = $request->file('foto_ktp')->store('jaminan', 'public');
+        }
 
         // Simpan data checkout ke session (belum buat transaksi)
         $request->session()->put('checkout_data', [
@@ -97,6 +103,7 @@ class OrderController extends Controller
             'tanggal_selesai'    => $request->tanggal_selesai,
             'metode_pengambilan' => $request->metode_pengambilan,
             'alamat_pengiriman'  => $request->alamat_pengiriman,
+            'foto_ktp'           => $fotoKtpPath,
         ]);
 
         // Redirect ke halaman pembayaran (Step 2)
@@ -171,7 +178,7 @@ class OrderController extends Controller
             $totalBiaya += 2500; // Biaya admin
 
             // 1. Simpan transaksi utama
-            $transaction = Transaction::create([
+            $transactionData = [
                 'user_id'            => $userId,
                 'tanggal_mulai'      => $checkoutData['tanggal_mulai'],
                 'tanggal_selesai'    => $checkoutData['tanggal_selesai'],
@@ -179,7 +186,15 @@ class OrderController extends Controller
                 'status_transaksi'   => 'menunggu',
                 'metode_pengambilan' => $checkoutData['metode_pengambilan'],
                 'alamat_pengiriman'  => $checkoutData['alamat_pengiriman'],
-            ]);
+            ];
+
+            if (isset($checkoutData['foto_ktp'])) {
+                $transactionData['foto_ktp'] = $checkoutData['foto_ktp'];
+                $transactionData['jenis_jaminan'] = 'ktp';
+                $transactionData['status_jaminan'] = 'pending';
+            }
+
+            $transaction = Transaction::create($transactionData);
 
             // 2. Simpan detail transaksi (setiap item di keranjang)
             foreach ($carts as $cart) {
@@ -325,7 +340,7 @@ class OrderController extends Controller
     /**
      * User membatalkan pesanan.
      */
-    public function batalkanPesanan($id)
+    public function batalkanPesanan(Request $request, $id)
     {
         $transaction = Transaction::with('details.product', 'user')->findOrFail($id);
 
@@ -344,7 +359,8 @@ class OrderController extends Controller
         }
 
         $transaction->update([
-            'status_transaksi' => 'dibatalkan',
+            'status_transaksi'      => 'dibatalkan',
+            'rekening_pengembalian' => $request->rekening_pengembalian,
         ]);
 
         $transaction->user->notify(new OrderStatusUpdated($transaction));

@@ -297,10 +297,10 @@
                         {{-- Tombol Batal Pesanan (FR-USR-026) --}}
                         @if(in_array($transaction->status_transaksi, ['menunggu', 'menunggu_admin']))
                         <form action="{{ route('pesanan.batal', $transaction->id) }}" method="POST"
-                              onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?');"
-                              style="margin: 0;">
+                              style="margin: 0;" id="form-batal-pesanan-{{ $transaction->id }}">
                             @csrf
-                            <button type="submit"
+                            <input type="hidden" name="rekening_pengembalian" id="rekening-{{ $transaction->id }}">
+                            <button type="button" onclick="confirmBatal('{{ $transaction->id }}', '{{ $transaction->status_transaksi }}')"
                                     style="width: 100%; padding: 12px; background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #e74c3c; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-bottom: 10px;">
                                 <i class="fas fa-ban"></i> Batalkan Pesanan
                             </button>
@@ -318,4 +318,25 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+function confirmBatal(id, status) {
+    if (status === 'menunggu_admin') {
+        let rekening = prompt('Pesanan ini sudah dibayar. Untuk membatalkan, silakan masukkan nomor rekening Anda (Bank, Atas Nama, No. Rek) untuk proses pengembalian dana:');
+        if (rekening === null || rekening.trim() === '') {
+            alert('Pembatalan digagalkan. Nomor rekening wajib diisi untuk pesanan yang sudah dibayar.');
+            return;
+        }
+        document.getElementById('rekening-' + id).value = rekening;
+    } else {
+        if (!confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
+            return;
+        }
+    }
+    
+    document.getElementById('form-batal-pesanan-' + id).submit();
+}
+</script>
 @endsection

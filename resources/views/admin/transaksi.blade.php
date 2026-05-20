@@ -561,6 +561,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         `}
                     </div>`;
 
+                    // ── Pembatalan & Pengembalian Dana ──
+                    if (data.status_transaksi === 'dibatalkan' && data.rekening_pengembalian) {
+                        html += `
+                        <div class="modal-section">
+                            <div class="modal-section-header">
+                                <h4 style="color: #e74c3c;"><i class="fas fa-undo"></i> Pengembalian Dana (Refund)</h4>
+                            </div>
+                            <div style="background: rgba(231,76,60,0.05); border: 1px solid rgba(231,76,60,0.2); border-radius: 10px; padding: 14px 16px;">
+                                <div style="font-size: 0.85rem; color: #c0392b; margin-bottom: 8px;"><strong>Rekening Pengembalian Pelanggan:</strong></div>
+                                <div style="font-family: monospace; font-size: 1.1rem; color: #e74c3c; background: #fff; padding: 10px; border: 1px dashed #e74c3c; border-radius: 6px; letter-spacing: 0.5px;">${data.rekening_pengembalian}</div>
+                            </div>
+                        </div>`;
+                    }
+
                     body.innerHTML = html;
 
                     // ── Bind denda button ──

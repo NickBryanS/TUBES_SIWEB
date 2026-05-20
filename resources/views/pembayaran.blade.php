@@ -168,5 +168,18 @@ document.getElementById('bukti-file')?.addEventListener('change', function() {
         document.getElementById('upload-proof').style.background = 'rgba(45,90,39,0.03)';
     }
 });
+
+// Validation on submit
+document.getElementById('pembayaran-form').addEventListener('submit', function(e) {
+    let method = document.getElementById('metode_pembayaran').value;
+    if (method === 'transfer_bank') {
+        let bukti = document.getElementById('bukti-file').files.length;
+        if (bukti === 0) {
+            e.preventDefault();
+            alert('Peringatan: Anda harus mengupload bukti transfer pembayaran sebelum membuat pesanan.');
+            return false;
+        }
+    }
+});
 </script>
 @endsection
