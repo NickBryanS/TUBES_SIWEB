@@ -21,6 +21,14 @@
             <i class="fas fa-boxes-stacked"></i>
             <span>Inventaris</span>
         </a>
+        <a href="{{ route('admin.kategori.index') }}" class="sidebar-link @yield('sidebar-kategori')" id="nav-kategori">
+            <i class="fas fa-tags"></i>
+            <span>Kategori</span>
+        </a>
+        <a href="{{ route('admin.ulasan.index') }}" class="sidebar-link @yield('sidebar-ulasan')" id="nav-ulasan">
+            <i class="fas fa-star"></i>
+            <span>Ulasan</span>
+        </a>
         <a href="{{ route('admin.transaksi.index') }}" class="sidebar-link @yield('sidebar-transaksi')" id="nav-transaksi">
             <i class="fas fa-receipt"></i>
             <span>Transaksi</span>

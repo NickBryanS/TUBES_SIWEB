@@ -271,6 +271,39 @@
     </div>
 </div>
 
+{{-- MODAL: DENDA KHUSUS --}}
+<div class="modal-overlay" id="modal-denda">
+    <div class="modal-box" style="max-width: 460px;">
+        <div class="modal-box-header">
+            <h3><i class="fas fa-exclamation-triangle" style="color:#d97706;"></i> Tetapkan Denda</h3>
+            <button class="modal-close-btn" data-close="modal-denda">&times;</button>
+        </div>
+        <form id="form-denda">
+            @csrf
+            <input type="hidden" id="denda-trx-id">
+            <div class="modal-box-body" style="padding:24px;">
+                <p style="font-size:0.84rem;color:#6b7280;margin:0 0 18px;">Masukkan nominal denda untuk barang yang rusak atau hilang. Denda akan ditambahkan ke tagihan pelanggan.</p>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block;font-size:0.82rem;font-weight:600;color:#374151;margin-bottom:6px;">Nominal Denda (Rp) <span style="color:#ef4444;">*</span></label>
+                    <input type="number" id="input-denda" name="denda" min="0" step="1000" placeholder="Contoh: 50000" required style="width:100%;padding:10px 14px;border:1px solid #e0e0e0;border-radius:8px;font-size:0.85rem;font-family:inherit;color:#111827;box-sizing:border-box;transition:all 0.2s;">
+                    <span class="denda-error error-denda" style="display:block;font-size:0.72rem;color:#ef4444;margin-top:4px;"></span>
+                </div>
+                <div style="margin-bottom:0;">
+                    <label style="display:block;font-size:0.82rem;font-weight:600;color:#374151;margin-bottom:6px;">Keterangan Denda <span style="color:#ef4444;">*</span></label>
+                    <textarea id="input-keterangan-denda" name="keterangan_denda" rows="3" placeholder="Contoh: Tiang tenda patah, sleeping bag sobek" required style="width:100%;padding:10px 14px;border:1px solid #e0e0e0;border-radius:8px;font-size:0.85rem;font-family:inherit;color:#111827;box-sizing:border-box;resize:vertical;min-height:70px;transition:all 0.2s;"></textarea>
+                    <span class="denda-error error-keterangan_denda" style="display:block;font-size:0.72rem;color:#ef4444;margin-top:4px;"></span>
+                </div>
+            </div>
+            <div class="modal-box-footer" style="background:#fafaf8;border-radius:0 0 16px 16px;">
+                <button type="button" class="btn btn-secondary" data-close="modal-denda">Batal</button>
+                <button type="submit" class="btn" style="background:#d97706;color:#fff;" id="btn-submit-denda">
+                    <i class="fas fa-save"></i> Simpan Denda
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {{-- TOAST CONTAINER --}}
 <div class="toast-container" id="toast-container"></div>
 
@@ -502,7 +535,45 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>`;
 
+                    // ── Denda Section ──
+                    const dendaVal = parseFloat(data.denda) || 0;
+                    const dendaKet = data.keterangan_denda || '';
+                    const isActive = !['dibatalkan', 'selesai'].includes(data.status_transaksi) || dendaVal > 0;
+
+                    html += `
+                    <div class="modal-section">
+                        <div class="modal-section-header">
+                            <h4><i class="fas fa-gavel"></i> Denda Khusus</h4>
+                            ${!['dibatalkan'].includes(data.status_transaksi) ? `<button type="button" class="modal-link" id="btn-open-denda" data-id="${data.id}" data-denda="${dendaVal}" data-ket="${dendaKet.replace(/"/g, '&quot;')}" style="cursor:pointer;border:none;background:none;font-family:inherit;"><i class="fas fa-edit"></i> ${dendaVal > 0 ? 'Ubah' : 'Tetapkan'} Denda</button>` : ''}
+                        </div>
+                        ${dendaVal > 0 ? `
+                            <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                    <span style="font-size:0.75rem;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.05em;">NOMINAL DENDA</span>
+                                    <span style="font-size:1.1rem;font-weight:800;color:#b45309;">${formatRp(dendaVal)}</span>
+                                </div>
+                                <div style="font-size:0.8rem;color:#78350f;line-height:1.5;"><strong>Keterangan:</strong> ${dendaKet || '-'}</div>
+                            </div>
+                        ` : `
+                            <div style="text-align:center;padding:16px;color:#9ca3af;font-size:0.84rem;">
+                                <i class="fas fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Tidak ada denda untuk transaksi ini.
+                            </div>
+                        `}
+                    </div>`;
+
                     body.innerHTML = html;
+
+                    // ── Bind denda button ──
+                    const btnDenda = document.getElementById('btn-open-denda');
+                    if (btnDenda) {
+                        btnDenda.addEventListener('click', function() {
+                            document.getElementById('denda-trx-id').value = this.dataset.id;
+                            document.getElementById('input-denda').value = parseFloat(this.dataset.denda) || '';
+                            document.getElementById('input-keterangan-denda').value = this.dataset.ket || '';
+                            document.querySelectorAll('.denda-error').forEach(el => el.textContent = '');
+                            openModal('modal-denda');
+                        });
+                    }
 
                     // ── Footer buttons ──
                     const isPending = ['menunggu', 'menunggu_admin'].includes(data.status_transaksi);
@@ -552,6 +623,47 @@ document.addEventListener('DOMContentLoaded', function() {
                     body.innerHTML = '<div class="modal-loading" style="color:#ef4444;"><i class="fas fa-exclamation-circle"></i><p>Gagal memuat data transaksi</p></div>';
                 });
         });
+    });
+
+    // ── Submit Denda Form ──
+    document.getElementById('form-denda').addEventListener('submit', function(e) {
+        e.preventDefault();
+        document.querySelectorAll('.denda-error').forEach(el => el.textContent = '');
+
+        const trxId = document.getElementById('denda-trx-id').value;
+        const body = {
+            denda: document.getElementById('input-denda').value,
+            keterangan_denda: document.getElementById('input-keterangan-denda').value,
+        };
+
+        const csrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
+
+        fetch(`{{ url('admin/transaksi') }}/${trxId}/denda`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                closeModal('modal-denda');
+                closeModal('modal-detail-trx');
+                showToast(data.message);
+                setTimeout(() => location.reload(), 800);
+            } else if (data.errors) {
+                for (const field in data.errors) {
+                    const el = document.querySelector(`.error-${field}`);
+                    if (el) el.textContent = data.errors[field][0];
+                }
+            } else {
+                showToast(data.message || 'Terjadi kesalahan', true);
+            }
+        })
+        .catch(() => showToast('Terjadi kesalahan', true));
     });
 
     // ── Keyboard ──

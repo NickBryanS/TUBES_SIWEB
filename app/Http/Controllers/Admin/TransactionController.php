@@ -95,6 +95,7 @@ class TransactionController extends Controller
             'tanggal_kembali_aktual' => $transaction->tanggal_kembali_aktual?->format('d M Y'),
             'total_biaya' => $transaction->total_biaya,
             'denda' => $transaction->denda,
+            'keterangan_denda' => $transaction->keterangan_denda,
             'perpanjangan_hari' => $transaction->perpanjangan_hari,
             'status_perpanjangan' => $transaction->status_perpanjangan,
             'status_transaksi' => $transaction->status_transaksi,
@@ -191,6 +192,37 @@ class TransactionController extends Controller
 
         return redirect()->route('admin.transaksi.index')
             ->with('success', "Status transaksi diubah ke \"{$label}\".");
+    }
+
+    /**
+     * Set denda manual oleh admin (barang rusak/hilang).
+     */
+    public function setDenda(Request $request, $id)
+    {
+        $request->validate([
+            'denda'            => 'required|numeric|min:0',
+            'keterangan_denda' => 'required|string|max:500',
+        ], [
+            'denda.required'            => 'Nominal denda wajib diisi.',
+            'denda.numeric'             => 'Nominal denda harus berupa angka.',
+            'denda.min'                 => 'Nominal denda tidak boleh negatif.',
+            'keterangan_denda.required' => 'Keterangan denda wajib diisi.',
+            'keterangan_denda.max'      => 'Keterangan maksimal 500 karakter.',
+        ]);
+
+        $transaction = Transaction::findOrFail($id);
+
+        $transaction->update([
+            'denda'            => $request->denda,
+            'keterangan_denda' => $request->keterangan_denda,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Denda berhasil disimpan sebesar Rp ' . number_format($request->denda, 0, ',', '.') . '.',
+            'denda'   => $transaction->denda,
+            'keterangan_denda' => $transaction->keterangan_denda,
+        ]);
     }
 
     /**
