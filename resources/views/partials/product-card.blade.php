@@ -28,7 +28,7 @@
     <div class="katalog-card-info">
         <div class="katalog-card-title-row">
             <h3>{{ $productName }}</h3>
-            <div class="katalog-rating"><i class="fas fa-star"></i> 4.9</div>
+            <div class="katalog-rating"><i class="fas fa-star"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '-' }}</div>
         </div>
         <p class="katalog-card-desc">{{ $productDesc }}</p>
         <div class="katalog-card-tags">
