@@ -60,13 +60,6 @@
                 <p class="katalog-subtitle">Menampilkan 12 peralatan premium</p>
             </div>
             <div class="katalog-sort">
-                <label class="sort-label">URUTKAN</label>
-                <select class="sort-select" id="sort-select">
-                    <option>Terbaru</option>
-                    <option>Harga Terendah</option>
-                    <option>Harga Tertinggi</option>
-                    <option>Rating Tertinggi</option>
-                </select>
             </div>
         </div>
 

@@ -103,6 +103,15 @@ Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
 
     // Konfirmasi Pengembalian & Denda (FR-USR-034)
     Route::post('/pesanan/{id}/pengembalian', [OrderController::class, 'konfirmasiPengembalian'])->name('pesanan.pengembalian');
+
+    // Ulasan Produk
+    Route::post('/produk/{id}/ulasan', [\App\Http\Controllers\ReviewController::class, 'store'])->name('ulasan.store');
+
+    // Notifikasi User
+    Route::post('/notifikasi/read', function () {
+        auth()->user()->unreadNotifications->markAsRead();
+        return redirect()->back();
+    })->name('notifikasi.read');
 });
 
 /*

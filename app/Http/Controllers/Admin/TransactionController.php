@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use App\Notifications\OrderStatusNotification;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -147,6 +148,8 @@ class TransactionController extends Controller
             $transaction->payment->update(['status_pembayaran' => 'terverifikasi']);
         }
 
+        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah divalidasi dan sedang diproses.'));
+
         return redirect()->route('admin.transaksi.index')
             ->with('success', 'Transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' berhasil divalidasi.');
     }
@@ -172,6 +175,8 @@ class TransactionController extends Controller
             'status_jaminan' => 'rejected',
         ]);
 
+        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah ditolak dan dibatalkan.'));
+
         return redirect()->route('admin.transaksi.index')
             ->with('success', 'Transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' ditolak.');
     }
@@ -189,6 +194,7 @@ class TransactionController extends Controller
         $transaction->update(['status_transaksi' => $request->status]);
 
         $label = str_replace('_', ' ', ucfirst($request->status));
+        $transaction->user->notify(new OrderStatusNotification($transaction, 'Status pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah diperbarui menjadi ' . $label . '.'));
 
         return redirect()->route('admin.transaksi.index')
             ->with('success', "Status transaksi diubah ke \"{$label}\".");
@@ -241,6 +247,9 @@ class TransactionController extends Controller
                 'status_transaksi' => 'diproses',
                 'status_jaminan' => 'verified',
             ]);
+            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah dikonfirmasi dan pesanan sedang diproses.'));
+        } else {
+            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah dikonfirmasi.'));
         }
 
         return redirect()->route('admin.transaksi.index')

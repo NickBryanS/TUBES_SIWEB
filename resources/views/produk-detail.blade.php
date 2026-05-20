@@ -36,9 +36,9 @@
                 </div>
                 <div class="price-right">
                     <div class="rating-display">
-                        <i class="fas fa-star"></i> 4.5
+                        <i class="fas fa-star" style="color: #fbbf24;"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '-' }}
                     </div>
-                    <span class="review-count">(128 Ulasan)</span>
+                    <span class="review-count">({{ $product->reviewCount() }} Ulasan)</span>
                 </div>
             </div>
 
@@ -162,6 +162,77 @@
                 <div>
                     <h4>Informasi Garansi & Keamanan</h4>
                     <p>Perlengkapan ini terasuransi dan telah mendapatkan profesional termasuk dalam setiap sewa.</p>
+                </div>
+            </div>
+
+            <!-- REVIEWS SECTION -->
+            <div class="reviews-section" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eaeaea;">
+                <h4 style="font-size: 1.25rem; font-weight: 700; color: #1a1a1a; margin-bottom: 20px;">Ulasan Pelanggan</h4>
+                
+                @auth
+                    <!-- FORM ULASAN -->
+                    <div class="review-form-container" style="background: #f9fafb; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                        <h5 style="margin-bottom: 15px; font-size: 1rem; color: #374151;">Tulis Ulasan Anda</h5>
+                        <form action="{{ route('ulasan.store', $product->id) }}" method="POST">
+                            @csrf
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #4b5563;">Pilih Rating</label>
+                                <div class="star-rating-input" style="display: flex; gap: 5px; flex-direction: row-reverse; justify-content: flex-end;">
+                                    <input type="radio" id="star5" name="rating" value="5" style="display: none;" />
+                                    <label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+                                    
+                                    <input type="radio" id="star4" name="rating" value="4" style="display: none;" />
+                                    <label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
+                                    
+                                    <input type="radio" id="star3" name="rating" value="3" style="display: none;" />
+                                    <label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
+                                    
+                                    <input type="radio" id="star2" name="rating" value="2" style="display: none;" />
+                                    <label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
+                                    
+                                    <input type="radio" id="star1" name="rating" value="1" style="display: none;" required />
+                                    <label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+                                </div>
+                                <style>
+                                    .star-rating-input label { font-size: 1.5rem; color: #d1d5db; cursor: pointer; transition: color 0.2s; }
+                                    .star-rating-input label:hover,
+                                    .star-rating-input label:hover ~ label,
+                                    .star-rating-input input[type="radio"]:checked ~ label { color: #fbbf24; }
+                                </style>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #4b5563;">Komentar (Opsional)</label>
+                                <textarea name="ulasan" rows="3" style="width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; font-family: inherit; font-size: 0.9rem;" placeholder="Bagaimana pengalaman Anda menggunakan produk ini?"></textarea>
+                            </div>
+                            <button type="submit" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s;">Kirim Ulasan</button>
+                        </form>
+                    </div>
+                @else
+                    <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 0.9rem; color: #4b5563;">
+                        Silakan <a href="{{ route('login') }}" style="color: #2563eb; font-weight: 600;">login</a> untuk memberikan ulasan.
+                    </div>
+                @endauth
+
+                <!-- DAFTAR ULASAN -->
+                <div class="reviews-list">
+                    @forelse($product->reviews()->latest()->get() as $review)
+                        <div class="review-card" style="padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid #f3f4f6;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <div style="font-weight: 600; font-size: 0.95rem; color: #1f2937;">{{ $review->user->nama_lengkap ?? $review->user->email }}</div>
+                                <div style="color: #fbbf24; font-size: 0.85rem;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star" style="{{ $i <= $review->rating ? 'color: #fbbf24;' : 'color: #e5e7eb;' }}"></i>
+                                    @endfor
+                                </div>
+                            </div>
+                            <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 8px;">{{ $review->created_at->diffForHumans() }}</div>
+                            @if($review->ulasan)
+                                <p style="font-size: 0.9rem; color: #4b5563; line-height: 1.5;">{{ $review->ulasan }}</p>
+                            @endif
+                        </div>
+                    @empty
+                        <p style="color: #6b7280; font-size: 0.9rem;">Belum ada ulasan untuk produk ini. Jadilah yang pertama!</p>
+                    @endforelse
                 </div>
             </div>
         </div>
