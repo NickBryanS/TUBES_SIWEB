@@ -33,6 +33,7 @@ class Transaction extends Model
         'foto_ktp',
         'jenis_jaminan',
         'status_jaminan',
+        'rekening_pengembalian',
     ];
 
     /**

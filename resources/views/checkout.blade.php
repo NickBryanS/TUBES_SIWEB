@@ -13,7 +13,7 @@
         {{-- STEPPER (partial) --}}
         @include('partials.checkout-stepper', ['currentStep' => 1])
 
-        <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST">
+        <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <!-- Hidden inputs untuk tanggal sewa -->
             <input type="hidden" name="tanggal_mulai" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
@@ -128,10 +128,11 @@
                 <div class="checkout-section" id="identity-section" style="display:none;">
                     <h3 class="checkout-section-title">Verifikasi Identitas (Jaminan)</h3>
                     <p class="upload-note">Wajib mengunggah tanda pengenal asli sebagai jaminan pengiriman alat.</p>
-                    <div class="upload-area" id="upload-area">
+                    <div class="upload-area" id="upload-area" onclick="document.getElementById('foto_ktp').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <p><strong>Klik untuk Upload atau seret file</strong></p>
+                        <p id="upload-ktp-text"><strong>Klik untuk Upload atau seret file</strong></p>
                         <span>Upload Foto KTP/SIM (maks. 5MB)</span>
+                        <input type="file" name="foto_ktp" id="foto_ktp" form="checkout-form" accept=".jpg,.jpeg,.png,.pdf" style="display:none;">
                     </div>
                 </div>
             </div>
@@ -197,6 +198,33 @@ document.querySelectorAll('input[name="metode_pengambilan"]').forEach(function(r
             identity.style.display = '';
         }
     });
+});
+
+// File upload preview
+document.getElementById('foto_ktp')?.addEventListener('change', function() {
+    var textEl = document.getElementById('upload-ktp-text');
+    if (this.files.length > 0) {
+        textEl.innerHTML = '<strong><i class="fas fa-check-circle" style="color:var(--green-dark)"></i> ' + this.files[0].name + '</strong>';
+        document.getElementById('upload-area').style.borderColor = 'var(--green-dark)';
+        document.getElementById('upload-area').style.background = 'rgba(45,90,39,0.03)';
+    } else {
+        textEl.innerHTML = '<strong>Klik untuk Upload atau seret file</strong>';
+        document.getElementById('upload-area').style.borderColor = '';
+        document.getElementById('upload-area').style.background = '';
+    }
+});
+
+// Validation on submit
+document.getElementById('checkout-form').addEventListener('submit', function(e) {
+    let method = document.querySelector('input[name="metode_pengambilan"]:checked').value;
+    if (method === 'deliver') {
+        let foto = document.getElementById('foto_ktp').files.length;
+        if (foto === 0) {
+            e.preventDefault();
+            alert('Peringatan: Anda harus mengupload bukti jaminan (KTP/SIM) untuk metode pengiriman ke alamat.');
+            return false;
+        }
+    }
 });
 </script>
 @endsection
