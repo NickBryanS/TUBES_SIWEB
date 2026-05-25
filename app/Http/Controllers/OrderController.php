@@ -353,14 +353,29 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Pesanan ini tidak dapat dibatalkan.');
         }
 
+        // Validasi input form refund jika status menunggu_admin
+        if ($transaction->status_transaksi === 'menunggu_admin') {
+            $request->validate([
+                'bank_pengembalian' => 'required|string|max:100',
+                'rekening_pengembalian' => 'required|string|max:100',
+                'atas_nama_pengembalian' => 'required|string|max:255',
+            ], [
+                'bank_pengembalian.required' => 'Nama Bank / E-Wallet wajib diisi.',
+                'rekening_pengembalian.required' => 'Nomor Rekening wajib diisi.',
+                'atas_nama_pengembalian.required' => 'Nama Pemilik Rekening wajib diisi.',
+            ]);
+        }
+
         // Kembalikan stok
         foreach ($transaction->details as $detail) {
             $detail->product->increment('stok_tersedia', $detail->jumlah);
         }
 
         $transaction->update([
-            'status_transaksi'      => 'dibatalkan',
-            'rekening_pengembalian' => $request->rekening_pengembalian,
+            'status_transaksi'       => 'dibatalkan',
+            'bank_pengembalian'      => $request->bank_pengembalian,
+            'rekening_pengembalian'  => $request->rekening_pengembalian,
+            'atas_nama_pengembalian' => $request->atas_nama_pengembalian,
         ]);
 
         $transaction->user->notify(new OrderStatusUpdated($transaction));
