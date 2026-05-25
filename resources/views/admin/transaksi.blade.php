@@ -562,17 +562,39 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>`;
 
                     // ── Pembatalan & Pengembalian Dana ──
-                    if (data.status_transaksi === 'dibatalkan' && data.rekening_pengembalian) {
+                    if (data.status_transaksi === 'dibatalkan') {
                         html += `
                         <div class="modal-section">
                             <div class="modal-section-header">
                                 <h4 style="color: #e74c3c;"><i class="fas fa-undo"></i> Pengembalian Dana (Refund)</h4>
-                            </div>
-                            <div style="background: rgba(231,76,60,0.05); border: 1px solid rgba(231,76,60,0.2); border-radius: 10px; padding: 14px 16px;">
-                                <div style="font-size: 0.85rem; color: #c0392b; margin-bottom: 8px;"><strong>Rekening Pengembalian Pelanggan:</strong></div>
-                                <div style="font-family: monospace; font-size: 1.1rem; color: #e74c3c; background: #fff; padding: 10px; border: 1px dashed #e74c3c; border-radius: 6px; letter-spacing: 0.5px;">${data.rekening_pengembalian}</div>
-                            </div>
-                        </div>`;
+                            </div>`;
+                            
+                        if (data.rekening_pengembalian) {
+                            html += `
+                            <div style="background: rgba(231,76,60,0.05); border: 1px solid rgba(231,76,60,0.2); border-radius: 10px; padding: 16px;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: #c0392b; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Bank / E-Wallet</div>
+                                        <div style="font-size: 0.95rem; color: #333; font-weight: 600;">${data.bank_pengembalian || '-'}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: #c0392b; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Atas Nama</div>
+                                        <div style="font-size: 0.95rem; color: #333; font-weight: 600;">${data.atas_nama_pengembalian || '-'}</div>
+                                    </div>
+                                    <div style="grid-column: 1 / -1; margin-top: 4px;">
+                                        <div style="font-size: 0.75rem; color: #c0392b; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Nomor Rekening</div>
+                                        <div style="font-family: monospace; font-size: 1.15rem; color: #e74c3c; background: #fff; padding: 10px 12px; border: 1px dashed #e74c3c; border-radius: 6px; letter-spacing: 0.5px;">${data.rekening_pengembalian}</div>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } else {
+                            html += `
+                            <div style="text-align: center; padding: 20px; background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 10px; color: #6b7280; font-size: 0.9rem;">
+                                <i class="fas fa-info-circle" style="margin-right: 6px;"></i> Tidak memerlukan pengembalian dana (belum dibayar).
+                            </div>`;
+                        }
+                        
+                        html += `</div>`;
                     }
 
                     body.innerHTML = html;
@@ -612,7 +634,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Buat tombol Cetak Nota & Buat Perjanjian
                     let extraButtons = `
-                        <a href="{{ url('pesanan') }}/${data.id}/nota" target="_blank" class="btn btn-outline-dark"><i class="fas fa-print"></i> Cetak Nota</a>
+                        <a href="{{ url('admin/transaksi') }}/${data.id}/nota" target="_blank" class="btn btn-outline-dark"><i class="fas fa-print"></i> Cetak Nota</a>
                     `;
                     if (!isPending) {
                         footerLeft.innerHTML = extraButtons;

@@ -296,15 +296,14 @@
 
                         {{-- Tombol Batal Pesanan (FR-USR-026) --}}
                         @if(in_array($transaction->status_transaksi, ['menunggu', 'menunggu_admin']))
-                        <form action="{{ route('pesanan.batal', $transaction->id) }}" method="POST"
-                              style="margin: 0;" id="form-batal-pesanan-{{ $transaction->id }}">
-                            @csrf
-                            <input type="hidden" name="rekening_pengembalian" id="rekening-{{ $transaction->id }}">
                             <button type="button" onclick="confirmBatal('{{ $transaction->id }}', '{{ $transaction->status_transaksi }}')"
                                     style="width: 100%; padding: 12px; background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #e74c3c; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-bottom: 10px;">
                                 <i class="fas fa-ban"></i> Batalkan Pesanan
                             </button>
-                        </form>
+
+                            <form action="{{ route('pesanan.batal', $transaction->id) }}" method="POST" id="form-batal-pesanan-{{ $transaction->id }}" style="display: none;">
+                                @csrf
+                            </form>
                         @endif
 
                         {{-- Kembali ke Riwayat --}}
@@ -316,27 +315,64 @@
                 </div>
             </div>
         </div>
+</div>
+
+{{-- Modal Refund --}}
+@if($transaction->status_transaksi === 'menunggu_admin')
+<div id="modal-refund" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background: white; width: 100%; max-width: 450px; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <h3 style="margin-bottom: 8px; color: #333; font-size: 1.2rem;"><i class="fas fa-undo"></i> Pengembalian Dana (Refund)</h3>
+        <p style="color: #666; font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5;">Pesanan ini sudah dibayar. Silakan isi data rekening bank atau e-wallet Anda untuk proses pengembalian dana.</p>
+        
+        <form action="{{ route('pesanan.batal', $transaction->id) }}" method="POST" id="form-refund-modal">
+            @csrf
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #444;">Nama Bank / E-Wallet <span style="color:red;">*</span></label>
+                <input type="text" name="bank_pengembalian" required placeholder="Contoh: BCA / GoPay" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #444;">Nomor Rekening / No HP <span style="color:red;">*</span></label>
+                <input type="text" name="rekening_pengembalian" required placeholder="Masukkan nomor rekening..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem;">
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #444;">Nama Pemilik Rekening <span style="color:red;">*</span></label>
+                <input type="text" name="atas_nama_pengembalian" required placeholder="Sesuai buku tabungan" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem;">
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" onclick="closeRefundModal()" style="padding: 10px 16px; background: white; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; color: #555; transition: background 0.2s;">Batal</button>
+                <button type="submit" style="padding: 10px 16px; background: #e74c3c; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; transition: background 0.2s;">Konfirmasi Pembatalan</button>
+            </div>
+        </form>
     </div>
 </div>
+@endif
+
 @endsection
 
 @section('scripts')
 <script>
 function confirmBatal(id, status) {
     if (status === 'menunggu_admin') {
-        let rekening = prompt('Pesanan ini sudah dibayar. Untuk membatalkan, silakan masukkan nomor rekening Anda (Bank, Atas Nama, No. Rek) untuk proses pengembalian dana:');
-        if (rekening === null || rekening.trim() === '') {
-            alert('Pembatalan digagalkan. Nomor rekening wajib diisi untuk pesanan yang sudah dibayar.');
-            return;
+        const modal = document.getElementById('modal-refund');
+        if (modal) {
+            modal.style.display = 'flex';
         }
-        document.getElementById('rekening-' + id).value = rekening;
     } else {
-        if (!confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
-            return;
+        if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
+            document.getElementById('form-batal-pesanan-' + id).submit();
         }
     }
-    
-    document.getElementById('form-batal-pesanan-' + id).submit();
+}
+
+function closeRefundModal() {
+    const modal = document.getElementById('modal-refund');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 </script>
 @endsection

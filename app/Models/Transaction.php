@@ -34,6 +34,8 @@ class Transaction extends Model
         'jenis_jaminan',
         'status_jaminan',
         'rekening_pengembalian',
+        'bank_pengembalian',
+        'atas_nama_pengembalian',
     ];
 
     /**

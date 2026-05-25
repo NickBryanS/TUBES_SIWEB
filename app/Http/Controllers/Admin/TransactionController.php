@@ -105,6 +105,9 @@ class TransactionController extends Controller
             'foto_ktp' => $transaction->foto_ktp ? asset('storage/' . $transaction->foto_ktp) : null,
             'jenis_jaminan' => $transaction->jenis_jaminan,
             'status_jaminan' => $transaction->status_jaminan,
+            'rekening_pengembalian' => $transaction->rekening_pengembalian,
+            'bank_pengembalian' => $transaction->bank_pengembalian,
+            'atas_nama_pengembalian' => $transaction->atas_nama_pengembalian,
             'created_at' => $transaction->created_at->format('d M Y, H:i'),
             'details' => $transaction->details->map(function ($d) use ($transaction) {
                 $hari = $transaction->tanggal_mulai->diffInDays($transaction->tanggal_selesai);
@@ -254,5 +257,16 @@ class TransactionController extends Controller
 
         return redirect()->route('admin.transaksi.index')
             ->with('success', 'Pembayaran dikonfirmasi lunas.');
+    }
+
+    /**
+     * Admin mencetak nota transaksi.
+     */
+    public function cetakNota($id)
+    {
+        $transaction = Transaction::with(['details.product', 'payment', 'user'])
+            ->findOrFail($id);
+
+        return view('nota', compact('transaction'));
     }
 }

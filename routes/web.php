@@ -145,6 +145,7 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::post('/transaksi/{id}/status', [TransactionController::class, 'updateStatus'])->name('admin.transaksi.status');
     Route::post('/transaksi/{id}/lunas', [TransactionController::class, 'konfirmasiLunas'])->name('admin.transaksi.lunas');
     Route::post('/transaksi/{id}/denda', [TransactionController::class, 'setDenda'])->name('admin.transaksi.denda');
+    Route::get('/transaksi/{id}/nota', [TransactionController::class, 'cetakNota'])->name('admin.transaksi.nota');
 
     // Pengguna Routes
     Route::get('/pengguna', [UserController::class, 'index'])->name('admin.pengguna.index');
