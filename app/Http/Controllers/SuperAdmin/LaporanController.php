@@ -108,14 +108,10 @@ class LaporanController extends Controller
 
         ActivityLog::catat('export_pdf', 'Mengekspor laporan PDF periode ' . $periodeLabel);
 
-        // Generate PDF menggunakan view HTML
-        $html = view('superadmin.exports.laporan-pdf', compact(
+        // Kembalikan halaman HTML yang bisa di-print oleh browser (auto-trigger window.print)
+        return view('superadmin.exports.laporan-pdf', compact(
             'transactions', 'periodeLabel', 'totalPendapatan', 'totalDenda'
-        ))->render();
-
-        return response($html)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'inline; filename="laporan-' . $periode . '.pdf"');
+        ));
     }
 
     /**

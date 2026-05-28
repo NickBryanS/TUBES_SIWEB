@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard - Gardakala Outdoor')
+@section('title', 'Dashboard Saya - Gardakala Outdoor')
 @section('nav-dashboard', 'active')
 
 @section('styles')
@@ -10,22 +10,28 @@
 @section('content')
 <div class="dashboard-page">
     <div class="dashboard-container">
-        {{-- HEADER --}}
+        {{-- HEADER SECTION --}}
         <div class="dash-header">
             <div>
-                <h1 class="dash-greeting">Halo, Petualang!</h1>
-                <p class="dash-greeting-sub">Pantau perlengkapan dan riwayat petualanganmu di sini.</p>
+                @php
+                    $firstName = explode(' ', Auth::user()->nama_lengkap ?? Auth::user()->name ?? 'Petualang')[0];
+                @endphp
+                <h1 class="dash-greeting">Halo, {{ $firstName }}!</h1>
+                <p class="dash-greeting-sub">Selamat datang kembali. Pantau jadwal rental, transaksi, dan wishlist petualanganmu di sini.</p>
+            </div>
+            <div class="dash-header-actions">
+                <a href="/katalog" class="btn-dash-primary"><i class="fas fa-plus"></i> Rental Baru</a>
             </div>
         </div>
 
-        {{-- STATS CARDS (dynamic from database) --}}
+        {{-- DYNAMIC STATS COUNTER --}}
         <div class="dash-stats" id="dash-stats">
             @php
             $stats = [
-                ['icon' => 'fas fa-campground', 'iconClass' => 'icon-green', 'label' => 'Sewa Aktif', 'number' => str_pad($sewaAktif, 2, '0', STR_PAD_LEFT)],
-                ['icon' => 'fas fa-clipboard-list', 'iconClass' => 'icon-amber', 'label' => 'Total Pesanan', 'number' => str_pad($totalPesanan, 2, '0', STR_PAD_LEFT)],
-                ['icon' => 'fas fa-check-circle', 'iconClass' => 'icon-blue', 'label' => 'Selesai', 'number' => str_pad($selesai, 2, '0', STR_PAD_LEFT)],
-                ['icon' => 'fas fa-clock', 'iconClass' => 'icon-red', 'label' => 'Menunggu Pembayaran', 'number' => str_pad($menungguBayar, 2, '0', STR_PAD_LEFT),
+                ['icon' => 'far fa-campground', 'iconClass' => 'icon-green', 'label' => 'Sewa Aktif', 'number' => str_pad($sewaAktif, 2, '0', STR_PAD_LEFT)],
+                ['icon' => 'far fa-file-alt', 'iconClass' => 'icon-amber', 'label' => 'Total Pesanan', 'number' => str_pad($totalPesanan, 2, '0', STR_PAD_LEFT)],
+                ['icon' => 'far fa-check-circle', 'iconClass' => 'icon-blue', 'label' => 'Selesai', 'number' => str_pad($selesai, 2, '0', STR_PAD_LEFT)],
+                ['icon' => 'far fa-clock', 'iconClass' => 'icon-red', 'label' => 'Menunggu Pembayaran', 'number' => str_pad($menungguBayar, 2, '0', STR_PAD_LEFT),
                  'badge' => $menungguBayar > 0 ? 'Segera' : null, 'badgeClass' => 'badge-urgent'],
             ];
             @endphp
@@ -35,121 +41,130 @@
             @endforeach
         </div>
 
-        {{-- MAIN CONTENT GRID --}}
+        {{-- MAIN DASHBOARD LAYOUT GRID --}}
         <div class="dash-content-grid">
-            {{-- LEFT: ACTIVE RENTAL --}}
-            <div class="dash-left">
+            {{-- LEFT PANEL: ACTIVE RENTALS --}}
+            <div class="dash-left-panel">
                 <div class="dash-section-header">
-                    <h2>Sedang Disewa</h2>
-                    <a href="/riwayat" class="see-all-link">Lihat Semua Alat <i class="fas fa-arrow-right"></i></a>
+                    <h2>Penyewaan Aktif</h2>
+                    @if($activeRental)
+                        <a href="/riwayat" class="see-all-link">Lihat Semua Alat <i class="fas fa-chevron-right"></i></a>
+                    @endif
                 </div>
 
                 @if($activeRental)
                 @php
                     $tanggalMulai = \Carbon\Carbon::parse($activeRental->tanggal_mulai);
                     $tanggalSelesai = \Carbon\Carbon::parse($activeRental->tanggal_selesai);
-                    $totalHari = $tanggalMulai->diffInDays($tanggalSelesai);
-                    $hariTerlewat = $tanggalMulai->diffInDays(now());
+                    $totalHari = max(1, $tanggalMulai->diffInDays($tanggalSelesai));
+                    $hariTerlewat = max(0, $tanggalMulai->diffInDays(now()));
                     $sisaHari = max(0, now()->diffInDays($tanggalSelesai, false));
-                    $progress = $totalHari > 0 ? min(100, round(($hariTerlewat / $totalHari) * 100)) : 0;
+                    $progress = min(100, round(($hariTerlewat / $totalHari) * 100));
                 @endphp
                 <div class="active-rental-card" id="active-rental">
                     <div class="rental-card-header">
                         <div>
-                            <span class="rental-label">RINGKASAN SEWA AKTIF</span>
+                            <span class="rental-label">KODE TRANSAKSI</span>
                             <span class="rental-ref">#GK-{{ str_pad($activeRental->id, 4, '0', STR_PAD_LEFT) }}</span>
                         </div>
-                        <span class="rental-status status-active"><i class="fas fa-circle"></i> Aktif Berjalan</span>
+                        <span class="rental-status-badge"><i class="fas fa-spinner fa-spin"></i> Sedang Disewa</span>
                     </div>
+                    
                     <div class="rental-items-list">
                         @foreach($activeRental->details as $detail)
                         <div class="rental-item-row">
-                            <span><i class="fas fa-campground"></i> {{ $detail->product->nama_produk ?? 'Produk' }}</span>
-                            <span>{{ $detail->jumlah }} Unit</span>
+                            <span class="item-name"><i class="far fa-campground"></i> {{ $detail->product->nama_produk ?? 'Peralatan Outdoor' }}</span>
+                            <span class="item-qty">{{ $detail->jumlah }} Unit</span>
                         </div>
                         @endforeach
                     </div>
-                    <div class="rental-period-bar">
-                        <div class="period-info">
+
+                    <div class="rental-period-progress">
+                        <div class="period-info-row">
                             <div>
-                                <span class="period-label">MASA SEWA</span>
-                                <span class="period-dates"><i class="fas fa-calendar"></i> {{ $tanggalMulai->format('d M') }} - {{ $tanggalSelesai->format('d M Y') }}</span>
+                                <span class="period-label">TANGGAL SEWA</span>
+                                <span class="period-dates"><i class="far fa-calendar"></i> {{ $tanggalMulai->format('d M') }} - {{ $tanggalSelesai->format('d M Y') }}</span>
                             </div>
                             <div class="period-remaining">
-                                <span class="period-label">SISA WAKTU</span>
-                                <span class="period-days">{{ str_pad($sisaHari, 2, '0', STR_PAD_LEFT) }} Hari</span>
+                                <span class="period-label">SISA HARI</span>
+                                <span class="period-days">{{ str_pad($sisaHari, 2, '0', STR_PAD_LEFT) }} Hari Lagi</span>
                             </div>
                         </div>
-                        <div class="progress-bar-container">
-                            <span class="progress-label">PROGRES PENGEMBALIAN</span>
-                            <div class="progress-bar">
+
+                        <div class="progress-bar-block">
+                            <div class="progress-header">
+                                <span>Progres Pengembalian</span>
+                                <span>{{ $progress }}%</span>
+                            </div>
+                            <div class="progress-track">
                                 <div class="progress-fill" style="width: {{ $progress }}%;"></div>
                             </div>
-                            <span class="progress-pct">{{ $progress }}%</span>
                         </div>
                     </div>
+
                     <div class="rental-actions">
-                        {{-- PERPANJANG: smart redirect --}}
                         @if($activeRentals->count() === 1 && $activeRental->status_perpanjangan !== 'pending')
-                            <a href="{{ route('perpanjangan.form', $activeRental->id) }}" class="btn-rental-action btn-extend">
+                            <a href="{{ route('perpanjangan.form', $activeRental->id) }}" class="btn-action-primary">
                                 <i class="fas fa-sync-alt"></i> Perpanjang Sewa
                             </a>
                         @elseif($activeRentals->count() > 1)
-                            <a href="{{ route('riwayat') }}?filter=active" class="btn-rental-action btn-extend">
+                            <a href="{{ route('riwayat') }}?filter=active" class="btn-action-primary">
                                 <i class="fas fa-sync-alt"></i> Perpanjang Sewa
                             </a>
                         @else
-                            <span class="btn-rental-action btn-extend" style="opacity: 0.5; cursor: not-allowed;">
-                                <i class="fas fa-sync-alt"></i> Perpanjang Sewa
-                            </span>
+                            <button disabled class="btn-action-primary disabled-btn">
+                                <i class="fas fa-sync-alt"></i> Perpanjang Sewa (Diproses)
+                            </button>
                         @endif
 
-                        {{-- NOTA DIGITAL --}}
-                        <a href="{{ route('pesanan.nota', $activeRental->id) }}" class="btn-rental-action btn-nota" target="_blank">
-                            <i class="fas fa-file-alt"></i> Unduh Nota Digital
+                        <a href="{{ route('pesanan.nota', $activeRental->id) }}" class="btn-action-outline" target="_blank">
+                            <i class="far fa-file-alt"></i> Nota Digital
                         </a>
                     </div>
                 </div>
                 @else
-                <div class="active-rental-card" id="active-rental" style="text-align: center; padding: 40px;">
-                    <i class="fas fa-campground" style="font-size: 2.5rem; color: rgba(255,255,255,0.15); margin-bottom: 12px;"></i>
-                    <p style="color: rgba(255,255,255,0.5); font-size: 0.95rem;">Tidak ada penyewaan aktif saat ini.</p>
-                    <a href="/katalog" style="color: #e8a838; text-decoration: none; font-size: 0.9rem; margin-top: 8px; display: inline-block;">
-                        <i class="fas fa-arrow-right"></i> Jelajahi Katalog
-                    </a>
+                <div class="empty-rental-card">
+                    <div class="empty-rental-icon">
+                        <i class="far fa-campground"></i>
+                    </div>
+                    <h3>Belum ada sewa aktif</h3>
+                    <p>Mulai rencanakan petualangan serumu dan sewa perlengkapan outdoor premium kami.</p>
+                    <a href="/katalog" class="btn-rent-now">Jelajahi Katalog</a>
                 </div>
                 @endif
             </div>
 
-            {{-- RIGHT: ADVENTURE --}}
-            <div class="dash-right">
-                <h2>Petualangan Terdekat</h2>
+            {{-- RIGHT PANEL: ADVENTURE & TIPS --}}
+            <aside class="dash-right-panel">
+                <h2>Rencana Perjalanan</h2>
                 <div class="adventure-card" id="adventure-card">
-                    <div class="adventure-image">
-                        <img src="{{ asset('images/mountain-adventure.png') }}" alt="Gunung Gede">
+                    <div class="adventure-image-wrapper">
+                        <img src="{{ asset('images/mountain-adventure.png') }}" alt="Petualangan Gunung Gede - Gardakala Outdoor">
                     </div>
                     <div class="adventure-info">
-                        <h3>Ekspedisi Gunung Gede</h3>
-                        <p><i class="fas fa-calendar"></i> 26 Okt - 28 Okt 2024</p>
-                        <p><i class="fas fa-map-marker-alt"></i> Basecamp Cibodas</p>
-                        <a href="#" class="adventure-btn">Lihat Rencana Perjalanan</a>
+                        <h3>Gunung Gede Pangrango</h3>
+                        <div class="adv-meta-list">
+                            <span><i class="far fa-calendar-alt"></i> 26 Okt - 28 Okt 2026</span>
+                            <span><i class="far fa-map-marker-alt"></i> Basecamp Cibodas</span>
+                        </div>
+                        <a href="/katalog" class="btn-adventure-action">Cari Perlengkapan</a>
                     </div>
                 </div>
-            </div>
+            </aside>
         </div>
 
-        {{-- TRANSACTION HISTORY (real-time from database) --}}
+        {{-- RECENT TRANSACTION TABLE --}}
         <div class="dash-transactions">
             <h2>Transaksi Terakhir</h2>
-            <div class="transaction-table-wrapper">
+            <div class="transaction-table-card">
                 <table class="transaction-table" id="transaction-table">
                     <thead>
                         <tr>
                             <th>ID PESANAN</th>
                             <th>TANGGAL</th>
-                            <th>ITEM</th>
-                            <th>STATUS</th>
-                            <th>TOTAL HARGA</th>
+                            <th>ITEM YANG DISEWA</th>
+                            <th>STATUS PROSES</th>
+                            <th>TOTAL BIAYA</th>
                             <th>AKSI</th>
                         </tr>
                     </thead>
@@ -157,33 +172,32 @@
                         @forelse($recentTransactions as $t)
                         @php
                             $statusStyles = [
-                                'menunggu'       => ['class' => 'status-pending',  'icon' => 'fas fa-exclamation-circle', 'label' => 'Menunggu Bayar'],
-                                'menunggu_admin' => ['class' => 'status-pending',  'icon' => 'fas fa-hourglass-half',     'label' => 'Menunggu Verifikasi'],
-                                'diproses'       => ['class' => 'status-approved', 'icon' => 'fas fa-check-circle',       'label' => 'Diproses'],
-                                'dikirim'        => ['class' => 'status-shipped',  'icon' => 'fas fa-truck',              'label' => 'Dikirim'],
-                                'selesai'        => ['class' => 'status-done',     'icon' => 'fas fa-check-double',       'label' => 'Selesai'],
-                                'dibatalkan'     => ['class' => 'status-cancelled','icon' => 'fas fa-ban',                'label' => 'Dibatalkan'],
+                                'menunggu'       => ['class' => 'status-waiting',  'icon' => 'far fa-clock', 'label' => 'Menunggu Pembayaran'],
+                                'menunggu_admin' => ['class' => 'status-waiting',  'icon' => 'far fa-hourglass', 'label' => 'Menunggu Konfirmasi'],
+                                'diproses'       => ['class' => 'status-active',   'icon' => 'far fa-box', 'label' => 'Diproses'],
+                                'dikirim'        => ['class' => 'status-active',   'icon' => 'far fa-truck', 'label' => 'Dikirim'],
+                                'selesai'        => ['class' => 'status-completed','icon' => 'far fa-check-circle', 'label' => 'Selesai'],
+                                'dibatalkan'     => ['class' => 'status-cancelled','icon' => 'far fa-times-circle', 'label' => 'Dibatalkan'],
                             ];
-                            $st = $statusStyles[$t->status_transaksi] ?? ['class' => 'status-pending', 'icon' => 'fas fa-info-circle', 'label' => $t->status_transaksi];
-                            $items = $t->details->map(fn($d) => $d->product->nama_produk ?? 'Produk')->implode(', ');
+                            $st = $statusStyles[$t->status_transaksi] ?? ['class' => 'status-waiting', 'icon' => 'far fa-info-circle', 'label' => $t->status_transaksi];
+                            $items = $t->details->map(fn($d) => $d->product->nama_produk ?? 'Alat')->implode(', ');
                         @endphp
                         <tr>
-                            <td class="order-id">#GK-{{ str_pad($t->id, 4, '0', STR_PAD_LEFT) }}</td>
+                            <td class="order-ref-code">#GK-{{ str_pad($t->id, 4, '0', STR_PAD_LEFT) }}</td>
                             <td>{{ $t->created_at->format('d M Y') }}</td>
-                            <td>{{ Str::limit($items, 40) }}</td>
+                            <td class="items-cell" title="{{ $items }}">{{ Str::limit($items, 44) }}</td>
                             <td><span class="status-badge {{ $st['class'] }}"><i class="{{ $st['icon'] }}"></i> {{ $st['label'] }}</span></td>
-                            <td class="price-col">Rp {{ number_format($t->total_biaya + $t->denda, 0, ',', '.') }}</td>
-                            <td>
-                                @if(in_array($t->status_transaksi, ['diproses', 'dikirim']))
-                                    <a href="{{ route('pesanan.detail', $t->id) }}" class="table-link">Lacak</a>
-                                @endif
-                                <a href="{{ route('pesanan.detail', $t->id) }}" class="table-link">Detail</a>
+                            <td class="price-val-col">Rp {{ number_format($t->total_biaya + $t->denda, 0, ',', '.') }}</td>
+                            <td class="actions-cell">
+                                <a href="{{ route('pesanan.detail', $t->id) }}" class="table-action-link">Lihat Detail</a>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.4); padding: 30px;">
-                                Belum ada transaksi. <a href="/katalog" style="color: #e8a838;">Mulai belanja</a>
+                            <td colspan="6" class="empty-table-row">
+                                <i class="far fa-folder-open"></i>
+                                <p>Belum ada riwayat transaksi rental.</p>
+                                <a href="/katalog">Mulai Menyewa</a>
                             </td>
                         </tr>
                         @endforelse

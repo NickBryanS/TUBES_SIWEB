@@ -303,6 +303,7 @@ class OrderController extends Controller
     public function riwayat()
     {
         $transactions = Transaction::with(['details.product', 'payment'])
+            ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -316,6 +317,11 @@ class OrderController extends Controller
     {
         $transaction = Transaction::with(['details.product', 'payment', 'user'])
             ->findOrFail($id);
+
+        // Pastikan transaksi hanya bisa dilihat oleh pemiliknya
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
 
         return view('pesanan-detail', compact('transaction'));
     }

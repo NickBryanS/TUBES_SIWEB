@@ -42,9 +42,11 @@ class OrderStatusNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'transaction_id' => $this->transaction->id,
-            'message' => $this->message,
-            'status' => $this->transaction->status,
+            'transaction_id'   => $this->transaction->id,
+            'transaction_code' => 'GK-' . str_pad($this->transaction->id, 4, '0', STR_PAD_LEFT),
+            'message'          => $this->message,
+            'status'           => $this->transaction->status_transaksi,
+            'url'              => url('/riwayat'),
         ];
     }
 }

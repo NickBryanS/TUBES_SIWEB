@@ -121,8 +121,6 @@ Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
 */
 Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::post('/transaksi/{id}/approve', [AdminDashboardController::class, 'approveTransaksi'])->name('admin.transaksi.approve');
-    Route::post('/transaksi/{id}/reject', [AdminDashboardController::class, 'rejectTransaksi'])->name('admin.transaksi.reject');
     Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
     // Inventory Routes (export & bulk-delete harus sebelum resource agar tidak konflik)
@@ -149,6 +147,7 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
 
     // Pengguna Routes
     Route::get('/pengguna', [UserController::class, 'index'])->name('admin.pengguna.index');
+    Route::get('/pengguna/export', [UserController::class, 'export'])->name('admin.pengguna.export');
     Route::get('/pengguna/{id}', [UserController::class, 'show'])->name('admin.pengguna.show');
     Route::post('/pengguna/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('admin.pengguna.toggle-status');
     Route::post('/pengguna/{id}/verifikasi', [UserController::class, 'toggleVerifikasi'])->name('admin.pengguna.verifikasi');

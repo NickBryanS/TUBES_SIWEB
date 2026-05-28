@@ -93,7 +93,7 @@ class ShippingController extends Controller
         return response()->json([
             'id'                 => $transaction->id,
             'user_nama'          => $transaction->user->nama_lengkap ?? 'User',
-            'user_telepon'       => $transaction->user->no_telepon ?? '-',
+            'user_telepon'       => $transaction->user->nomor_telepon ?? '-',
             'alamat_pengiriman'  => $transaction->alamat_pengiriman ?? '-',
             'tanggal_mulai'      => Carbon::parse($transaction->tanggal_mulai)->translatedFormat('d M Y'),
             'tanggal_selesai'    => Carbon::parse($transaction->tanggal_selesai)->translatedFormat('d M Y'),
@@ -114,8 +114,7 @@ class ShippingController extends Controller
         $action = $request->input('action');
 
         if ($action === 'siapkan' && $transaction->status_transaksi === 'diproses') {
-            // Siapkan pesanan — tetap diproses, tapi tandai siap kirim
-            // (opsional: bisa tambah kolom 'siap_kirim' nanti)
+            $transaction->update(['siap_kirim' => true]);
             return back()->with('success', 'Pesanan #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' siap dikirim.');
         }
 

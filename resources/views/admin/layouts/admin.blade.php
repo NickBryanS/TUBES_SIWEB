@@ -28,14 +28,23 @@
                 </div>
             </div>
             <div class="topbar-right">
-                <button class="topbar-icon" id="btn-notification" aria-label="Notifikasi">
+                @php
+                    // Hitung notifikasi aktif secara dinamis
+                    $notifCount = \App\Models\Transaction::whereIn('status_transaksi', ['menunggu', 'menunggu_admin'])->count()
+                                + \App\Models\Payment::where('status_pembayaran', 'menunggu')->count();
+                @endphp
+                <a href="{{ route('admin.notifikasi.index') }}" class="topbar-icon" id="btn-notification"
+                   aria-label="Notifikasi" title="Pusat Notifikasi" style="text-decoration:none; position:relative;">
                     <i class="fas fa-bell"></i>
-                    <span class="topbar-badge">3</span>
-                </button>
-                <button class="topbar-icon" id="btn-settings" aria-label="Settings">
+                    @if($notifCount > 0)
+                        <span class="topbar-badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
+                    @endif
+                </a>
+                <a href="{{ route('admin.pengguna.index') }}" class="topbar-icon" id="btn-settings"
+                   aria-label="Settings" title="Manajemen Pengguna" style="text-decoration:none;">
                     <i class="fas fa-cog"></i>
-                </button>
-                <a href="#" class="btn-ekspor" id="btn-ekspor">
+                </a>
+                <a href="{{ route('admin.pengguna.export') }}" class="btn-ekspor" id="btn-ekspor">
                     <i class="fas fa-download"></i> Ekspor Data
                 </a>
                 <form action="{{ route('admin.logout') }}" method="POST" style="display: inline-block;">
