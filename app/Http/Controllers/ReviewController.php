@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,6 +18,18 @@ class ReviewController extends Controller
         ]);
 
         $product = Product::findOrFail($productId);
+
+        // Validasi: user hanya bisa review produk yang pernah disewa dan sudah selesai
+        $pernakSewa = Transaction::where('user_id', Auth::id())
+            ->where('status_transaksi', 'selesai')
+            ->whereHas('details', function ($q) use ($productId) {
+                $q->where('product_id', $productId);
+            })->exists();
+
+        if (!$pernakSewa) {
+            return redirect()->back()
+                ->with('error', 'Anda hanya bisa mengulas produk yang sudah pernah disewa dan selesai.');
+        }
 
         // Optional: Cek apakah user sudah pernah mereview produk ini
         $existingReview = Review::where('user_id', Auth::id())

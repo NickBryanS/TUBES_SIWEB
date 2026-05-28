@@ -127,6 +127,26 @@ class UserController extends Controller
     }
 
     /**
+     * Export all users data as print-friendly PDF (via browser print).
+     */
+    public function export()
+    {
+        $users = User::where('peran', 'user')
+            ->withCount('transactions')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalPengguna  = $users->count();
+        $terverifikasi  = $users->where('status_verifikasi', true)->count();
+        $diblokir       = $users->whereIn('status_akun', ['banned', 'nonaktif'])->count();
+        $aktif          = $users->where('status_akun', 'aktif')->count();
+
+        return view('admin.exports.pengguna-pdf', compact(
+            'users', 'totalPengguna', 'terverifikasi', 'diblokir', 'aktif'
+        ));
+    }
+
+    /**
      * Delete a user account.
      */
     public function destroy($id)

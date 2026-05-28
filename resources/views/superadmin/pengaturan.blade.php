@@ -22,38 +22,50 @@
     <div class="sa-set-grid-2">
         <div class="sa-card sa-set-section">
             <h3 class="sa-set-section-title"><i class="fas fa-store"></i> Informasi Toko Umum</h3>
-            <div class="sa-form-grid">
-                <div class="sa-form-group full">
-                    <label class="sa-form-label">NAMA TOKO</label>
-                    <input type="text" class="sa-form-input" value="Summit Peak Rentals" readonly>
+            <form method="POST" action="{{ route('superadmin.pengaturan.update') }}">
+                @csrf
+                <div class="sa-form-grid">
+                    <div class="sa-form-group full">
+                        <label class="sa-form-label">NAMA TOKO</label>
+                        <input type="text" name="nama_toko" class="sa-form-input"
+                               value="{{ $settings['nama_toko'] ?? 'Gardakala Outdoor' }}" required>
+                    </div>
+                    <div class="sa-form-group">
+                        <label class="sa-form-label">SINGKATAN</label>
+                        <input type="text" name="singkatan_toko" class="sa-form-input"
+                               value="{{ $settings['singkatan_toko'] ?? 'GKDL' }}">
+                    </div>
+                    <div class="sa-form-group">
+                        <label class="sa-form-label">TELEPON</label>
+                        <input type="text" name="telepon_toko" class="sa-form-input"
+                               value="{{ $settings['telepon_toko'] ?? '' }}">
+                    </div>
+                    <div class="sa-form-group full">
+                        <label class="sa-form-label">EMAIL OPERASIONAL</label>
+                        <input type="email" name="email_toko" class="sa-form-input"
+                               value="{{ $settings['email_toko'] ?? '' }}">
+                    </div>
+                    <div class="sa-form-group full">
+                        <label class="sa-form-label">ALAMAT LENGKAP</label>
+                        <textarea name="alamat_toko" class="sa-form-textarea" rows="2">{{ $settings['alamat_toko'] ?? '' }}</textarea>
+                    </div>
                 </div>
-                <div class="sa-form-group">
-                    <label class="sa-form-label">SINGKATAN</label>
-                    <input type="text" class="sa-form-input" value="SPR" readonly>
+                <div style="margin-top:16px;text-align:right;">
+                    <button type="submit" class="sa-btn-primary">
+                        <i class="fas fa-save"></i> Simpan Pengaturan
+                    </button>
                 </div>
-                <div class="sa-form-group">
-                    <label class="sa-form-label">TELEPON</label>
-                    <input type="text" class="sa-form-input" value="+62 812 3456 7890" readonly>
-                </div>
-                <div class="sa-form-group full">
-                    <label class="sa-form-label">EMAIL OPERASIONAL</label>
-                    <input type="email" class="sa-form-input" value="ops@summitpeak.id" readonly>
-                </div>
-                <div class="sa-form-group full">
-                    <label class="sa-form-label">ALAMAT LENGKAP</label>
-                    <textarea class="sa-form-textarea" rows="2" readonly>Jl. Pinus Hijau No. 42, Komplek Rimba Raya, Kecamatan Cisarua, Kabupaten Bogor, Jawa Barat, 16750</textarea>
-                </div>
-            </div>
+            </form>
         </div>
 
         <div class="sa-card sa-set-section">
             <h3 class="sa-set-section-title"><i class="fas fa-scroll"></i> Kebijakan Sewa</h3>
             <div class="sa-form-grid">
                 <div class="sa-form-group">
-                    <label class="sa-form-label">DURASI SEWA (HARI)</label>
+                    <label class="sa-form-label">DURASI SEWA MINIMUM (HARI)</label>
                     <div class="sa-counter">
                         <button class="sa-counter-btn" type="button">-</button>
-                        <span class="sa-counter-val">1</span>
+                        <span class="sa-counter-val">{{ $settings['min_sewa_hari'] ?? 1 }}</span>
                         <button class="sa-counter-btn" type="button">+</button>
                     </div>
                 </div>
@@ -61,20 +73,21 @@
                     <label class="sa-form-label">MAX. DP (%)</label>
                     <div class="sa-counter">
                         <button class="sa-counter-btn" type="button">-</button>
-                        <span class="sa-counter-val">50</span>
+                        <span class="sa-counter-val">{{ $settings['max_dp_persen'] ?? 50 }}</span>
                         <button class="sa-counter-btn" type="button">+</button>
                     </div>
                 </div>
                 <div class="sa-form-group full">
                     <label class="sa-form-label">DENDA KETERLAMBATAN PER HARI</label>
-                    <input type="text" class="sa-form-input" value="Rp 50.000" readonly>
+                    <input type="text" class="sa-form-input"
+                           value="Rp {{ number_format($settings['denda_per_hari'] ?? 50000, 0, ',', '.') }}" readonly>
                 </div>
                 <div class="sa-form-group full">
-                    <label class="sa-form-label">SYARAT & KETENTUAN</label>
+                    <label class="sa-form-label">SYARAT &amp; KETENTUAN</label>
                     <div class="sa-terms-list">
                         <p>1. Hanya untuk mahasiswa/WNI dengan ID yang sudah terverifikasi.</p>
                         <p>2. Jika produk rusak/hilang menjadi tanggung jawab penyewa.</p>
-                        <p>3. Pembatalan > 24 jam sebelum disewakan: potongan 50%.</p>
+                        <p>3. Pembatalan &gt; 24 jam sebelum disewakan: potongan 50%.</p>
                         <p>4. Pengembalian barang harus dalam kondisi original.</p>
                     </div>
                 </div>

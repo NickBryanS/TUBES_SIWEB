@@ -106,7 +106,7 @@ class NotificationController extends Controller
         // ── 4. Pengembalian (transaksi yang sedang berjalan mendekati/melewati tanggal selesai) ──
         if (in_array($filter, ['semua', 'pengembalian'])) {
             $perpanjangan = Transaction::with('user')
-                ->where('status_perpanjangan', 'diminta')
+                ->where('status_perpanjangan', 'pending')
                 ->orderBy('updated_at', 'desc')
                 ->get();
 

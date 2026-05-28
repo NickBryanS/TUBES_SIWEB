@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use App\Notifications\OrderStatusNotification;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -121,6 +122,12 @@ class AdminDashboardController extends Controller
             $transaction->payment->update(['status_pembayaran' => 'terverifikasi']);
         }
 
+        // Kirim notifikasi ke user
+        $transaction->user->notify(new OrderStatusNotification(
+            $transaction,
+            'Pesanan Anda #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah disetujui dan sedang diproses.'
+        ));
+
         return redirect()->route('admin.dashboard')->with('success', 'Transaksi #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' berhasil disetujui.');
     }
 
@@ -141,6 +148,12 @@ class AdminDashboardController extends Controller
         }
 
         $transaction->update(['status_transaksi' => 'dibatalkan']);
+
+        // Kirim notifikasi ke user
+        $transaction->user->notify(new OrderStatusNotification(
+            $transaction,
+            'Pesanan Anda #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah ditolak dan dibatalkan.'
+        ));
 
         return redirect()->route('admin.dashboard')->with('success', 'Transaksi #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' ditolak.');
     }

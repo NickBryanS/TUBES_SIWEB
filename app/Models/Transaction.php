@@ -29,6 +29,7 @@ class Transaction extends Model
         'status_perpanjangan',
         'status_transaksi',
         'metode_pengambilan',
+        'siap_kirim',
         'alamat_pengiriman',
         'foto_ktp',
         'jenis_jaminan',
@@ -52,6 +53,7 @@ class Transaction extends Model
             'total_biaya'            => 'decimal:2',
             'denda'                  => 'decimal:2',
             'perpanjangan_hari'      => 'integer',
+            'siap_kirim'             => 'boolean',
         ];
     }
 

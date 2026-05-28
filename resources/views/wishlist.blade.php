@@ -1,113 +1,161 @@
 @extends('layouts.app')
 
-@section('title', 'Wishlist - Gardakala Outdoor')
+@section('title', 'Daftar Keinginan - Gardakala Outdoor')
+@section('nav-wishlist', 'active')
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/katalog.css') }}">
 <style>
-    .wishlist-header {
-        padding: 40px 20px 20px;
-        text-align: center;
-    }
-    .wishlist-container {
-        max-width: 1200px;
+    .wishlist-page-wrapper {
+        padding: 32px 40px;
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 0 20px 40px;
+        width: 100%;
     }
-    .empty-wishlist {
-        text-align: center;
-        padding: 60px 20px;
-        background: #f8f9fa;
-        border-radius: 12px;
-        border: 1px dashed #ced4da;
-        margin-top: 20px;
+    .wishlist-header-block {
+        margin-bottom: 32px;
     }
-    .empty-wishlist i {
-        font-size: 48px;
-        color: #adb5bd;
-        margin-bottom: 20px;
+    .wishlist-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        letter-spacing: -0.02em;
     }
-    .empty-wishlist p {
-        color: #6c757d;
-        font-size: 1.1rem;
+    .wishlist-subtitle {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 4px;
     }
-    .btn-remove-wishlist {
-        background: none;
-        border: none;
-        color: #e63946;
+    .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    .wishlist-card-container {
+        position: relative;
+    }
+    .btn-remove-wishlist-top {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 10;
+        width: 36px;
+        height: 36px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        color: var(--red-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        box-shadow: var(--shadow-sm);
         cursor: pointer;
-        padding: 5px;
-        font-size: 1.2rem;
-        transition: color 0.3s;
+        transition: var(--transition);
     }
-    .btn-remove-wishlist:hover {
-        color: #c1121f;
+    .btn-remove-wishlist-top:hover {
+        background: #FFF0F0;
+        transform: scale(1.05);
+        border-color: var(--red-soft);
+    }
+    .empty-wishlist-container {
+        text-align: center;
+        padding: 64px 32px;
+        background: var(--white);
+        border-radius: var(--radius);
+        border: 1px dashed var(--border);
+        max-width: 600px;
+        margin: 40px auto 0;
+        box-shadow: var(--shadow-sm);
+    }
+    .empty-wishlist-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #FFF0F0;
+        color: var(--red-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 1.5rem;
+    }
+    .empty-wishlist-container h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+    }
+    .empty-wishlist-container p {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+    .btn-wishlist-explore {
+        display: inline-block;
+        padding: 12px 28px;
+        background: var(--green-dark);
+        color: var(--white);
+        font-weight: 600;
+        font-size: 0.875rem;
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
+    }
+    .btn-wishlist-explore:hover {
+        background: var(--green-darker);
+    }
+    @media (max-width: 992px) {
+        .wishlist-grid { grid-template-columns: repeat(2, 1fr); }
+        .wishlist-page-wrapper { padding: 16px; }
+    }
+    @media (max-width: 768px) {
+        .wishlist-grid { grid-template-columns: 1fr; }
     }
 </style>
 @endsection
 
 @section('content')
-<div class="wishlist-page">
-    <div class="wishlist-header">
-        <h1>Daftar Keinginan (Wishlist)</h1>
-        <p>Barang-barang favorit yang siap menemani petualangan Anda.</p>
+<div class="wishlist-page-wrapper">
+    <div class="wishlist-header-block">
+        <h1 class="wishlist-title">Wishlist Saya</h1>
+        <p class="wishlist-subtitle">Daftar perlengkapan outdoor impian yang Anda simpan untuk petualangan selanjutnya.</p>
     </div>
 
-    <div class="wishlist-container">
-        @if(session('success'))
-            <div class="alert alert-success" style="padding:15px; background:#d4edda; color:#155724; margin-bottom:20px; border-radius:8px; text-align:center;">
-                {{ session('success') }}
-            </div>
-        @endif
+    @if(session('success'))
+        <div class="alert alert-success" style="padding: 12px 20px; background: #EAFDF0; border: 1px solid var(--border); border-left: 4px solid var(--green-tag); color: var(--green-dark); border-radius: 8px; margin-bottom: 24px;">
+            {{ session('success') }}
+        </div>
+    @endif
 
-        @if($wishlists->isEmpty())
-            <div class="empty-wishlist">
-                <i class="far fa-heart"></i>
-                <p>Wishlist Anda masih kosong. Yuk, cari perlengkapan impian Anda di Katalog!</p>
-                <a href="/katalog" class="checkout-btn" style="display:inline-block; margin-top:15px; text-decoration:none; padding:10px 20px; background:#2b2d42; color:white; border-radius:5px;">
-                    Eksplorasi Katalog
-                </a>
+    @if($wishlists->isEmpty())
+        <div class="empty-wishlist-container">
+            <div class="empty-wishlist-icon">
+                <i class="fas fa-heart"></i>
             </div>
-        @else
-            <div class="katalog-grid">
-                @foreach($wishlists as $wish)
-                    <div class="katalog-card" style="position: relative;">
-                        <!-- Remove from wishlist button -->
-                        <form action="{{ route('wishlist.toggle', $wish->product->id) }}" method="POST" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+            <h3>Wishlist Anda Kosong</h3>
+            <p>Anda belum menyimpan barang apa pun. Jelajahi katalog lengkap kami untuk menemukan perlengkapan outdoor yang Anda inginkan.</p>
+            <a href="/katalog" class="btn-wishlist-explore">Eksplorasi Katalog</a>
+        </div>
+    @else
+        <div class="wishlist-grid">
+            @foreach($wishlists as $wish)
+                @if($wish->product)
+                    <div class="wishlist-card-container">
+                        {{-- Absolute Quick Remove Button --}}
+                        <form action="{{ route('wishlist.toggle', $wish->product->id) }}" method="POST" style="margin: 0;">
                             @csrf
-                            <button type="submit" class="btn-remove-wishlist" title="Hapus dari wishlist">
+                            <button type="submit" class="btn-remove-wishlist-top" title="Hapus dari Wishlist">
                                 <i class="fas fa-heart"></i>
                             </button>
                         </form>
                         
-                        <a href="{{ route('produk.detail', $wish->product->id) }}" style="text-decoration: none; color: inherit;">
-                            <div class="katalog-card-image">
-                                <img src="{{ $wish->product->url_gambar ?? asset('images/default.png') }}" alt="{{ $wish->product->nama_produk }}">
-                            </div>
-                            <div class="katalog-card-info">
-                                <div class="katalog-card-title-row">
-                                    <h3>{{ $wish->product->nama_produk }}</h3>
-                                    <div class="katalog-rating"><i class="fas fa-star"></i> 4.5</div>
-                                </div>
-                                <p class="katalog-card-desc">{{ Str::limit($wish->product->deskripsi, 50) }}</p>
-                                <div class="katalog-card-footer">
-                                    <div class="katalog-price-info">
-                                        <span class="katalog-price-label">SEWA PER HARI</span>
-                                        <span class="katalog-price">Rp {{ number_format($wish->product->harga_sewa, 0, ',', '.') }}</span>
-                                    </div>
-                                    <form action="{{ route('cart.store', $wish->product->id) }}" method="POST" style="margin:0;">
-                                        @csrf
-                                        <input type="hidden" name="quantity" value="1">
-                                        <input type="hidden" name="days" value="1">
-                                        <button type="submit" class="katalog-cart-btn" style="position: relative; z-index: 10;"><i class="fas fa-shopping-cart"></i></button>
-                                    </form>
-                                </div>
-                            </div>
-                        </a>
+                        {{-- Include our upgraded Product Card --}}
+                        @include('partials.product-card', ['product' => $wish->product])
                     </div>
-                @endforeach
-            </div>
-        @endif
-    </div>
+                @endif
+            @endforeach
+        </div>
+    @endif
 </div>
 @endsection

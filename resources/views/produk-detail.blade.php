@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Produk - Gardakala Outdoor')
-@section('description', 'Detail peralatan outdoor untuk disewa di Gardakala Outdoor.')
+@section('title', $product->nama_produk . ' - Gardakala Outdoor')
+@section('description', 'Sewa ' . $product->nama_produk . ' premium dengan harga terbaik di Gardakala Outdoor.')
 @section('nav-katalog', 'active')
 
 @section('styles')
@@ -9,230 +9,305 @@
 @endsection
 
 @section('content')
-<div class="produk-page">
-    <div class="produk-container">
-        <!-- LEFT: IMAGES -->
-        <div class="produk-images">
-            <div class="produk-main-image" id="main-product-image">
-                <img src="{{ asset($product->url_gambar ?? 'images/placeholder.png') }}" alt="{{ $product->nama_produk }}" id="main-img">
+<div class="produk-detail-page">
+    <div class="produk-detail-container">
+        {{-- TOP ROW: GALLERIES & INFOS & SIDEBAR --}}
+        <div class="detail-top-grid">
+            {{-- 1. LEFT GALLERY: Vertical Thumbnails + Main Image --}}
+            <div class="gallery-wrapper">
+                <div class="gallery-thumbnails">
+                    <button class="thumb-btn active" onclick="changeImage(this)">
+                        <img src="{{ asset($product->url_gambar ?? 'images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}">
+                    </button>
+                    {{-- Additional dynamic/mockup gallery thumbnails for outdoor feel --}}
+                    <button class="thumb-btn" onclick="changeImage(this)">
+                        <img src="{{ asset('images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}">
+                    </button>
+                    <button class="thumb-btn" onclick="changeImage(this)">
+                        <img src="{{ asset('images/backpack-product.png') }}" alt="Outdoor Backpack">
+                    </button>
+                </div>
+                <div class="gallery-main">
+                    <span class="detail-category-badge">{{ $product->category->nama_kategori ?? 'Peralatan' }}</span>
+                    <img src="{{ asset($product->url_gambar ?? 'images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}" id="main-product-img">
+                </div>
             </div>
-            <div class="produk-thumbnails">
-                <button class="thumb active" onclick="changeImage(this)">
-                    <img src="{{ asset($product->url_gambar ?? 'images/placeholder.png') }}" alt="{{ $product->nama_produk }}">
-                </button>
+
+            {{-- 2. CENTER CONTENT: Product specifications & Calendar selector --}}
+            <div class="info-wrapper">
+                <div class="product-header-block">
+                    <h1 class="detail-product-name">{{ $product->nama_produk }}</h1>
+                    <div class="detail-rating-row">
+                        <span class="star-rating">
+                            <i class="fas fa-star"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '4.8' }}
+                        </span>
+                        <span class="review-link">{{ $product->reviewCount() }} Ulasan Pelanggan</span>
+                        <span class="divider-dot">•</span>
+                        <span class="stock-status {{ $product->stok_tersedia > 0 ? 'instock' : 'outstock' }}">
+                            {{ $product->stok_tersedia > 0 ? 'Tersedia (' . $product->stok_tersedia . ' Unit)' : 'Stok Habis' }}
+                        </span>
+                    </div>
+                </div>
+
+                <p class="detail-short-desc">{{ $product->deskripsi }}</p>
+
+                {{-- Interactive Rent Calendar Selection --}}
+                <div class="calendar-card-section">
+                    <div class="calendar-card-header">
+                        <h4>Pilih Tanggal Rental</h4>
+                        <span class="calendar-hint">Klik tanggal mulai & tanggal berakhir</span>
+                    </div>
+                    <div class="calendar-grid-wrapper">
+                        <div class="cal-days-header-row">
+                            <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+                        </div>
+                        <div class="cal-days-grid" id="calendar-days-grid">
+                            <div class="cal-day disabled">28</div>
+                            <div class="cal-day disabled">29</div>
+                            <div class="cal-day disabled">30</div>
+                            <div class="cal-day">1</div>
+                            <div class="cal-day">2</div>
+                            <div class="cal-day">3</div>
+                            <div class="cal-day">4</div>
+                            <div class="cal-day">5</div>
+                            <div class="cal-day">6</div>
+                            <div class="cal-day">7</div>
+                            <div class="cal-day selected">8</div>
+                            <div class="cal-day selected">9</div>
+                            <div class="cal-day selected active">10</div>
+                            <div class="cal-day">11</div>
+                            <div class="cal-day">12</div>
+                            <div class="cal-day">13</div>
+                            <div class="cal-day">14</div>
+                            <div class="cal-day">15</div>
+                            <div class="cal-day">16</div>
+                            <div class="cal-day">17</div>
+                            <div class="cal-day">18</div>
+                            <div class="cal-day">19</div>
+                            <div class="cal-day">20</div>
+                            <div class="cal-day">21</div>
+                            <div class="cal-day">22</div>
+                            <div class="cal-day">23</div>
+                            <div class="cal-day">24</div>
+                            <div class="cal-day">25</div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            {{-- 3. RIGHT SIDEBAR: Pricing, Quantity selection, and CTA Buttons --}}
+            <aside class="actions-sidebar">
+                <div class="price-box">
+                    <span class="price-box-label">Harga Sewa</span>
+                    <div class="price-box-value">
+                        Rp {{ number_format($product->harga_sewa, 0, ',', '.') }}
+                        <span class="price-box-unit">/ hari</span>
+                    </div>
+                </div>
+
+                <form method="POST" id="checkout-form" class="checkout-form-block">
+                    @csrf
+                    <input type="hidden" name="days" id="input-days" value="3">
+                    <input type="hidden" name="quantity" id="input-qty" value="1">
+
+                    {{-- Quantity Selector --}}
+                    <div class="qty-selector-group">
+                        <span class="qty-field-label">Jumlah Perlengkapan</span>
+                        <div class="qty-control-box">
+                            <button type="button" class="btn-qty-adj" id="qty-minus"><i class="fas fa-minus"></i></button>
+                            <span class="qty-display-val" id="qty-display-value">1</span>
+                            <button type="button" class="btn-qty-adj" id="qty-plus"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+
+                    {{-- Dynamic Summary Calculation Box --}}
+                    <div class="summary-calc-box">
+                        <div class="calc-row">
+                            <span id="summary-dur-text">Sewa 3 hari</span>
+                            <span id="summary-dur-price">Rp {{ number_format($product->harga_sewa * 3, 0, ',', '.') }}</span>
+                        </div>
+                        <div class="calc-row border-top">
+                            <strong>Total Perkiraan</strong>
+                            <strong id="summary-total-price" class="total-text-green">Rp {{ number_format($product->harga_sewa * 3, 0, ',', '.') }}</strong>
+                        </div>
+                    </div>
+
+                    @if(session('success'))
+                        <div class="success-alert-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ session('success') }}</span>
+                        </div>
+                    @endif
+
+                    {{-- CTA buttons --}}
+                    <div class="cta-actions-group">
+                        <button type="submit" formaction="{{ route('cart.store', $product->id) }}" class="btn-cta-cart">
+                            <i class="fas fa-shopping-bag"></i> + Keranjang
+                        </button>
+                        <button type="submit" formaction="{{ route('cart.directCheckout', $product->id) }}" class="btn-cta-checkout">
+                            Sewa Sekarang
+                        </button>
+                    </div>
+
+                    {{-- Wishlist Toggle --}}
+                    <button type="submit" formaction="{{ route('wishlist.toggle', $product->id) }}" class="btn-cta-wishlist">
+                        <i class="far fa-heart"></i> Simpan ke Wishlist
+                    </button>
+                </form>
+
+                {{-- Guarantee Policy Box --}}
+                <div class="guarantee-policy-card">
+                    <div class="policy-item">
+                        <i class="fas fa-shield-halved"></i>
+                        <div>
+                            <h5>Alat Higienis & Steril</h5>
+                            <p>Dibersihkan dengan disinfektan profesional setelah setiap sewa.</p>
+                        </div>
+                    </div>
+                    <div class="policy-item">
+                        <i class="fas fa-rotate-left"></i>
+                        <div>
+                            <h5>Jaminan Penggantian</h5>
+                            <p>Rusak saat di jalan? Kami ganti alat serupa gratis.</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
         </div>
 
-        <!-- RIGHT: DETAILS -->
-        <div class="produk-details">
-            <span class="produk-badge-label">{{ $product->category->nama_kategori ?? 'GEAR' }}</span>
-            <h1 class="produk-name">{{ $product->nama_produk }}</h1>
-            <p class="produk-desc-short">{{ $product->deskripsi }}</p>
-
-            <div class="produk-price-section">
-                <div class="price-left">
-                    <span class="price-label">HARGA SEWA</span>
-                    <span class="price-value">Rp {{ number_format($product->harga_sewa, 0, ',', '.') }} <span class="price-unit">/hari</span></span>
-                </div>
-                <div class="price-right">
-                    <div class="rating-display">
-                        <i class="fas fa-star" style="color: #fbbf24;"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '-' }}
-                    </div>
-                    <span class="review-count">({{ $product->reviewCount() }} Ulasan)</span>
-                </div>
+        {{-- BOTTOM TAB PANEL --}}
+        <div class="detail-bottom-tabs">
+            {{-- Tab Headers --}}
+            <div class="tab-headers-row">
+                <button class="tab-header-btn active" onclick="switchDetailTab(event, 'tab-deskripsi')">Deskripsi</button>
+                <button class="tab-header-btn" onclick="switchDetailTab(event, 'tab-spesifikasi')">Spesifikasi Lengkap</button>
+                <button class="tab-header-btn" onclick="switchDetailTab(event, 'tab-ulasan')">Ulasan ({{ $product->reviewCount() }})</button>
+                <button class="tab-header-btn" onclick="switchDetailTab(event, 'tab-faq')">FAQ Rental</button>
             </div>
 
-            <form method="POST" id="action-form">
-                @csrf
-                <input type="hidden" name="days" id="input-days" value="3">
-                <input type="hidden" name="quantity" id="input-qty" value="1">
-                
-                <!-- CALENDAR -->
-                <div class="calendar-section">
-                    <div class="calendar-header">
-                        <h4>Pilih Tanggal Sewa</h4>
-                        <div class="calendar-nav">
-                            <button type="button" class="cal-nav-btn" id="cal-prev"><i class="fas fa-chevron-left"></i></button>
-                            <button type="button" class="cal-nav-btn" id="cal-next"><i class="fas fa-chevron-right"></i></button>
+            {{-- Tab Contents --}}
+            <div class="tab-contents-container">
+                {{-- 1. Deskripsi Tab --}}
+                <div class="tab-content-panel active" id="tab-deskripsi">
+                    <div class="description-rich-text">
+                        <h3>Deskripsi Produk</h3>
+                        <p>{{ $product->deskripsi }}</p>
+                        <br>
+                        <h4>Mengapa Memilih Perlengkapan Ini?</h4>
+                        <p>Didesain khusus untuk para petualang yang mementingkan keamanan, kehandalan, dan keringanan di medan berat. Setiap jahitan, bahan material, dan fitur telah diuji secara teliti untuk kenyamanan optimal Anda di alam bebas.</p>
+                    </div>
+                </div>
+
+                {{-- 2. Spesifikasi Lengkap Tab --}}
+                <div class="tab-content-panel" id="tab-spesifikasi">
+                    <div class="specs-table-wrapper">
+                        <h3>Spesifikasi Teknik Lengkap</h3>
+                        <div class="detail-specs-table">
+                            @php
+                                $specs = json_decode($product->spesifikasi_teknis ?? '{}', true) ?: [];
+                            @endphp
+                            @forelse($specs as $key => $val)
+                                <div class="detail-specs-row">
+                                    <span class="detail-spec-label">{{ ucwords(str_replace('_', ' ', $key)) }}</span>
+                                    <span class="detail-spec-value">{{ $val }}</span>
+                                </div>
+                            @empty
+                                <div class="detail-specs-row empty-row">
+                                    <span>Belum ada spesifikasi teknis spesifik untuk produk ini.</span>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
-                    <div class="calendar-grid">
-                        <div class="cal-day-header">M</div>
-                        <div class="cal-day-header">S</div>
-                        <div class="cal-day-header">S</div>
-                        <div class="cal-day-header">R</div>
-                        <div class="cal-day-header">K</div>
-                        <div class="cal-day-header">J</div>
-                        <div class="cal-day-header">S</div>
-                        <div class="cal-day disabled">28</div>
-                        <div class="cal-day disabled">29</div>
-                        <div class="cal-day disabled">30</div>
-                        <div class="cal-day">1</div>
-                        <div class="cal-day">2</div>
-                        <div class="cal-day">3</div>
-                        <div class="cal-day">4</div>
-                        <div class="cal-day">5</div>
-                        <div class="cal-day">6</div>
-                        <div class="cal-day">7</div>
-                        <div class="cal-day selected">8</div>
-                        <div class="cal-day selected">9</div>
-                        <div class="cal-day selected active">10</div>
-                        <div class="cal-day">11</div>
-                        <div class="cal-day">12</div>
-                        <div class="cal-day">13</div>
-                        <div class="cal-day">14</div>
-                        <div class="cal-day">15</div>
-                        <div class="cal-day">16</div>
-                        <div class="cal-day">17</div>
-                        <div class="cal-day">18</div>
-                    </div>
                 </div>
 
-                <!-- QTY -->
-                <div class="qty-section">
-                    <span class="qty-label">Jumlah Unit</span>
-                    <div class="qty-controls">
-                        <button type="button" class="qty-btn" id="qty-minus"><i class="fas fa-minus"></i></button>
-                        <span class="qty-value" id="qty-value">1</span>
-                        <button type="button" class="qty-btn" id="qty-plus"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
-
-                <!-- ACTIONS -->
-                @if(session('success'))
-                    <div class="alert alert-success" style="padding:10px; background:#d4edda; color:#155724; border-radius:5px; margin-bottom:15px; font-size:14px;">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <button type="submit" formaction="{{ route('cart.store', $product->id) }}" class="btn-add-cart" id="add-to-cart" style="flex: 1;">
-                        Tambah ke Keranjang
-                    </button>
-                    <button type="submit" formaction="{{ route('cart.directCheckout', $product->id) }}" class="btn-add-cart" style="flex: 1; background: #e63946; color: white;">
-                        Checkout
-                    </button>
-                </div>
-                
-                <button type="submit" formaction="{{ route('wishlist.toggle', $product->id) }}" class="btn-wishlist" id="add-wishlist">
-                    <i class="far fa-heart"></i> Tambah ke Wishlist
-                </button>
-            </form>
-
-            <!-- SPECIFICATIONS -->
-            <div class="specs-section">
-                <h4 class="specs-title">Spesifikasi Teknik</h4>
-                <div class="specs-table">
-                    @php
-                        $specs = json_decode($product->spesifikasi_teknis ?? '{}', true) ?: [];
-                    @endphp
-                    @forelse($specs as $key => $val)
-                    <div class="spec-row">
-                        <span class="spec-key">{{ $key }}</span>
-                        <span class="spec-val">{{ $val }}</span>
-                    </div>
-                    @empty
-                    <div class="spec-row">
-                        <span class="spec-key" style="color: var(--text-light);">Belum ada spesifikasi</span>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-
-            <!-- FEATURES -->
-            <div class="features-section">
-                <h4 class="features-title">Fitur Unggulan</h4>
-                <div class="feature-item">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <strong>Storm-Proof Design:</strong> Mampu menahan angin hingga kecepatan 80 km/jam.
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <strong>Thermal Reflective:</strong> Lapisan dalam memantulkan panas tubuh untuk kehangatan maksimal.
-                    </div>
-                </div>
-            </div>
-
-            <!-- WARRANTY -->
-            <div class="warranty-section">
-                <div class="warranty-icon"><i class="fas fa-shield-alt"></i></div>
-                <div>
-                    <h4>Informasi Garansi & Keamanan</h4>
-                    <p>Perlengkapan ini terasuransi dan telah mendapatkan profesional termasuk dalam setiap sewa.</p>
-                </div>
-            </div>
-
-            <!-- REVIEWS SECTION -->
-            <div class="reviews-section" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eaeaea;">
-                <h4 style="font-size: 1.25rem; font-weight: 700; color: #1a1a1a; margin-bottom: 20px;">Ulasan Pelanggan</h4>
-                
-                @auth
-                    <!-- FORM ULASAN -->
-                    <div class="review-form-container" style="background: #f9fafb; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
-                        <h5 style="margin-bottom: 15px; font-size: 1rem; color: #374151;">Tulis Ulasan Anda</h5>
-                        <form action="{{ route('ulasan.store', $product->id) }}" method="POST">
-                            @csrf
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #4b5563;">Pilih Rating</label>
-                                <div class="star-rating-input" style="display: flex; gap: 5px; flex-direction: row-reverse; justify-content: flex-end;">
-                                    <input type="radio" id="star5" name="rating" value="5" style="display: none;" />
-                                    <label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
-                                    
-                                    <input type="radio" id="star4" name="rating" value="4" style="display: none;" />
-                                    <label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
-                                    
-                                    <input type="radio" id="star3" name="rating" value="3" style="display: none;" />
-                                    <label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
-                                    
-                                    <input type="radio" id="star2" name="rating" value="2" style="display: none;" />
-                                    <label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
-                                    
-                                    <input type="radio" id="star1" name="rating" value="1" style="display: none;" required />
-                                    <label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+                {{-- 3. Ulasan Tab --}}
+                <div class="tab-content-panel" id="tab-ulasan">
+                    <div class="ulasan-panel-grid">
+                        <div class="ulasan-form-box">
+                            @auth
+                                <h4>Tulis Ulasan</h4>
+                                <p>Bagikan pengalaman Anda saat menggunakan alat ini.</p>
+                                <form action="{{ route('ulasan.store', $product->id) }}" method="POST" class="ulasan-form-control">
+                                    @csrf
+                                    <div class="form-group-item">
+                                        <label>Beri Rating Bintang</label>
+                                        <div class="star-rating-radio-group">
+                                            <input type="radio" id="star5" name="rating" value="5">
+                                            <label for="star5"><i class="fas fa-star"></i></label>
+                                            <input type="radio" id="star4" name="rating" value="4">
+                                            <label for="star4"><i class="fas fa-star"></i></label>
+                                            <input type="radio" id="star3" name="rating" value="3">
+                                            <label for="star3"><i class="fas fa-star"></i></label>
+                                            <input type="radio" id="star2" name="rating" value="2">
+                                            <label for="star2"><i class="fas fa-star"></i></label>
+                                            <input type="radio" id="star1" name="rating" value="1" required>
+                                            <label for="star1"><i class="fas fa-star"></i></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group-item">
+                                        <label>Pesan Komentar</label>
+                                        <textarea name="ulasan" rows="4" placeholder="Apakah tenda bocor? Bagaimana dengan suspensi tas? Tulis di sini..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-submit-ulasan">Kirim Ulasan</button>
+                                </form>
+                            @else
+                                <div class="ulasan-login-notice">
+                                    <i class="fas fa-circle-info"></i>
+                                    <span>Silakan <a href="{{ route('login') }}">login</a> untuk menulis ulasan produk.</span>
                                 </div>
-                                <style>
-                                    .star-rating-input label { font-size: 1.5rem; color: #d1d5db; cursor: pointer; transition: color 0.2s; }
-                                    .star-rating-input label:hover,
-                                    .star-rating-input label:hover ~ label,
-                                    .star-rating-input input[type="radio"]:checked ~ label { color: #fbbf24; }
-                                </style>
-                            </div>
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #4b5563;">Komentar (Opsional)</label>
-                                <textarea name="ulasan" rows="3" style="width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; font-family: inherit; font-size: 0.9rem;" placeholder="Bagaimana pengalaman Anda menggunakan produk ini?"></textarea>
-                            </div>
-                            <button type="submit" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s;">Kirim Ulasan</button>
-                        </form>
-                    </div>
-                @else
-                    <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 0.9rem; color: #4b5563;">
-                        Silakan <a href="{{ route('login') }}" style="color: #2563eb; font-weight: 600;">login</a> untuk memberikan ulasan.
-                    </div>
-                @endauth
-
-                <!-- DAFTAR ULASAN -->
-                <div class="reviews-list">
-                    @forelse($product->reviews()->latest()->get() as $review)
-                        <div class="review-card" style="padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid #f3f4f6;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <div style="font-weight: 600; font-size: 0.95rem; color: #1f2937;">{{ $review->user->nama_lengkap ?? $review->user->email }}</div>
-                                <div style="color: #fbbf24; font-size: 0.85rem;">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <i class="fas fa-star" style="{{ $i <= $review->rating ? 'color: #fbbf24;' : 'color: #e5e7eb;' }}"></i>
-                                    @endfor
-                                </div>
-                            </div>
-                            <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 8px;">{{ $review->created_at->diffForHumans() }}</div>
-                            @if($review->ulasan)
-                                <p style="font-size: 0.9rem; color: #4b5563; line-height: 1.5;">{{ $review->ulasan }}</p>
-                            @endif
+                            @endauth
                         </div>
-                    @empty
-                        <p style="color: #6b7280; font-size: 0.9rem;">Belum ada ulasan untuk produk ini. Jadilah yang pertama!</p>
-                    @endforelse
+
+                        <div class="ulasan-list-box">
+                            <h4>Daftar Ulasan Pelanggan</h4>
+                            <div class="ulasan-cards-wrapper">
+                                @forelse($product->reviews()->latest()->get() as $review)
+                                    <div class="ulasan-review-card">
+                                        <div class="ulasan-card-header">
+                                            <div>
+                                                <h5>{{ $review->user->nama_lengkap ?? $review->user->email }}</h5>
+                                                <small class="ulasan-time">{{ $review->created_at->diffForHumans() }}</small>
+                                            </div>
+                                            <div class="stars-display-green">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="fas fa-star" style="{{ $i <= $review->rating ? 'color: var(--yellow-soft);' : 'color: #E2E8F0;' }}"></i>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        @if($review->ulasan)
+                                            <p class="ulasan-card-comment">{{ $review->ulasan }}</p>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <div class="empty-reviews-notice">
+                                        <i class="far fa-star"></i>
+                                        <p>Belum ada ulasan untuk perlengkapan ini. Jadilah yang pertama memberikan review!</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 4. FAQ Rental Tab --}}
+                <div class="tab-content-panel" id="tab-faq">
+                    <div class="faq-list-wrapper">
+                        <h3>Pertanyaan Terkait Penyewaan</h3>
+                        <div class="faq-grid-panel">
+                            <div class="faq-item-card">
+                                <h5>Bagaimana jika alat kotor saat dikembalikan?</h5>
+                                <p>Kami mengerti bahwa berpetualang membuat alat terkena lumpur/debu. Jangan khawatir, biaya pencucian standar sudah termasuk dalam tarif sewa. Kecuali noda ekstrem/kerusakan fisik berat.</p>
+                            </div>
+                            <div class="faq-item-card">
+                                <h5>Berapa batas waktu denda keterlambatan?</h5>
+                                <p>Keterlambatan pengembalian dikenakan denda sesuai tarif harian produk yang berlaku per hari keterlambatan. Harap hubungi customer support kami jika terjadi keterlambatan darurat di jalan.</p>
+                            </div>
+                            <div class="faq-item-card">
+                                <h5>Dapatkah saya membatalkan sewa yang sudah dibayar?</h5>
+                                <p>Pembatalan yang diajukan minimal 24 jam sebelum tanggal mulai rental akan mendapatkan refund penuh 100%. Pembatalan kurang dari 24 jam dikenakan denda pembatalan 50%.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -242,66 +317,98 @@
 
 @section('scripts')
 <script>
-function changeImage(thumb) {
-    const mainImg = document.getElementById('main-img');
-    const imgSrc = thumb.querySelector('img').src;
-    mainImg.src = imgSrc;
-    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-    thumb.classList.add('active');
-}
-
-document.getElementById('qty-minus')?.addEventListener('click', function() {
-    const val = document.getElementById('qty-value');
-    const inputQty = document.getElementById('input-qty');
-    let current = parseInt(val.textContent);
-    if (current > 1) {
-        val.textContent = current - 1;
-        if(inputQty) inputQty.value = current - 1;
+    function changeImage(thumb) {
+        const mainImg = document.getElementById('main-product-img');
+        const imgSrc = thumb.querySelector('img').src;
+        mainImg.src = imgSrc;
+        document.querySelectorAll('.thumb-btn').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
     }
-});
 
-document.getElementById('qty-plus')?.addEventListener('click', function() {
-    const val = document.getElementById('qty-value');
-    const inputQty = document.getElementById('input-qty');
-    let current = parseInt(val.textContent);
-    val.textContent = current + 1;
-    if(inputQty) inputQty.value = current + 1;
-});
+    function switchDetailTab(event, tabId) {
+        document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
+        document.querySelectorAll('.tab-header-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
 
-// Calendar range selection
-let calStartDate = null;
-const calDays = Array.from(document.querySelectorAll('.cal-day:not(.disabled)'));
+    const pricePerDay = {{ $product->harga_sewa }};
 
-calDays.forEach((day, index) => {
-    day.addEventListener('click', function() {
-        if (!calStartDate || document.querySelectorAll('.cal-day.active').length === 2) {
-            // First click (or reset): clear everything
-            calDays.forEach(d => { d.classList.remove('selected', 'active'); });
-            this.classList.add('selected', 'active');
-            calStartDate = index;
-            document.getElementById('input-days').value = 1;
-        } else {
-            // Second click: create range
-            let startIdx = Math.min(calStartDate, index);
-            let endIdx = Math.max(calStartDate, index);
-            
-            calDays.forEach((d, i) => {
-                if (i >= startIdx && i <= endIdx) {
-                    d.classList.add('selected');
-                }
-                if (i === startIdx || i === endIdx) {
-                    d.classList.add('active');
-                }
-            });
-            
-            const numDays = endIdx - startIdx + 1;
-            const inputDays = document.getElementById('input-days');
-            if (inputDays) {
-                inputDays.value = numDays;
-            }
-            calStartDate = null; // Reset for next interaction if needed
+    function updateSummary() {
+        const days = parseInt(document.getElementById('input-days').value) || 1;
+        const qty = parseInt(document.getElementById('input-qty').value) || 1;
+        const total = pricePerDay * days * qty;
+        
+        const formatter = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            maximumFractionDigits: 0
+        });
+
+        const formattedTotal = formatter.format(total).replace("IDR", "Rp");
+        const formattedBase = formatter.format(pricePerDay * days).replace("IDR", "Rp");
+
+        document.getElementById('summary-dur-text').innerText = `Sewa ${days} hari x ${qty} unit`;
+        document.getElementById('summary-dur-price').innerText = formattedTotal;
+        document.getElementById('summary-total-price').innerText = formattedTotal;
+    }
+
+    document.getElementById('qty-minus')?.addEventListener('click', function() {
+        const val = document.getElementById('qty-display-value');
+        const inputQty = document.getElementById('input-qty');
+        let current = parseInt(val.textContent);
+        if (current > 1) {
+            val.textContent = current - 1;
+            if(inputQty) inputQty.value = current - 1;
+            updateSummary();
         }
     });
-});
+
+    document.getElementById('qty-plus')?.addEventListener('click', function() {
+        const val = document.getElementById('qty-display-value');
+        const inputQty = document.getElementById('input-qty');
+        let current = parseInt(val.textContent);
+        if (current < {{ $product->stok_tersedia }}) {
+            val.textContent = current + 1;
+            if(inputQty) inputQty.value = current + 1;
+            updateSummary();
+        }
+    });
+
+    // Calendar selection range handler
+    let calStartDate = null;
+    const calDays = Array.from(document.querySelectorAll('.cal-day:not(.disabled)'));
+
+    calDays.forEach((day, index) => {
+        day.addEventListener('click', function() {
+            if (!calStartDate || document.querySelectorAll('.cal-day.active').length === 2) {
+                // First click: reset and activate single day
+                calDays.forEach(d => { d.classList.remove('selected', 'active'); });
+                this.classList.add('selected', 'active');
+                calStartDate = index;
+                document.getElementById('input-days').value = 1;
+                updateSummary();
+            } else {
+                // Second click: create date range highlight
+                let startIdx = Math.min(calStartDate, index);
+                let endIdx = Math.max(calStartDate, index);
+                
+                calDays.forEach((d, i) => {
+                    if (i >= startIdx && i <= endIdx) {
+                        d.classList.add('selected');
+                    }
+                    if (i === startIdx || i === endIdx) {
+                        d.classList.add('active');
+                    }
+                });
+                
+                const numDays = endIdx - startIdx + 1;
+                document.getElementById('input-days').value = numDays;
+                updateSummary();
+                calStartDate = null; // reset anchor
+            }
+        });
+    });
 </script>
 @endsection

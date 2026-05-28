@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\PaymentSetting;
+use App\Models\Setting;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
@@ -17,17 +18,43 @@ class PengaturanController extends Controller
 
         $paymentSettings = PaymentSetting::orderBy('created_at', 'desc')->get();
 
-        return view('superadmin.pengaturan', compact('timAdmin', 'paymentSettings'));
+        // Ambil semua settings toko
+        $settings = Setting::allAsArray();
+
+        return view('superadmin.pengaturan', compact('timAdmin', 'paymentSettings', 'settings'));
     }
 
     /**
-     * Simpan pengaturan toko.
+     * Simpan pengaturan toko ke database.
      */
     public function update(Request $request)
     {
-        // Placeholder: save settings to DB or config
-        ActivityLog::catat('update_pengaturan', 'Memperbarui pengaturan toko.');
-        return back()->with('success', 'Pengaturan berhasil disimpan.');
+        $request->validate([
+            'nama_toko'      => 'required|string|max:255',
+            'singkatan_toko' => 'nullable|string|max:20',
+            'telepon_toko'   => 'nullable|string|max:20',
+            'email_toko'     => 'nullable|email|max:255',
+            'alamat_toko'    => 'nullable|string|max:500',
+            'denda_per_hari' => 'nullable|numeric|min:0',
+            'min_sewa_hari'  => 'nullable|integer|min:1',
+            'max_dp_persen'  => 'nullable|integer|min:0|max:100',
+        ]);
+
+        $fields = [
+            'nama_toko', 'singkatan_toko', 'telepon_toko',
+            'email_toko', 'alamat_toko', 'denda_per_hari',
+            'min_sewa_hari', 'max_dp_persen',
+        ];
+
+        foreach ($fields as $field) {
+            if ($request->has($field)) {
+                Setting::set($field, $request->input($field));
+            }
+        }
+
+        ActivityLog::catat('update_pengaturan', 'Memperbarui pengaturan toko: ' . ($request->nama_toko ?? '-'));
+
+        return back()->with('success', 'Pengaturan toko berhasil disimpan.');
     }
 
     /**
@@ -36,16 +63,16 @@ class PengaturanController extends Controller
     public function storePayment(Request $request)
     {
         $request->validate([
-            'nama_bank' => 'required|string|max:100',
+            'nama_bank'      => 'required|string|max:100',
             'nomor_rekening' => 'required|string|max:50',
-            'atas_nama' => 'required|string|max:255',
+            'atas_nama'      => 'required|string|max:255',
         ]);
 
         $setting = PaymentSetting::create([
-            'nama_bank' => strtoupper($request->nama_bank),
+            'nama_bank'      => strtoupper($request->nama_bank),
             'nomor_rekening' => $request->nomor_rekening,
-            'atas_nama' => strtoupper($request->atas_nama),
-            'is_active' => true,
+            'atas_nama'      => strtoupper($request->atas_nama),
+            'is_active'      => true,
         ]);
 
         ActivityLog::catat(
@@ -66,15 +93,15 @@ class PengaturanController extends Controller
         $setting = PaymentSetting::findOrFail($id);
 
         $request->validate([
-            'nama_bank' => 'required|string|max:100',
+            'nama_bank'      => 'required|string|max:100',
             'nomor_rekening' => 'required|string|max:50',
-            'atas_nama' => 'required|string|max:255',
+            'atas_nama'      => 'required|string|max:255',
         ]);
 
         $setting->update([
-            'nama_bank' => strtoupper($request->nama_bank),
+            'nama_bank'      => strtoupper($request->nama_bank),
             'nomor_rekening' => $request->nomor_rekening,
-            'atas_nama' => strtoupper($request->atas_nama),
+            'atas_nama'      => strtoupper($request->atas_nama),
         ]);
 
         ActivityLog::catat(
@@ -93,7 +120,7 @@ class PengaturanController extends Controller
     public function destroyPayment($id)
     {
         $setting = PaymentSetting::findOrFail($id);
-        $label = $setting->nama_bank . ' - ' . $setting->nomor_rekening;
+        $label   = $setting->nama_bank . ' - ' . $setting->nomor_rekening;
 
         ActivityLog::catat(
             'hapus_rekening',

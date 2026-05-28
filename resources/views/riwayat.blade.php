@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Riwayat Transaksi - Gardakala Outdoor')
+@section('title', 'Pesanan Saya - Gardakala Outdoor')
 @section('nav-rental', 'active')
 
 @section('styles')
@@ -10,8 +10,10 @@
 @section('content')
 <div class="riwayat-page">
     <div class="riwayat-container">
-        <h1 class="riwayat-title">Riwayat Transaksi</h1>
-        <p class="riwayat-subtitle">Kelola penyewaan peralatan outdoor Anda dan pantau status petualangan berikutnya.</p>
+        <div class="riwayat-header">
+            <h1 class="riwayat-title">Pesanan Saya</h1>
+            <p class="riwayat-subtitle">Kelola semua transaksi dan pantau status penyewaan Anda.</p>
+        </div>
 
         {{-- FILTER TABS --}}
         <div class="riwayat-tabs" id="riwayat-tabs">
@@ -31,7 +33,7 @@
                 if ($t->status_transaksi === 'dibatalkan') $filterStatus = 'cancelled';
 
                 $firstDetail = $t->details->first();
-                $image = $firstDetail && $firstDetail->product ? $firstDetail->product->url_gambar : 'images/placeholder.png';
+                $image = $firstDetail && $firstDetail->product ? $firstDetail->product->url_gambar : 'images/tent-expedition.png';
                 $name = $firstDetail && $firstDetail->product ? $firstDetail->product->nama_produk : 'Pesanan';
 
                 $items = $t->details->map(function($d) {
@@ -58,6 +60,7 @@
                 $mappedTransactions[] = [
                     'id' => $t->id,
                     'filterStatus' => $filterStatus,
+                    'rawStatus' => $t->status_transaksi,
                     'image' => $image,
                     'ref' => 'GK-' . str_pad($t->id, 4, '0', STR_PAD_LEFT),
                     'name' => $name . ($t->details->count() > 1 ? ' + lainnya' : ''),
@@ -71,9 +74,15 @@
             }
             @endphp
 
-            @foreach($mappedTransactions as $trx)
+            @forelse($mappedTransactions as $trx)
                 @include('partials.riwayat-card', ['trx' => $trx])
-            @endforeach
+            @empty
+                <div class="empty-riwayat">
+                    <i class="far fa-file-alt"></i>
+                    <p>Anda belum pernah melakukan pemesanan sewa perlengkapan outdoor.</p>
+                    <a href="/katalog" class="btn-rent-now">Mulai Sewa Sekarang</a>
+                </div>
+            @endforelse
         </div>
     </div>
 </div>
@@ -86,9 +95,11 @@ document.querySelectorAll('.riwayat-tab').forEach(function(tab) {
         document.querySelectorAll('.riwayat-tab').forEach(t => t.classList.remove('active'));
         this.classList.add('active');
         const filter = this.dataset.filter;
+        let count = 0;
         document.querySelectorAll('.riwayat-card').forEach(function(card) {
             if (filter === 'all' || card.dataset.status === filter) {
                 card.style.display = '';
+                count++;
             } else {
                 card.style.display = 'none';
             }
