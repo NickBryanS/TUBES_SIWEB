@@ -132,7 +132,7 @@
     align-items: center;
     gap: 8px;
     padding: 12px 24px;
-    border: 1px solid rgba(255,255,255,0.4);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     color: var(--white);
     font-weight: 600;
     font-size: 0.85rem;
@@ -142,7 +142,7 @@
 
 .btn-banner-outline:hover {
     border-color: var(--white);
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .banner-illustration {
@@ -164,14 +164,14 @@
 .dash-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 15px;
 }
 
 .stat-card {
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 24px;
+    padding: 20px;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -195,9 +195,20 @@
     font-size: 1.35rem;
 }
 
-.icon-green { background: var(--green-light); color: var(--green-dark); }
-.icon-amber { background: #FFF9E6; color: #F5A623; }
-.icon-blue { background: #EBF7FC; color: #3498DB; }
+.icon-green {
+    background: var(--green-light);
+    color: var(--green-dark);
+}
+
+.icon-amber {
+    background: #FFF9E6;
+    color: #F5A623;
+}
+
+.icon-blue {
+    background: #EBF7FC;
+    color: #3498DB;
+}
 
 .stat-card-info {
     display: flex;
@@ -229,13 +240,16 @@
     color: var(--white);
     overflow: hidden;
     box-shadow: var(--shadow-md);
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .rental-premium-overlay {
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 50%);
     pointer-events: none;
 }
 
@@ -312,7 +326,7 @@
 .rental-items-list-modern .item-icon {
     width: 32px;
     height: 32px;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -370,7 +384,7 @@
 .rental-actions-premium {
     display: flex;
     gap: 14px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-top: 20px;
 }
 
@@ -395,8 +409,8 @@
 
 .btn-action-premium-primary.disabled-btn {
     opacity: 0.5;
-    background: rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.8);
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
     cursor: not-allowed;
 }
 
@@ -407,7 +421,7 @@
     justify-content: center;
     gap: 8px;
     padding: 12px;
-    border: 1px solid rgba(255,255,255,0.25);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     color: var(--white);
     font-weight: 600;
     font-size: 0.85rem;
@@ -417,7 +431,7 @@
 
 .btn-action-premium-outline:hover {
     border-color: var(--white);
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
 }
 
 /* Empty rental card */
@@ -551,10 +565,25 @@
     width: fit-content;
 }
 
-.status-completed { background: #EAFDF0; color: #2ECC71; }
-.status-active { background: #EBF7FC; color: #3498DB; }
-.status-waiting { background: #FFF9E6; color: #F5A623; }
-.status-cancelled { background: #FFF0F0; color: #E66A6A; }
+.status-completed {
+    background: #EAFDF0;
+    color: #2ECC71;
+}
+
+.status-active {
+    background: #EBF7FC;
+    color: #3498DB;
+}
+
+.status-waiting {
+    background: #FFF9E6;
+    color: #F5A623;
+}
+
+.status-cancelled {
+    background: #FFF0F0;
+    color: #E66A6A;
+}
 
 .timeline-price-action {
     display: flex;
@@ -756,16 +785,46 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
-    .dash-content-grid { grid-template-columns: 1fr; }
-    .dash-welcome-banner { padding: 32px; }
-    .dash-welcome-banner h1 { font-size: 1.8rem; }
-    .dash-stats { grid-template-columns: 1fr; }
+    .dash-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-welcome-banner {
+        padding: 32px;
+    }
+
+    .dash-welcome-banner h1 {
+        font-size: 1.8rem;
+    }
+
+    .dash-stats {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 768px) {
-    .dashboard-page { padding: 16px; }
-    .timeline-row { flex-direction: column; align-items: flex-start; gap: 14px; }
-    .timeline-details { padding: 0; }
-    .timeline-price-action { width: 100%; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px; }
-    .rental-actions-premium { flex-direction: column; }
+    .dashboard-page {
+        padding: 16px;
+    }
+
+    .timeline-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .timeline-details {
+        padding: 0;
+    }
+
+    .timeline-price-action {
+        width: 100%;
+        justify-content: space-between;
+        border-top: 1px solid var(--border);
+        padding-top: 12px;
+    }
+
+    .rental-actions-premium {
+        flex-direction: column;
+    }
 }

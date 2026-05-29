@@ -11,55 +11,67 @@
 @section('content')
 <div class="produk-detail-page">
     <div class="produk-detail-container">
-        {{-- TOP ROW: GALLERIES & INFOS & SIDEBAR --}}
+        {{-- TOP ROW: 2-COLUMN LAYOUT --}}
         <div class="detail-top-grid">
-            {{-- 1. LEFT GALLERY: Vertical Thumbnails + Main Image --}}
-            <div class="gallery-wrapper">
-                <div class="gallery-thumbnails">
+            {{-- LEFT COLUMN: Main Image & Horizontal Thumbnails --}}
+            <div class="left-column">
+                <div class="gallery-main">
+                    <img src="{{ asset($product->url_gambar ?? 'images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}" id="main-product-img">
+                </div>
+                <div class="gallery-thumbnails horizontal">
                     <button class="thumb-btn active" onclick="changeImage(this)">
                         <img src="{{ asset($product->url_gambar ?? 'images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}">
                     </button>
-                    {{-- Additional dynamic/mockup gallery thumbnails for outdoor feel --}}
                     <button class="thumb-btn" onclick="changeImage(this)">
                         <img src="{{ asset('images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}">
                     </button>
                     <button class="thumb-btn" onclick="changeImage(this)">
                         <img src="{{ asset('images/backpack-product.png') }}" alt="Outdoor Backpack">
                     </button>
-                </div>
-                <div class="gallery-main">
-                    <span class="detail-category-badge">{{ $product->category->nama_kategori ?? 'Peralatan' }}</span>
-                    <img src="{{ asset($product->url_gambar ?? 'images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}" id="main-product-img">
+                    <button class="thumb-btn" onclick="changeImage(this)">
+                        <img src="{{ asset('images/backpack-product.png') }}" alt="Outdoor Backpack 2">
+                    </button>
                 </div>
             </div>
 
-            {{-- 2. CENTER CONTENT: Product specifications & Calendar selector --}}
-            <div class="info-wrapper">
+            {{-- RIGHT COLUMN: Info, Calendar, Actions --}}
+            <div class="right-column">
                 <div class="product-header-block">
+                    <span class="detail-category-badge">{{ $product->category->nama_kategori ?? 'PRO GRADE GEAR' }}</span>
                     <h1 class="detail-product-name">{{ $product->nama_produk }}</h1>
-                    <div class="detail-rating-row">
-                        <span class="star-rating">
-                            <i class="fas fa-star"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '4.8' }}
-                        </span>
-                        <span class="review-link">{{ $product->reviewCount() }} Ulasan Pelanggan</span>
-                        <span class="divider-dot">•</span>
-                        <span class="stock-status {{ $product->stok_tersedia > 0 ? 'instock' : 'outstock' }}">
-                            {{ $product->stok_tersedia > 0 ? 'Tersedia (' . $product->stok_tersedia . ' Unit)' : 'Stok Habis' }}
-                        </span>
+                    <p class="detail-short-desc">{{ $product->deskripsi }}</p>
+                </div>
+
+                <hr class="section-divider">
+
+                <div class="price-rating-row">
+                    <div class="price-box">
+                        <span class="price-box-label">HARGA SEWA</span>
+                        <div class="price-box-value">
+                            Rp {{ number_format($product->harga_sewa, 0, ',', '.') }}
+                            <span class="price-box-unit">/ hari</span>
+                        </div>
+                    </div>
+                    <div class="rating-box">
+                        <i class="fas fa-star"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '4.9' }}
+                        <span class="review-link">({{ $product->reviewCount() }} Ulasan)</span>
                     </div>
                 </div>
 
-                <p class="detail-short-desc">{{ $product->deskripsi }}</p>
+                <hr class="section-divider">
 
                 {{-- Interactive Rent Calendar Selection --}}
                 <div class="calendar-card-section">
                     <div class="calendar-card-header">
-                        <h4>Pilih Tanggal Rental</h4>
-                        <span class="calendar-hint">Klik tanggal mulai & tanggal berakhir</span>
+                        <h4>Pilih Tanggal Sewa</h4>
+                        <div class="cal-nav-arrows">
+                            <i class="fas fa-chevron-left"></i>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
                     </div>
                     <div class="calendar-grid-wrapper">
                         <div class="cal-days-header-row">
-                            <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+                            <span>S</span><span>S</span><span>R</span><span>K</span><span>J</span><span>S</span><span>M</span>
                         </div>
                         <div class="cal-days-grid" id="calendar-days-grid">
                             <div class="cal-day disabled">28</div>
@@ -72,7 +84,7 @@
                             <div class="cal-day">5</div>
                             <div class="cal-day">6</div>
                             <div class="cal-day">7</div>
-                            <div class="cal-day selected">8</div>
+                            <div class="cal-day selected active">8</div>
                             <div class="cal-day selected">9</div>
                             <div class="cal-day selected active">10</div>
                             <div class="cal-day">11</div>
@@ -83,25 +95,7 @@
                             <div class="cal-day">16</div>
                             <div class="cal-day">17</div>
                             <div class="cal-day">18</div>
-                            <div class="cal-day">19</div>
-                            <div class="cal-day">20</div>
-                            <div class="cal-day">21</div>
-                            <div class="cal-day">22</div>
-                            <div class="cal-day">23</div>
-                            <div class="cal-day">24</div>
-                            <div class="cal-day">25</div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- 3. RIGHT SIDEBAR: Pricing, Quantity selection, and CTA Buttons --}}
-            <aside class="actions-sidebar">
-                <div class="price-box">
-                    <span class="price-box-label">Harga Sewa</span>
-                    <div class="price-box-value">
-                        Rp {{ number_format($product->harga_sewa, 0, ',', '.') }}
-                        <span class="price-box-unit">/ hari</span>
                     </div>
                 </div>
 
@@ -112,7 +106,7 @@
 
                     {{-- Quantity Selector --}}
                     <div class="qty-selector-group">
-                        <span class="qty-field-label">Jumlah Perlengkapan</span>
+                        <span class="qty-field-label">Jumlah Unit</span>
                         <div class="qty-control-box">
                             <button type="button" class="btn-qty-adj" id="qty-minus"><i class="fas fa-minus"></i></button>
                             <span class="qty-display-val" id="qty-display-value">1</span>
@@ -120,59 +114,46 @@
                         </div>
                     </div>
 
-                    {{-- Dynamic Summary Calculation Box --}}
-                    <div class="summary-calc-box">
-                        <div class="calc-row">
-                            <span id="summary-dur-text">Sewa 3 hari</span>
-                            <span id="summary-dur-price">Rp {{ number_format($product->harga_sewa * 3, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="calc-row border-top">
-                            <strong>Total Perkiraan</strong>
-                            <strong id="summary-total-price" class="total-text-green">Rp {{ number_format($product->harga_sewa * 3, 0, ',', '.') }}</strong>
-                        </div>
-                    </div>
-
-                    @if(session('success'))
-                        <div class="success-alert-badge">
-                            <i class="fas fa-check-circle"></i>
-                            <span>{{ session('success') }}</span>
-                        </div>
-                    @endif
-
                     {{-- CTA buttons --}}
                     <div class="cta-actions-group">
                         <button type="submit" formaction="{{ route('cart.store', $product->id) }}" class="btn-cta-cart">
-                            <i class="fas fa-shopping-bag"></i> + Keranjang
+                            <i class="fas fa-shopping-bag"></i> Tambah ke Keranjang
                         </button>
-                        <button type="submit" formaction="{{ route('cart.directCheckout', $product->id) }}" class="btn-cta-checkout">
-                            Sewa Sekarang
+                        <button type="submit" formaction="{{ route('wishlist.toggle', $product->id) }}" class="btn-cta-wishlist">
+                            <i class="far fa-heart"></i> Tambah ke Wishlist
                         </button>
                     </div>
-
-                    {{-- Wishlist Toggle --}}
-                    <button type="submit" formaction="{{ route('wishlist.toggle', $product->id) }}" class="btn-cta-wishlist">
-                        <i class="far fa-heart"></i> Simpan ke Wishlist
-                    </button>
                 </form>
 
-                {{-- Guarantee Policy Box --}}
-                <div class="guarantee-policy-card">
-                    <div class="policy-item">
-                        <i class="fas fa-shield-halved"></i>
-                        <div>
-                            <h5>Alat Higienis & Steril</h5>
-                            <p>Dibersihkan dengan disinfektan profesional setelah setiap sewa.</p>
-                        </div>
-                    </div>
-                    <div class="policy-item">
-                        <i class="fas fa-rotate-left"></i>
-                        <div>
-                            <h5>Jaminan Penggantian</h5>
-                            <p>Rusak saat di jalan? Kami ganti alat serupa gratis.</p>
-                        </div>
+                <div class="quick-specs">
+                    <h4>Spesifikasi Teknik</h4>
+                    <div class="quick-specs-grid">
+                        @php
+                            $specs = json_decode($product->spesifikasi_teknis ?? '{}', true) ?: [];
+                            $count = 0;
+                        @endphp
+                        @foreach($specs as $key => $val)
+                            @if($count < 4)
+                                <div class="spec-row">
+                                    <span class="spec-label">{{ ucwords(str_replace('_', ' ', $key)) }}</span>
+                                    <span class="spec-val">{{ $val }}</span>
+                                </div>
+                                @php $count++; @endphp
+                            @endif
+                        @endforeach
+                        @if(empty($specs))
+                            <div class="spec-row">
+                                <span class="spec-label">Kapasitas</span>
+                                <span class="spec-val">3-4 Orang</span>
+                            </div>
+                            <div class="spec-row">
+                                <span class="spec-label">Berat Total</span>
+                                <span class="spec-val">3.8 kg</span>
+                            </div>
+                        @endif
                     </div>
                 </div>
-            </aside>
+            </div>
         </div>
 
         {{-- BOTTOM TAB PANEL --}}
