@@ -7,10 +7,6 @@
         </button>
         
         {{-- Elegant welcome text / search --}}
-        <div class="portal-search-box">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" placeholder="Cari perlengkapan petualangan..." id="portal-global-search">
-        </div>
     </div>
     
     <div class="portal-header-right">

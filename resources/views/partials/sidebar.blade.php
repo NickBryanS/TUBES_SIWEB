@@ -10,7 +10,6 @@
         {{-- Navigation Menu --}}
         <nav class="sidebar-menu">
             <a href="/dashboard" class="sidebar-menu-item @yield('nav-dashboard')" id="sidebar-dashboard">
-                <i class="fas fa-grid-2"></i>
                 <i class="fas fa-cubes"></i>
                 <span>Dashboard</span>
             </a>
