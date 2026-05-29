@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Gardakala Outdoor - Sewa Alat Outdoor')
-@section('description', 'Gardakala Outdoor - Sewa perlengkapan outdoor premium tanpa harus membeli mahal.')
+@section('title', 'Gardakala Outdoor - Sewa Alat Outdoor Premium')
+@section('description', 'Gardakala Outdoor - Sewa perlengkapan outdoor premium untuk pendakian, kemping, dan petualangan alam bebas.')
 @section('nav-home', 'active')
 
 @section('styles')
@@ -10,134 +10,155 @@
 
 @section('content')
 <div class="home-page-content">
-    {{-- HERO SECTION --}}
+    {{-- PREMIUM HERO SECTION --}}
     @include('partials.hero')
 
-    {{-- KATEGORI POPULER --}}
-    <section class="kategori-populer-section">
+    {{-- PERLENGKAPAN TERPOPULER (Top 3 Premium Products) --}}
+    <section class="popular-equipment-section">
         <div class="home-section-header">
-            <h2 class="home-section-title">Kategori Populer</h2>
-            <a href="/katalog" class="home-see-all">Lihat Semua</a>
-        </div>
-        <div class="kategori-grid">
-            {{-- Camping Card --}}
-            <a href="/katalog?category=tenda" class="kategori-card">
-                <div class="kategori-icon-wrapper">
-                    <img src="{{ asset('images/tent-expedition.png') }}" alt="Camping - Gardakala Outdoor" class="kategori-img">
-                </div>
-                <div class="kategori-text">
-                    <h3>Camping</h3>
-                    <p>12+ Peralatan</p>
-                </div>
-            </a>
-
-            {{-- Hiking Card --}}
-            <a href="/katalog?category=tas-carrier" class="kategori-card">
-                <div class="kategori-icon-wrapper">
-                    <img src="{{ asset('images/backpack-product.png') }}" alt="Hiking - Gardakala Outdoor" class="kategori-img">
-                </div>
-                <div class="kategori-text">
-                    <h3>Hiking</h3>
-                    <p>10+ Peralatan</p>
-                </div>
-            </a>
-
-            {{-- Cooking Card --}}
-            <a href="/katalog?category=alat-masak" class="kategori-card">
-                <div class="kategori-icon-wrapper">
-                    <img src="{{ asset('images/stove-product.png') }}" alt="Cooking - Gardakala Outdoor" class="kategori-img">
-                </div>
-                <div class="kategori-text">
-                    <h3>Cooking</h3>
-                    <p>8+ Peralatan</p>
-                </div>
-            </a>
-
-            {{-- Sleeping Gear Card --}}
-            <a href="/katalog?category=alat-tidur" class="kategori-card">
-                <div class="kategori-icon-wrapper">
-                    <img src="{{ asset('images/sleepingbag-product.png') }}" alt="Sleeping Gear - Gardakala Outdoor" class="kategori-img">
-                </div>
-                <div class="kategori-text">
-                    <h3>Sleeping Gear</h3>
-                    <p>7+ Peralatan</p>
-                </div>
-            </a>
-        </div>
-    </section>
-
-    {{-- REKOMENDASI UNTUKMU --}}
-    <section class="rekomendasi-section">
-        <div class="home-section-header">
-            <h2 class="home-section-title">Rekomendasi Untukmu</h2>
-            <a href="/katalog" class="home-see-all">Lihat Semua</a>
+            <div>
+                <h2 class="home-section-title">Perlengkapan Terpopuler</h2>
+                <p class="home-section-subtitle">Alat-alat outdoor paling favorit pilihan para petualang sejati.</p>
+            </div>
+            <a href="/katalog" class="home-see-all">Lihat Semua Alat <i class="fas fa-chevron-right"></i></a>
         </div>
         
         @php
-            $products = \App\Models\Product::with('category')->take(4)->get();
+            $popularProducts = \App\Models\Product::with('category')->take(3)->get();
         @endphp
 
-        <div class="rekomendasi-grid">
-            @forelse($products as $product)
+        <div class="popular-equipment-grid">
+            @forelse($popularProducts as $product)
                 @php
                     $productId    = $product->id;
                     $productImage = $product->url_gambar ?? 'images/tent-expedition.png';
                     $productName  = $product->nama_produk;
+                    $productDesc  = $product->deskripsi;
                     $productPrice = 'Rp ' . number_format($product->harga_sewa, 0, ',', '.');
                     $categoryName = $product->category->nama_kategori ?? 'Outdoor';
                 @endphp
-                <div class="rekomendasi-card-wrapper">
-                    <a href="{{ route('produk.detail', $productId) }}" class="rekomendasi-card">
-                        <div class="rekomendasi-image-box">
-                            <span class="rekomendasi-badge">{{ $categoryName }}</span>
-                            <img src="{{ asset($productImage) }}" alt="{{ $productName }}" class="rekomendasi-img">
+                <div class="equipment-premium-card">
+                    <div class="equipment-card-image">
+                        <span class="equipment-badge">{{ $categoryName }}</span>
+                        <img src="{{ asset($productImage) }}" alt="{{ $productName }}">
+                    </div>
+                    <div class="equipment-card-body">
+                        <div class="equipment-card-meta">
+                            <span class="equipment-rating">
+                                <i class="fas fa-star"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '4.8' }}
+                            </span>
+                            <span class="equipment-reviews">({{ $product->reviewCount() > 0 ? $product->reviewCount() : '12' }} Ulasan)</span>
                         </div>
-                        <div class="rekomendasi-info">
-                            <div class="rekomendasi-meta">
-                                <span class="rekomendasi-rating">
-                                    <i class="fas fa-star"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '4.8' }}
-                                </span>
-                            </div>
-                            <h3 class="rekomendasi-name">{{ $productName }}</h3>
-                            <div class="rekomendasi-price-box">
-                                <span class="rekomendasi-price">{{ $productPrice }}<span class="price-unit">/hari</span></span>
+                        <h3 class="equipment-title">{{ $productName }}</h3>
+                        <p class="equipment-desc">{{ Str::limit($productDesc, 80) }}</p>
+                        <div class="equipment-card-footer">
+                            <span class="equipment-price">{{ $productPrice }}<span class="price-unit">/hari</span></span>
+                            <div class="equipment-actions">
+                                <a href="{{ route('produk.detail', $productId) }}" class="btn-equipment-detail">Detail</a>
+                                <form action="{{ route('cart.store', $productId) }}" method="POST" style="margin:0;">
+                                    @csrf
+                                    <input type="hidden" name="quantity" value="1">
+                                    <input type="hidden" name="days" value="1">
+                                    <button type="submit" class="btn-equipment-cart"><i class="fas fa-shopping-bag"></i></button>
+                                </form>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </div>
             @empty
-                <div class="empty-products">Belum ada perlengkapan outdoor tersedia saat ini.</div>
+                <div class="empty-products">Belum ada perlengkapan outdoor populer yang tersedia.</div>
             @endforelse
         </div>
     </section>
 
-    {{-- HOW IT WORKS SECTION (Simple step info) --}}
+    {{-- CARA KERJA KAMI (3 Steps) --}}
     <section class="how-it-works-section" id="how-it-works">
         <div class="home-section-header center-header">
-            <h2 class="home-section-title">Cara Rental Mudah</h2>
-            <p class="home-section-subtitle">Mulai petualangan luar ruangan Anda dengan 3 langkah sederhana.</p>
+            <h2 class="home-section-title">Cara Kerja Kami</h2>
+            <p class="home-section-subtitle">Sewa peralatan camping & mendaki dengan 3 langkah praktis dan mudah.</p>
         </div>
         <div class="steps-grid">
             <div class="step-card">
                 <div class="step-icon">
                     <i class="far fa-compass"></i>
                 </div>
-                <h3>Pilih Perlengkapan</h3>
-                <p>Cari alat camping atau mendaki premium dari katalog lengkap kami.</p>
+                <h3>Pilih Alat</h3>
+                <p>Telusuri berbagai perlengkapan kemping & mendaki kelas atas dari katalog lengkap kami.</p>
             </div>
             <div class="step-card">
                 <div class="step-icon">
-                    <i class="far fa-calendar-alt"></i>
+                    <i class="far fa-calendar-check"></i>
                 </div>
-                <h3>Tentukan Jadwal sewa</h3>
-                <p>Pilih durasi tanggal sewa yang sesuai dengan rencana petualangan Anda.</p>
+                <h3>Tentukan Tanggal</h3>
+                <p>Atur tanggal pengambilan dan pengembalian barang sesuai dengan jadwal perjalanan Anda.</p>
             </div>
             <div class="step-card">
                 <div class="step-icon">
-                    <i class="far fa-check-circle"></i>
+                    <i class="fas fa-route"></i>
                 </div>
-                <h3>Ambil & Mulai Beraksi</h3>
-                <p>Ambil pesanan di toko atau minta pengiriman langsung ke alamat Anda.</p>
+                <h3>Ambil & Jelajahi</h3>
+                <p>Ambil langsung barang di toko terdekat kami atau nikmati layanan pengiriman instan.</p>
+            </div>
+        </div>
+    </section>
+
+    {{-- KEAMANAN DAN KENYAMANAN SEBAGAI PRIORITAS --}}
+    <section class="security-priority-section">
+        <div class="security-grid">
+            {{-- Left Side: 4 Benefit Cards Grid --}}
+            <div class="security-benefits-block">
+                <div class="benefit-modern-card">
+                    <div class="benefit-card-icon"><i class="fas fa-circle-check"></i></div>
+                    <div class="benefit-card-text">
+                        <h4>Alat Terawat & Bersih</h4>
+                        <p>Kami menjamin semua alat selalu steril dan dalam kondisi siap tempur di alam bebas.</p>
+                    </div>
+                </div>
+                <div class="benefit-modern-card">
+                    <div class="benefit-card-icon"><i class="fas fa-tags"></i></div>
+                    <div class="benefit-card-text">
+                        <h4>Harga Bersahabat</h4>
+                        <p>Tarif rental yang transparan, tanpa biaya tersembunyi, ramah untuk kantong petualang.</p>
+                    </div>
+                </div>
+                <div class="benefit-modern-card">
+                    <div class="benefit-card-icon"><i class="fas fa-truck-fast"></i></div>
+                    <div class="benefit-card-text">
+                        <h4>Layanan Pengiriman Cepat</h4>
+                        <p>Nikmati kemudahan pengiriman peralatan langsung ke basecamp atau depan rumah Anda.</p>
+                    </div>
+                </div>
+                <div class="benefit-modern-card">
+                    <div class="benefit-card-icon"><i class="fas fa-mobile-screen"></i></div>
+                    <div class="benefit-card-text">
+                        <h4>Booking Mudah & Cepat</h4>
+                        <p>Sistem booking cerdas secara real-time kapan pun dan di mana pun Anda berada.</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Right Side: Content Banner + Checks --}}
+            <div class="security-info-block">
+                <span class="security-label"><i class="fas fa-shield-heart"></i> PRIORITAS UTAMA KAMI</span>
+                <h2 class="security-title">Keamanan dan Kenyamanan Anda Adalah Prioritas Kami</h2>
+                <p class="security-desc">Setiap peralatan yang kami sewakan melewati proses pemeliharaan ketat agar petualangan Anda tetap aman dan tak terlupakan.</p>
+                
+                <ul class="security-check-list">
+                    <li>
+                        <span class="check-bullet"><i class="fas fa-check"></i></span>
+                        <div>
+                            <strong>Pengecekan Kualitas Double-Check</strong>
+                            <p>Tim kami memeriksa fisik alat sebelum diserahterimakan untuk menghindari defect di lapangan.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="check-bullet"><i class="fas fa-check"></i></span>
+                        <div>
+                            <strong>Garansi Penggantian Alat Rusak</strong>
+                            <p>Apabila terjadi malfungsi teknis di jalan, kami siap mengirimkan alat pengganti dengan segera.</p>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </section>

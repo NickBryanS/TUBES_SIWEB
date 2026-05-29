@@ -59,7 +59,7 @@
 .filter-search-box:focus-within {
     border-color: var(--green-dark);
     background: var(--white);
-    box-shadow: 0 0 0 3px rgba(30, 62, 43, 0.08);
+    box-shadow: 0 0 0 3px rgba(23, 54, 36, 0.08);
 }
 
 .filter-search-box i {
@@ -129,7 +129,7 @@
     outline: none;
     border-color: var(--green-dark);
     background-color: var(--white);
-    box-shadow: 0 0 0 3px rgba(30, 62, 43, 0.08);
+    box-shadow: 0 0 0 3px rgba(23, 54, 36, 0.08);
 }
 
 .filter-reset-btn {
@@ -186,6 +186,8 @@
 
 .katalog-card-container {
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .katalog-card {
@@ -198,27 +200,28 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    flex: 1;
 }
 
 .katalog-card:hover {
     box-shadow: var(--shadow-lg);
     transform: translateY(-4px);
-    border-color: rgba(30, 62, 43, 0.15);
+    border-color: rgba(23, 54, 36, 0.15);
 }
 
 .katalog-card-image {
     position: relative;
     background: var(--green-light);
-    height: 200px;
+    height: 180px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px;
     overflow: hidden;
 }
 
 .katalog-card-image img {
-    max-height: 160px;
+    max-height: 140px;
     width: auto;
     object-fit: contain;
     transition: transform 0.4s ease;
@@ -245,7 +248,7 @@
 }
 
 .katalog-card-info {
-    padding: 20px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -260,17 +263,22 @@
 }
 
 .katalog-card-title-row .product-name {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-dark);
-    line-height: 1.25;
+    line-height: 1.3;
+    min-height: 2.6em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .katalog-rating {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--text-dark);
     white-space: nowrap;
@@ -286,45 +294,51 @@
 }
 
 .katalog-card-desc {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-light);
-    line-height: 1.5;
-    margin-bottom: 16px;
-    flex: 1;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    min-height: 2.8em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 /* Minimalist Spec Icons */
 .katalog-card-specs {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 20px;
+    gap: 6px;
+    margin-bottom: 16px;
+    min-height: 48px;
+    align-content: flex-start;
 }
 
 .spec-icon-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
+    gap: 4px;
+    padding: 4px 8px;
     background: var(--green-light);
-    border-radius: 8px;
-    font-size: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--green-dark);
 }
 
 .spec-icon-badge i {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--green-dark);
 }
 
 .spec-icon-tag {
     display: inline-block;
-    padding: 6px 12px;
+    padding: 4px 8px;
     background: var(--cream);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
     font-weight: 500;
     color: var(--text-medium);
 }
@@ -332,9 +346,9 @@
 .katalog-card-footer {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
     border-top: 1px solid var(--border);
-    padding-top: 16px;
+    padding-top: 12px;
     margin-top: auto;
 }
 
@@ -344,13 +358,13 @@
 }
 
 .katalog-price {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 800;
     color: var(--green-dark);
 }
 
 .price-period {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 400;
     color: var(--text-light);
     margin-left: 2px;
@@ -360,17 +374,17 @@
 .katalog-card-actions {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
-    gap: 8px;
+    gap: 6px;
 }
 
 .btn-card-detail {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 8px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: var(--text-medium);
     background: var(--white);
@@ -388,11 +402,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 8px;
     background: var(--green-dark);
     color: var(--white);
     border-radius: var(--radius-sm);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     transition: var(--transition);
 }

@@ -33,6 +33,8 @@
     }
     .wishlist-card-container {
         position: relative;
+        display: flex;
+        flex-direction: column;
     }
     .btn-remove-wishlist-top {
         position: absolute;

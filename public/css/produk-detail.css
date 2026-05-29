@@ -60,7 +60,7 @@
 
 .thumb-btn.active {
     border-color: var(--green-dark);
-    box-shadow: 0 0 0 2px rgba(30, 62, 43, 0.15);
+    box-shadow: 0 0 0 2px rgba(23, 54, 36, 0.15);
 }
 
 .gallery-main {
@@ -763,7 +763,7 @@
     background: var(--green-light);
     border-radius: 12px;
     padding: 20px;
-    border: 1px solid rgba(30, 62, 43, 0.05);
+    border: 1px solid rgba(23, 54, 36, 0.05);
 }
 
 .faq-item-card h5 {
