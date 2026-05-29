@@ -1,32 +1,49 @@
-{{-- User Sidebar Minimalis --}}
+{{-- Premium User Sidebar (Gambar 3) --}}
 <aside class="user-sidebar" id="user-sidebar">
-    <nav class="sidebar-menu">
-        <a href="/" class="sidebar-menu-item @yield('nav-home')" id="sidebar-home">
-            <i class="far fa-compass"></i>
-            <span>Beranda</span>
+    <div class="sidebar-top-wrapper">
+        {{-- Brand Logo --}}
+        <a href="/" class="sidebar-brand">
+            <i class="fas fa-mountain"></i>
+            <span>Gardakala Outdoor</span>
         </a>
-        <a href="/katalog" class="sidebar-menu-item @yield('nav-katalog')" id="sidebar-katalog">
-            <i class="far fa-folder-open"></i>
-            <span>Katalog</span>
-        </a>
-        <a href="/riwayat" class="sidebar-menu-item @yield('nav-rental')" id="sidebar-pesanan">
-            <i class="far fa-file-alt"></i>
-            <span>Pesanan Saya</span>
-        </a>
+        
+        {{-- Navigation Menu --}}
+        <nav class="sidebar-menu">
+            <a href="/dashboard" class="sidebar-menu-item @yield('nav-dashboard')" id="sidebar-dashboard">
+                <i class="fas fa-grid-2"></i>
+                <i class="fas fa-cubes"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/katalog" class="sidebar-menu-item @yield('nav-katalog')" id="sidebar-katalog">
+                <i class="fas fa-compass"></i>
+                <span>Katalog Alat</span>
+            </a>
+            <a href="/riwayat" class="sidebar-menu-item @yield('nav-rental')" id="sidebar-pesanan">
+                <i class="far fa-calendar-check"></i>
+                <span>Pesanan Saya</span>
+            </a>
+        </nav>
+    </div>
 
-        <a href="/dashboard" class="sidebar-menu-item @yield('nav-dashboard')" id="sidebar-dashboard">
-            <i class="far fa-user"></i>
-            <span>Profil</span>
-        </a>
-    </nav>
-
-    {{-- Help Card at bottom --}}
-    <div class="sidebar-help-card">
-        <div class="help-icon-circle">
-            <i class="fas fa-headset"></i>
+    {{-- Bottom Section: Help Card & Logout --}}
+    <div class="sidebar-bottom-wrapper">
+        {{-- Help Card --}}
+        <div class="sidebar-help-card">
+            <div class="help-icon-circle">
+                <i class="fas fa-headset"></i>
+            </div>
+            <h4>Butuh Bantuan?</h4>
+            <p>Tim support kami siap membantu kelancaran petualangan Anda.</p>
+            <a href="https://wa.me/6287715778007" target="_blank" class="btn-help-contact">WhatsApp Support</a>
         </div>
-        <h4>Butuh bantuan?</h4>
-        <p>Kami siap membantu kelancaran petualangan Anda.</p>
-        <a href="https://wa.me/6287715778007" target="_blank" class="btn-help-contact">Hubungi Kami</a>
+        
+        {{-- Logout Form --}}
+        <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">
+            @csrf
+            <button type="submit" class="btn-sidebar-logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Keluar</span>
+            </button>
+        </form>
     </div>
 </aside>

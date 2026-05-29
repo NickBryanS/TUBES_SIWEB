@@ -6,37 +6,45 @@
 }
 
 :root {
-    --green-primary: #1E3E2B;
-    --green-dark: #1E3E2B;
-    --green-darker: #12281B;
-    --green-light: #F4F7F5;
-    --green-olive: #607255;
-    --green-accent: #3E5E47;
-    --green-btn: #1E3E2B;
-    --cream: #FAF9F6;
-    --cream-dark: #F2EFE9;
-    --text-dark: #1A1A1A;
-    --text-medium: #4A4A4A;
+    /* === Palet Utama User === */
+    --bg-main: #ECEDE3;
+    --bg-card: #F5F5EF;
+    --green-dark: #173624;
+    --green-sage: #7A8F72;
+    --green-olive: #556B2F;
+    --text-dark: #2D2D2D;
     --text-light: #7A7A7A;
-    --text-muted: #999999;
-    --white: #ffffff;
-    --border: #E8EBE9;
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 20px rgba(0,0,0,0.05);
-    --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+    --border: #D9D9D0;
+    --hover: #DDE6D8;
+    --white: #FFFFFF;
+
+    /* === Alias agar variabel lama tetap bekerja === */
+    --green-primary: #173624;
+    --green-darker: #0f2a1b;
+    --green-light: #DDE6D8;
+    --green-accent: #556B2F;
+    --green-btn: #173624;
+    --cream: #ECEDE3;
+    --cream-dark: #D9D9D0;
+    --text-medium: #5a5a5a;
+    --text-muted: #9a9a9a;
+    --olive: #7A8F72;
+    --olive-light: #92a88a;
+    --olive-dark: #556B2F;
+    --beige: #F5F5EF;
+    --red-soft: #e27c7c;
+    --yellow-soft: #f4be5e;
+    --green-tag: #2ecc71;
+    --blue-tag: #3498db;
+
+    /* === Shadows & Radius === */
+    --shadow-sm: 0 4px 12px rgba(23, 54, 36, 0.04);
+    --shadow-md: 0 8px 24px rgba(23, 54, 36, 0.07);
+    --shadow-lg: 0 16px 40px rgba(23, 54, 36, 0.12);
     --radius: 16px;
-    --radius-sm: 10px;
-    --radius-lg: 24px;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    --olive: #607255;
-    --olive-light: #829577;
-    --olive-dark: #46533E;
-    --beige: #F5F2EC;
-    --red-soft: #E66A6A;
-    --yellow-soft: #F5A623;
-    --green-tag: #2ECC71;
-    --blue-tag: #3498DB;
+    --radius-sm: 12px;
+    --radius-lg: 28px;
+    --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html {
@@ -69,6 +77,25 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     background: var(--cream);
 }
 
+.app-layout-container.portal-layout {
+    margin-top: 0;
+    min-height: 100vh;
+}
+.app-layout-container.portal-layout .user-sidebar {
+    height: 100vh;
+    top: 0;
+}
+.app-layout-container.portal-layout .app-content-wrapper {
+    min-height: 100vh;
+}
+.app-layout-container.public-layout {
+    margin-top: 72px;
+    min-height: calc(100vh - 72px);
+}
+.app-layout-container.public-layout .app-content-wrapper {
+    min-height: calc(100vh - 72px);
+}
+
 .app-content-wrapper {
     flex: 1;
     display: flex;
@@ -80,6 +107,137 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .main-content {
     flex: 1;
     padding: 0;
+}
+
+/* ===== PORTAL HEADER STYLES ===== */
+.portal-header {
+    height: 76px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+.portal-header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+.btn-sidebar-toggle {
+    display: none;
+    font-size: 1.25rem;
+    color: var(--text-medium);
+}
+.portal-search-box {
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+}
+.portal-search-box .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+.portal-search-box input {
+    width: 100%;
+    height: 42px;
+    padding: 0 16px 0 44px;
+    background: var(--green-light);
+    border: 1px solid transparent;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    outline: none;
+    transition: var(--transition);
+}
+.portal-search-box input:focus {
+    background: var(--white);
+    border-color: var(--green-dark);
+}
+.portal-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.portal-icon-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--text-medium);
+    font-size: 1.1rem;
+    position: relative;
+    background: var(--green-light);
+}
+.portal-icon-link:hover {
+    background: var(--border);
+    color: var(--green-dark);
+}
+.portal-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: var(--green-dark);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 0.65rem;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--white);
+}
+.portal-dropdown-wrapper {
+    position: relative;
+}
+.portal-notification-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 12px);
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    width: 320px;
+    z-index: 1010;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    animation: slideUp 0.2s ease-out;
+}
+.portal-notification-dropdown.show {
+    display: block;
+}
+.portal-profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 6px 4px 14px;
+    background: var(--green-light);
+    border-radius: 30px;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+.portal-profile-trigger:hover {
+    background: var(--border);
+}
+.portal-profile-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 /* ===== NAVBAR ===== */
@@ -321,7 +479,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 
 .dropdown-item.unread {
-    background: #FAFDFB;
+    background: var(--bg-card);
     border-left: 3px solid var(--olive);
 }
 
@@ -389,7 +547,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 
 .btn-profile-logout:hover {
-    background: #FFF5F5;
+    background: #fef2f2;
 }
 
 /* ===== USER SIDEBAR ===== */
@@ -397,36 +555,64 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     width: 280px;
     background: var(--white);
     border-right: 1px solid var(--border);
-    padding: 32px 20px;
+    padding: 32px 20px 24px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: calc(100vh - 72px);
+    height: 100vh;
     position: sticky;
-    top: 72px;
+    top: 0;
     z-index: 100;
+    flex-shrink: 0;
+}
+
+.sidebar-top-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--green-dark);
+    letter-spacing: -0.02em;
+    padding: 0 8px;
+    margin-bottom: 36px;
+    text-transform: uppercase;
+}
+
+.sidebar-brand i {
+    font-size: 1.35rem;
+    color: var(--green-dark);
 }
 
 .sidebar-menu {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .sidebar-menu-item {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 14px 20px;
+    padding: 12px 18px;
     border-radius: 12px;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.875rem;
+    font-weight: 600;
     color: var(--text-medium);
     transition: var(--transition);
 }
 
 .sidebar-menu-item i {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
+    color: var(--text-light);
+    width: 20px;
+    text-align: center;
+    transition: var(--transition);
 }
 
 .sidebar-menu-item:hover {
@@ -434,20 +620,33 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     color: var(--green-dark);
 }
 
-.sidebar-menu-item.active {
-    background: rgba(30, 62, 43, 0.08);
+.sidebar-menu-item:hover i {
     color: var(--green-dark);
-    font-weight: 600;
+}
+
+.sidebar-menu-item.active {
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-weight: 750;
+}
+
+.sidebar-menu-item.active i {
+    color: var(--green-dark);
+}
+
+.sidebar-bottom-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 /* Sidebar Help Card */
 .sidebar-help-card {
-    background: var(--green-light);
-    border: 1px solid rgba(30, 62, 43, 0.06);
+    background: var(--cream);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 20px;
     text-align: center;
-    margin-top: auto;
 }
 
 .help-icon-circle {
@@ -462,11 +661,12 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     color: var(--green-dark);
     font-size: 1.1rem;
     box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
 }
 
 .sidebar-help-card h4 {
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 750;
     color: var(--text-dark);
     margin-bottom: 4px;
 }
@@ -475,6 +675,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     font-size: 0.75rem;
     color: var(--text-light);
     margin-bottom: 14px;
+    line-height: 1.4;
 }
 
 .btn-help-contact {
@@ -485,12 +686,37 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     color: var(--white);
     border-radius: var(--radius-sm);
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 700;
     transition: var(--transition);
 }
 
 .btn-help-contact:hover {
     background: var(--green-darker);
+    transform: translateY(-1px);
+}
+
+/* Logout Form in Sidebar */
+.sidebar-logout-form {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+}
+
+.btn-sidebar-logout {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--red-soft);
+    transition: var(--transition);
+}
+
+.btn-sidebar-logout:hover {
+    background: #fef2f2;
+    color: #e24c4c;
 }
 
 /* ===== FOOTER ===== */

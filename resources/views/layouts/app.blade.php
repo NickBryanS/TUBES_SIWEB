@@ -13,24 +13,37 @@
     @yield('styles')
 </head>
 <body>
-    {{-- NAVBAR (partial) --}}
-    @include('partials.navbar')
+    @php
+        $isPortal = Auth::check() && !Request::is('/');
+    @endphp
+
+    @if(!$isPortal)
+        {{-- NAVBAR (partial) --}}
+        @include('partials.navbar')
+    @endif
 
     {{-- MAIN APP CONTAINER --}}
-    <div class="app-layout-container">
+    <div class="app-layout-container {{ $isPortal ? 'portal-layout' : 'public-layout' }}">
         {{-- SIDEBAR (partial) --}}
-        @if(!Route::is('wishlist.index'))
+        @if($isPortal)
             @include('partials.sidebar')
         @endif
 
         {{-- MAIN CONTENT AREA --}}
         <div class="app-content-wrapper">
+            @if($isPortal)
+                {{-- PORTAL HEADER (partial) --}}
+                @include('partials.portal-header')
+            @endif
+
             <main class="main-content">
                 @yield('content')
             </main>
 
             {{-- FOOTER (partial) --}}
-            @include('partials.footer')
+            @if(!$isPortal)
+                @include('partials.footer')
+            @endif
         </div>
     </div>
 

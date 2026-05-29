@@ -62,7 +62,7 @@
 
 .cart-item-card:hover {
     box-shadow: var(--shadow-md);
-    border-color: rgba(30, 62, 43, 0.12);
+    border-color: rgba(23, 54, 36, 0.12);
 }
 
 .cart-item-image {
