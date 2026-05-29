@@ -425,7 +425,7 @@
     background: var(--green-darker);
 }
 
-/* ===== RIGHT PANEL: ADVENTURE ===== */
+/* ===== RIGHT PANEL: PROFILE CARD ===== */
 .dash-right-panel {
     display: flex;
     flex-direction: column;
@@ -435,79 +435,96 @@
     margin-bottom: 20px;
 }
 
-.adventure-card {
+.profile-card {
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 24px 20px;
 }
 
-.adventure-image-wrapper {
-    height: 160px;
+.profile-card-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
     overflow: hidden;
-    background: var(--cream);
+    border: 3px solid var(--green-light);
+    box-shadow: 0 4px 12px rgba(30, 62, 43, 0.1);
+    margin-bottom: 16px;
 }
 
-.adventure-image-wrapper img {
+.profile-avatar-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
 }
 
-.adventure-card:hover .adventure-image-wrapper img {
-    transform: scale(1.05);
-}
-
-.adventure-info {
-    padding: 20px;
-}
-
-.adventure-info h3 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 12px;
-}
-
-.adv-meta-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.profile-card-info {
+    text-align: center;
     margin-bottom: 20px;
 }
 
-.adv-meta-list span {
-    font-size: 0.8rem;
+.profile-card-info h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.profile-email {
+    font-size: 0.82rem;
     color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.profile-joined {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-light);
+    background: var(--cream);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.profile-joined i {
+    color: var(--green-olive);
+    font-size: 0.7rem;
+}
+
+.profile-card-logout {
+    width: 100%;
+    padding-top: 16px;
+}
+
+.btn-profile-card-logout {
+    width: 100%;
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.adv-meta-list span i {
-    color: var(--green-olive);
-    width: 14px;
-}
-
-.btn-adventure-action {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background: var(--green-light);
-    color: var(--green-dark);
-    border: 1px solid rgba(30, 62, 43, 0.08);
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-align: center;
-    border-radius: var(--radius-sm);
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text-medium);
+    cursor: pointer;
     transition: var(--transition);
+    font-family: inherit;
 }
 
-.btn-adventure-action:hover {
-    background: var(--green-dark);
-    color: var(--white);
+.btn-profile-card-logout:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #dc2626;
 }
 
 /* ===== TRANSACTIONS TABLE CARD ===== */
@@ -620,7 +637,15 @@
 @media (max-width: 1200px) {
     .dash-stats { grid-template-columns: repeat(2, 1fr); }
     .dash-content-grid { grid-template-columns: 1fr; }
-    .dash-right-panel { display: none; } /* hide trip helper on tablet for clean layout */
+    .profile-card {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 20px 24px;
+        gap: 20px;
+    }
+    .profile-card-avatar { margin-bottom: 0; }
+    .profile-card-info { text-align: left; margin-bottom: 0; flex: 1; }
+    .profile-card-logout { padding-top: 0; }
 }
 
 @media (max-width: 768px) {
@@ -631,4 +656,11 @@
     .btn-dash-primary { width: 100%; justify-content: center; }
     .transaction-table-card { overflow-x: auto; }
     .rental-actions { flex-direction: column; }
+    .profile-card {
+        flex-direction: column;
+        align-items: center;
+    }
+    .profile-card-info { text-align: center; }
+
 }
+

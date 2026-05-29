@@ -49,7 +49,8 @@ Route::middleware('redirect_if_admin')->group(function () {
 
     Route::get('/katalog', function () {
         $products = Product::with('category')->get();
-        return view('katalog', compact('products'));
+        $categories = \App\Models\Category::all();
+        return view('katalog', compact('products', 'categories'));
     });
 
     // Product Detail page mapping

@@ -28,7 +28,7 @@
         <div class="dash-stats" id="dash-stats">
             @php
             $stats = [
-                ['icon' => 'far fa-campground', 'iconClass' => 'icon-green', 'label' => 'Sewa Aktif', 'number' => str_pad($sewaAktif, 2, '0', STR_PAD_LEFT)],
+                ['icon' => 'fas fa-tent', 'iconClass' => 'icon-green', 'label' => 'Sewa Aktif', 'number' => str_pad($sewaAktif, 2, '0', STR_PAD_LEFT)],
                 ['icon' => 'far fa-file-alt', 'iconClass' => 'icon-amber', 'label' => 'Total Pesanan', 'number' => str_pad($totalPesanan, 2, '0', STR_PAD_LEFT)],
                 ['icon' => 'far fa-check-circle', 'iconClass' => 'icon-blue', 'label' => 'Selesai', 'number' => str_pad($selesai, 2, '0', STR_PAD_LEFT)],
                 ['icon' => 'far fa-clock', 'iconClass' => 'icon-red', 'label' => 'Menunggu Pembayaran', 'number' => str_pad($menungguBayar, 2, '0', STR_PAD_LEFT),
@@ -73,7 +73,7 @@
                     <div class="rental-items-list">
                         @foreach($activeRental->details as $detail)
                         <div class="rental-item-row">
-                            <span class="item-name"><i class="far fa-campground"></i> {{ $detail->product->nama_produk ?? 'Peralatan Outdoor' }}</span>
+                            <span class="item-name"><i class="fas fa-tent"></i> {{ $detail->product->nama_produk ?? 'Peralatan Outdoor' }}</span>
                             <span class="item-qty">{{ $detail->jumlah }} Unit</span>
                         </div>
                         @endforeach
@@ -125,7 +125,7 @@
                 @else
                 <div class="empty-rental-card">
                     <div class="empty-rental-icon">
-                        <i class="far fa-campground"></i>
+                        <i class="fas fa-tent"></i>
                     </div>
                     <h3>Belum ada sewa aktif</h3>
                     <p>Mulai rencanakan petualangan serumu dan sewa perlengkapan outdoor premium kami.</p>
@@ -134,21 +134,25 @@
                 @endif
             </div>
 
-            {{-- RIGHT PANEL: ADVENTURE & TIPS --}}
+            {{-- RIGHT PANEL: PROFILE CARD --}}
             <aside class="dash-right-panel">
-                <h2>Rencana Perjalanan</h2>
-                <div class="adventure-card" id="adventure-card">
-                    <div class="adventure-image-wrapper">
-                        <img src="{{ asset('images/mountain-adventure.png') }}" alt="Petualangan Gunung Gede - Gardakala Outdoor">
+                <h2>Profil Saya</h2>
+                <div class="profile-card" id="profile-card">
+                    <div class="profile-card-avatar">
+                        <img src="{{ Auth::user()->url_avatar ?? asset('images/avatar-default.png') }}" alt="{{ Auth::user()->nama_lengkap ?? 'User' }}" class="profile-avatar-img">
                     </div>
-                    <div class="adventure-info">
-                        <h3>Gunung Gede Pangrango</h3>
-                        <div class="adv-meta-list">
-                            <span><i class="far fa-calendar-alt"></i> 26 Okt - 28 Okt 2026</span>
-                            <span><i class="far fa-map-marker-alt"></i> Basecamp Cibodas</span>
-                        </div>
-                        <a href="/katalog" class="btn-adventure-action">Cari Perlengkapan</a>
+                    <div class="profile-card-info">
+                        <h3>{{ Auth::user()->nama_lengkap ?? Auth::user()->name ?? 'Petualang' }}</h3>
+                        <p class="profile-email">{{ Auth::user()->email }}</p>
+                        <span class="profile-joined"><i class="far fa-calendar-alt"></i> Bergabung {{ Auth::user()->created_at->translatedFormat('d M Y') }}</span>
                     </div>
+
+                    <form method="POST" action="{{ route('logout') }}" class="profile-card-logout">
+                        @csrf
+                        <button type="submit" class="btn-profile-card-logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
                 </div>
             </aside>
         </div>
@@ -174,12 +178,12 @@
                             $statusStyles = [
                                 'menunggu'       => ['class' => 'status-waiting',  'icon' => 'far fa-clock', 'label' => 'Menunggu Pembayaran'],
                                 'menunggu_admin' => ['class' => 'status-waiting',  'icon' => 'far fa-hourglass', 'label' => 'Menunggu Konfirmasi'],
-                                'diproses'       => ['class' => 'status-active',   'icon' => 'far fa-box', 'label' => 'Diproses'],
-                                'dikirim'        => ['class' => 'status-active',   'icon' => 'far fa-truck', 'label' => 'Dikirim'],
-                                'selesai'        => ['class' => 'status-completed','icon' => 'far fa-check-circle', 'label' => 'Selesai'],
-                                'dibatalkan'     => ['class' => 'status-cancelled','icon' => 'far fa-times-circle', 'label' => 'Dibatalkan'],
+                                'diproses'       => ['class' => 'status-active',   'icon' => 'fas fa-box', 'label' => 'Diproses'],
+                                'dikirim'        => ['class' => 'status-active',   'icon' => 'fas fa-truck', 'label' => 'Dikirim'],
+                                'selesai'        => ['class' => 'status-completed','icon' => 'far fa-circle-check', 'label' => 'Selesai'],
+                                'dibatalkan'     => ['class' => 'status-cancelled','icon' => 'fas fa-circle-xmark', 'label' => 'Dibatalkan'],
                             ];
-                            $st = $statusStyles[$t->status_transaksi] ?? ['class' => 'status-waiting', 'icon' => 'far fa-info-circle', 'label' => $t->status_transaksi];
+                            $st = $statusStyles[$t->status_transaksi] ?? ['class' => 'status-waiting', 'icon' => 'fas fa-circle-info', 'label' => $t->status_transaksi];
                             $items = $t->details->map(fn($d) => $d->product->nama_produk ?? 'Alat')->implode(', ');
                         @endphp
                         <tr>
