@@ -45,7 +45,7 @@
             @endif
             @if($berat)
                 <span class="spec-icon-badge" title="Berat">
-                    <i class="far fa-weight-hanging"></i> {{ $berat }}
+                    <i class="fas fa-weight-hanging"></i> {{ $berat }}
                 </span>
             @endif
             @if($material && !$kapasitas)
@@ -55,10 +55,10 @@
                 <span class="spec-icon-tag">{{ $fitur }}</span>
             @endif
             @if($comfort)
-                <span class="spec-icon-badge"><i class="far fa-thermometer-half"></i> {{ $comfort }}</span>
+                <span class="spec-icon-badge"><i class="fas fa-temperature-half"></i> {{ $comfort }}</span>
             @endif
             @if($lumen)
-                <span class="spec-icon-badge"><i class="far fa-lightbulb"></i> {{ $lumen }}</span>
+                <span class="spec-icon-badge"><i class="fas fa-lightbulb"></i> {{ $lumen }}</span>
             @endif
         </div>
 

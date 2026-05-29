@@ -99,7 +99,7 @@
                 </div>
             @else
                 <div class="cancelled-notice">
-                    <i class="far fa-exclamation-circle"></i>
+                    <i class="fas fa-circle-exclamation"></i>
                     <span>Transaksi ini telah dibatalkan.</span>
                 </div>
             @endif

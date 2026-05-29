@@ -7,17 +7,7 @@
             <span>Gardakala Outdoor</span>
         </a>
 
-        {{-- Center: Big Search Bar --}}
-        <div class="nav-search-container">
-            <form action="/katalog" method="GET" class="nav-search-form">
-                <div class="nav-search-wrapper">
-                    <i class="fas fa-search nav-search-icon"></i>
-                    <input type="text" name="search" placeholder="Cari tenda, carrier, sleeping bag..." value="{{ request('search') }}" class="nav-search-input">
-                </div>
-            </form>
-        </div>
-
-        {{-- Right: Icons & Profile --}}
+        {{-- Right: Icons --}}
         <div class="nav-icons" id="nav-icons">
             {{-- Wishlist Icon --}}
             <a href="/wishlist" class="nav-icon-link" aria-label="Wishlist" title="Wishlist">
@@ -83,38 +73,11 @@
                 @endif
             </a>
 
-            {{-- Profile --}}
+            {{-- Profile / Login --}}
             @auth
-                <div class="nav-profile-dropdown-wrapper">
-                    <button class="nav-profile-trigger" id="profile-toggle" onclick="toggleProfileMenu()">
-                        <img src="{{ Auth::user()->url_avatar ?? asset('images/avatar-default.png') }}" alt="{{ Auth::user()->name }}" class="nav-avatar-img">
-                        <span class="nav-profile-name">Hai, {{ explode(' ', Auth::user()->nama_lengkap ?? Auth::user()->name ?? 'Petualang')[0] }}</span>
-                        <i class="fas fa-chevron-down nav-arrow-icon"></i>
-                    </button>
-                    <div class="profile-dropdown-menu" id="profile-menu">
-                        <div class="profile-dropdown-header">
-                            <h4>{{ Auth::user()->nama_lengkap ?? Auth::user()->name }}</h4>
-                            <p>{{ Auth::user()->email }}</p>
-                        </div>
-                        <div class="profile-dropdown-body">
-                            <a href="/dashboard" class="profile-dropdown-item">
-                                <i class="far fa-user"></i> Dashboard Saya
-                            </a>
-                            <a href="/riwayat" class="profile-dropdown-item">
-                                <i class="far fa-file-alt"></i> Pesanan Saya
-                            </a>
-                            <a href="/wishlist" class="profile-dropdown-item">
-                                <i class="far fa-heart"></i> Wishlist
-                            </a>
-                        </div>
-                        <form method="POST" action="{{ route('logout') }}" class="profile-logout-form">
-                            @csrf
-                            <button type="submit" class="btn-profile-logout">
-                                <i class="far fa-sign-out"></i> Logout
-                            </button>
-                        </form>
-                    </div>
-                </div>
+                <a href="/dashboard" class="nav-icon-link" aria-label="Profil" title="Profil Saya">
+                    <i class="far fa-user-circle"></i>
+                </a>
             @else
                 <a href="/login" class="btn-nav-login">Masuk</a>
             @endauth
@@ -123,37 +86,18 @@
 </nav>
 
 <script>
-    function toggleProfileMenu() {
-        var menu = document.getElementById('profile-menu');
-        var notifMenu = document.getElementById('notification-menu');
-        if (menu) {
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        }
-        if (notifMenu) {
-            notifMenu.style.display = 'none';
-        }
-    }
     function toggleNotificationMenu() {
         var menu = document.getElementById('notification-menu');
-        var profileMenu = document.getElementById('profile-menu');
         if (menu) {
             menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        }
-        if (profileMenu) {
-            profileMenu.style.display = 'none';
         }
     }
     document.addEventListener('click', function(e) {
-        var profileWrapper = document.querySelector('.nav-profile-dropdown-wrapper');
         var notifWrapper = document.querySelector('.nav-dropdown-wrapper');
-        
-        if (profileWrapper && !profileWrapper.contains(e.target)) {
-            var menu = document.getElementById('profile-menu');
-            if (menu) menu.style.display = 'none';
-        }
         if (notifWrapper && !notifWrapper.contains(e.target)) {
             var menu = document.getElementById('notification-menu');
             if (menu) menu.style.display = 'none';
         }
     });
 </script>
+
