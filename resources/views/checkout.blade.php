@@ -93,14 +93,15 @@
 
                 <!-- PERSONAL INFO -->
                 <div class="checkout-section">
+                    <h3 class="checkout-section-title"><i class="fas fa-user"></i> Info Penerima</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">NAMA PENERIMA</label>
-                            <input type="text" class="form-input" value="John Doe" id="nama-penerima" form="checkout-form">
+                            <input type="text" class="form-input" name="nama_penerima" value="{{ Auth::user()->nama_lengkap ?? '' }}" id="nama-penerima" form="checkout-form" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">NOMOR HP</label>
-                            <input type="text" class="form-input" value="0812.5456.7890" id="nomor-hp" form="checkout-form">
+                            <input type="text" class="form-input" name="telepon_penerima" value="{{ Auth::user()->no_telepon ?? '' }}" id="nomor-hp" form="checkout-form" required>
                         </div>
                     </div>
                 </div>
@@ -108,19 +109,9 @@
                 <!-- DELIVERY ADDRESS (initially hidden, shown when method=deliver) -->
                 <div class="checkout-section" id="delivery-address-section" style="display:none;">
                     <h3 class="checkout-section-title">Detail Pengiriman</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">NAMA LENGKAP</label>
-                            <input type="text" class="form-input" value="John Doe" form="checkout-form">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">NOMOR HP</label>
-                            <input type="text" class="form-input" value="0812.5456.7890" form="checkout-form">
-                        </div>
-                    </div>
                     <div class="form-group full-width">
                         <label class="form-label">ALAMAT LENGKAP</label>
-                        <textarea class="form-textarea" name="alamat_pengiriman" rows="3" form="checkout-form">Jl. Rimba No. 12, Jakarta Selatan</textarea>
+                        <textarea class="form-textarea" name="alamat_pengiriman" rows="3" form="checkout-form" placeholder="Masukkan alamat lengkap pengiriman..."></textarea>
                     </div>
                 </div>
 

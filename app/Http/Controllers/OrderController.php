@@ -15,15 +15,6 @@ use Carbon\Carbon;
 
 class OrderController extends Controller
 {
-    /**
-     * Helper: Ambil user ID yang sedang login.
-     * Jika belum ada sistem auth, gunakan user pertama sebagai fallback (development only).
-     * TODO: Hapus fallback saat sistem login sudah tersedia.
-     */
-    private function getUserId()
-    {
-        return Auth::id() ?? \App\Models\User::first()?->id;
-    }
 
     /**
      * Tampilkan halaman dashboard user.
@@ -31,7 +22,7 @@ class OrderController extends Controller
      */
     public function dashboard()
     {
-        $userId = $this->getUserId();
+        $userId = Auth::id();
 
         // Query semua transaksi milik user
         $allTransactions = Transaction::where('user_id', $userId)
@@ -66,7 +57,7 @@ class OrderController extends Controller
      */
     public function checkout()
     {
-        $userId = $this->getUserId();
+        $userId = Auth::id();
         $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
 
         $subtotal = 0;
@@ -88,6 +79,8 @@ class OrderController extends Controller
             'tanggal_mulai'      => 'required|date|after_or_equal:today',
             'tanggal_selesai'    => 'required|date|after:tanggal_mulai',
             'metode_pengambilan' => 'required|in:pickup,deliver',
+            'nama_penerima'      => 'required|string|max:255',
+            'telepon_penerima'   => 'required|string|max:30',
             'alamat_pengiriman'  => 'nullable|required_if:metode_pengambilan,deliver|string',
             'foto_ktp'           => 'nullable|required_if:metode_pengambilan,deliver|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
@@ -102,6 +95,8 @@ class OrderController extends Controller
             'tanggal_mulai'      => $request->tanggal_mulai,
             'tanggal_selesai'    => $request->tanggal_selesai,
             'metode_pengambilan' => $request->metode_pengambilan,
+            'nama_penerima'      => $request->nama_penerima,
+            'telepon_penerima'   => $request->telepon_penerima,
             'alamat_pengiriman'  => $request->alamat_pengiriman,
             'foto_ktp'           => $fotoKtpPath,
         ]);
@@ -121,7 +116,7 @@ class OrderController extends Controller
             return redirect()->route('checkout')->with('error', 'Silakan isi data pemesanan terlebih dahulu.');
         }
 
-        $userId = $this->getUserId();
+        $userId = Auth::id();
         $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
 
         if ($carts->isEmpty()) {
@@ -138,7 +133,10 @@ class OrderController extends Controller
 
         $checkoutData = $request->session()->get('checkout_data');
 
-        return view('pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'total', 'checkoutData'));
+        // Ambil daftar rekening aktif dari pengaturan admin
+        $paymentSettings = \App\Models\PaymentSetting::where('is_active', true)->get();
+
+        return view('pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'total', 'checkoutData', 'paymentSettings'));
     }
 
     /**
@@ -160,7 +158,7 @@ class OrderController extends Controller
         }
 
         // Ambil keranjang dari database
-        $userId = $this->getUserId();
+        $userId = Auth::id();
         $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
 
         if ($carts->isEmpty()) {
@@ -186,6 +184,8 @@ class OrderController extends Controller
                 'status_transaksi'   => 'menunggu',
                 'metode_pengambilan' => $checkoutData['metode_pengambilan'],
                 'alamat_pengiriman'  => $checkoutData['alamat_pengiriman'],
+                'nama_penerima'      => $checkoutData['nama_penerima'],
+                'telepon_penerima'   => $checkoutData['telepon_penerima'],
             ];
 
             if (isset($checkoutData['foto_ktp'])) {
@@ -335,8 +335,7 @@ class OrderController extends Controller
             ->findOrFail($id);
 
         // Pastikan transaksi milik user yang login
-        $userId = $this->getUserId();
-        if ($transaction->user_id !== $userId) {
+        if ($transaction->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
@@ -350,8 +349,7 @@ class OrderController extends Controller
     {
         $transaction = Transaction::with('details.product', 'user')->findOrFail($id);
 
-        $userId = $this->getUserId();
-        if ($transaction->user_id !== $userId) {
+        if ($transaction->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
@@ -503,8 +501,7 @@ class OrderController extends Controller
         $transaction = Transaction::findOrFail($id);
 
         // Pastikan transaksi milik user yang login
-        $userId = $this->getUserId();
-        if ($transaction->user_id !== $userId) {
+        if ($transaction->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
@@ -575,5 +572,28 @@ class OrderController extends Controller
 
         return redirect()->route('pesanan.detail', $transaction->id)
                          ->with('info', 'Pengajuan perpanjangan ditolak.');
+    }
+
+    /**
+     * User mengonfirmasi bahwa pesanan (pengantaran) telah diterima.
+     */
+    public function terimaPesanan($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+
+        // Pastikan transaksi milik user yang login
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        if ($transaction->status_transaksi === 'dikirim' && $transaction->metode_pengambilan === 'deliver') {
+            $transaction->update([
+                'barang_diterima' => true
+            ]);
+            return redirect()->route('pesanan.detail', $transaction->id)
+                             ->with('success', 'Terima kasih, Anda telah mengonfirmasi penerimaan barang.');
+        }
+
+        return redirect()->back()->with('error', 'Status pesanan tidak valid untuk tindakan ini.');
     }
 }

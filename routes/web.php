@@ -102,6 +102,9 @@ Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
     Route::post('/pesanan/{id}/perpanjangan/approve', [OrderController::class, 'approvePerpanjangan'])->name('perpanjangan.approve');
     Route::post('/pesanan/{id}/perpanjangan/reject', [OrderController::class, 'rejectPerpanjangan'])->name('perpanjangan.reject');
 
+    // Konfirmasi Penerimaan Barang (Pesanan Diterima)
+    Route::post('/pesanan/{id}/terima', [OrderController::class, 'terimaPesanan'])->name('pesanan.terima');
+
     // Konfirmasi Pengembalian & Denda (FR-USR-034)
     Route::post('/pesanan/{id}/pengembalian', [OrderController::class, 'konfirmasiPengembalian'])->name('pesanan.pengembalian');
 

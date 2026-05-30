@@ -26,8 +26,9 @@
             ['title' => 'Dipinjam',       'icon' => 'fas fa-box-open'],
             ['title' => 'Dikembalikan',   'icon' => 'fas fa-undo-alt'],
         ];
+        $currentStep = $statusMap[$transaction->status_transaksi] ?? 0;
     } else {
-        // 5-step stepper untuk Diantar
+        // 4-step stepper untuk Diantar
         $statusMap = [
             'menunggu'       => 0,
             'menunggu_admin' => 0,
@@ -38,13 +39,22 @@
         ];
         $steps = [
             ['title' => 'Pesanan Dibuat',       'icon' => 'fas fa-check'],
-            ['title' => 'Barang Disiapkan',      'icon' => 'fas fa-box'],
-            ['title' => 'Barang Sedang Diantar', 'icon' => 'fas fa-truck'],
-            ['title' => 'Barang Diterima',       'icon' => 'fas fa-hand-holding'],
-            ['title' => 'Selesai',              'icon' => 'fas fa-flag-checkered'],
+            ['title' => 'Disiapkan',             'icon' => 'fas fa-box'],
+            ['title' => 'Sedang Diantar',        'icon' => 'fas fa-truck'],
+            ['title' => 'Barang Diterima',       'icon' => 'fas fa-box-open'],
+            ['title' => 'Pesanan Selesai',       'icon' => 'fas fa-flag-checkered'],
         ];
+        $currentStep = $statusMap[$transaction->status_transaksi] ?? 0;
+
+        if ($transaction->status_transaksi === 'dikirim' && $transaction->barang_diterima) {
+            $currentStep = 3;
+        }
+        
+        // Logika tambahan jika barang sudah disiapkan dan tinggal dikirim
+        if ($transaction->status_transaksi === 'diproses' && $transaction->siap_kirim) {
+            $steps[1]['title'] = 'Siap Dikirim';
+        }
     }
-    $currentStep = $statusMap[$transaction->status_transaksi] ?? 0;
 @endphp
 
 @section('content')
@@ -148,6 +158,58 @@
         <div class="pesanan-grid">
             <!-- LEFT -->
             <div class="pesanan-left">
+                {{-- LIVE TRACKING CARD (KHUSUS STATUS DIKIRIM) --}}
+                @if($transaction->status_transaksi === 'dikirim' && $transaction->metode_pengambilan === 'deliver')
+                    @if(!$transaction->barang_diterima)
+                    <div class="delivery-tracking-card">
+                        <div class="delivery-tracking-header">
+                            <div class="delivery-pulse-indicator">
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-dot"></div>
+                            </div>
+                            <h3>Pesanan Sedang Diantar</h3>
+                        </div>
+                        <div class="delivery-tracking-body">
+                            <div class="delivery-illustration">
+                                <i class="fas fa-truck-fast" style="font-size: 2.5rem; color: var(--primary-color);"></i>
+                            </div>
+                            <div class="delivery-info">
+                                <h4>Pengantaran Langsung Gardakala</h4>
+                                <p>Barang Anda sedang dalam perjalanan menuju lokasi Anda dan diantar langsung oleh tim internal kami.</p>
+                                
+                                @php
+                                    $waMessage = urlencode("Halo Gardakala, saya ingin menanyakan status pengantaran untuk pesanan #GK-" . str_pad($transaction->id, 4, '0', STR_PAD_LEFT) . ". Apakah kurir sudah dekat?");
+                                    $waNumber = "6281234567890"; // Bisa disesuaikan dengan nomor asli toko
+                                @endphp
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <a href="https://wa.me/{{ $waNumber }}?text={{ $waMessage }}" target="_blank" class="btn-hubungi-kurir" style="flex: 1; text-align: center;">
+                                        <i class="fab fa-whatsapp"></i> Hubungi Tim Pengantar
+                                    </a>
+                                    <form action="{{ route('pesanan.terima', $transaction->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin telah menerima semua barang pesanan dengan baik?');" style="flex: 1; margin: 0;">
+                                        @csrf
+                                        <button type="submit" class="btn-action-primary" style="width: 100%; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">
+                                            <i class="fas fa-box-open"></i> Pesanan Diterima
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @else
+                    <div class="delivery-tracking-card" style="background: rgba(46, 204, 113, 0.05); border-color: rgba(46, 204, 113, 0.2);">
+                        <div class="delivery-tracking-header" style="background: rgba(46, 204, 113, 0.1);">
+                            <h3><i class="fas fa-box-open" style="color: #2ecc71;"></i> Barang Telah Diterima</h3>
+                        </div>
+                        <div class="delivery-tracking-body">
+                            <div class="delivery-info">
+                                <h4>Masa Sewa Sedang Berjalan</h4>
+                                <p>Terima kasih telah mengonfirmasi penerimaan barang. Selamat menikmati perlengkapan dari Gardakala Outdoor! Jangan lupa mengembalikan barang pada tanggal selesai yang tertera.</p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                @endif
+
                 {{-- STATUS PERPANJANGAN BADGE --}}
                 @if($transaction->status_perpanjangan === 'pending')
                     <div style="background: rgba(241,196,15,0.1); border: 1px solid rgba(241,196,15,0.3); padding: 14px 20px; border-radius: 10px; margin-bottom: 16px; color: #f1c40f; font-size: 0.9rem;">
@@ -331,7 +393,7 @@
                         @endif
 
                         {{-- Tombol Konfirmasi Pengembalian (FR-USR-034) --}}
-                        @if(in_array($transaction->status_transaksi, ['diproses', 'dikirim']))
+                        @if((in_array($transaction->status_transaksi, ['diproses', 'dikirim']) && $transaction->metode_pengambilan === 'pickup') || ($transaction->status_transaksi === 'dikirim' && $transaction->metode_pengambilan === 'deliver' && $transaction->barang_diterima))
                         <form action="{{ route('pesanan.pengembalian', $transaction->id) }}" method="POST"
                               onsubmit="return confirm('Konfirmasi bahwa barang telah dikembalikan?');"
                               style="margin: 0;">

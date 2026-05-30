@@ -66,16 +66,17 @@
 
 .riwayat-card {
     background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border: 1px solid rgba(45, 90, 39, 0.1);
+    border-radius: 16px;
     padding: 24px;
-    transition: var(--transition);
-    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 .riwayat-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: rgba(23, 54, 36, 0.12);
+    box-shadow: 0 12px 30px rgba(45, 90, 39, 0.08);
+    transform: translateY(-2px);
+    border-color: rgba(45, 90, 39, 0.2);
 }
 
 .riwayat-card-main {
@@ -85,21 +86,29 @@
 }
 
 .riwayat-card-image {
-    width: 130px;
-    height: 130px;
-    background: var(--green-light);
-    border-radius: var(--radius-sm);
+    width: 140px;
+    height: 140px;
+    background: linear-gradient(135deg, rgba(45, 90, 39, 0.05), rgba(45, 90, 39, 0.15));
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
+    padding: 16px;
     flex-shrink: 0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    overflow: hidden;
 }
 
 .riwayat-card-image img {
-    max-height: 100px;
+    max-height: 110px;
     width: auto;
     object-fit: contain;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.1));
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.riwayat-card:hover .riwayat-card-image img {
+    transform: scale(1.1) rotate(2deg);
 }
 
 .riwayat-card-content {
@@ -126,60 +135,69 @@
 }
 
 .riwayat-title {
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 800;
     color: var(--text-dark);
     line-height: 1.25;
+    margin-bottom: 4px;
 }
 
 .riwayat-items {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--text-medium);
+    margin-top: 6px;
+    font-weight: 500;
 }
 
 /* Status Badges */
 .status-badge {
     display: inline-block;
-    padding: 6px 14px;
+    padding: 8px 16px;
     border-radius: 30px;
-    font-size: 0.72rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 .status-completed {
     background: #EAFDF0;
     color: #2ECC71;
+    border: 1px solid rgba(46, 204, 113, 0.3);
 }
 
 .status-active {
-    background: #EBF7FC;
-    color: #3498DB;
+    background: #E8F5E9;
+    color: var(--green-dark);
+    border: 1px solid rgba(45, 90, 39, 0.2);
 }
 
 .status-pending {
     background: #FFF9E6;
     color: #F5A623;
+    border: 1px solid rgba(245, 166, 35, 0.3);
 }
 
 .status-cancelled {
     background: #FFF0F0;
     color: #E66A6A;
+    border: 1px solid rgba(230, 106, 106, 0.3);
 }
 
 /* Cancelled Notice */
 .cancelled-notice {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: #FFF5F5;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(to right, #FFF5F5, #ffffff);
+    border-left: 4px solid #E66A6A;
     border-radius: 8px;
     color: #E66A6A;
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(230, 106, 106, 0.05);
 }
 
 /* ===== TRACKING PROGRESS BAR ===== */
@@ -191,18 +209,20 @@
 
 .tracking-progress-bar {
     position: absolute;
-    top: 31px;
+    top: 33px;
     left: 45px;
     right: 45px;
     height: 4px;
     background: #E2E8F0;
     z-index: 1;
+    border-radius: 4px;
 }
 
 .progress-line-fill {
     height: 100%;
     background: var(--green-dark);
     transition: var(--transition);
+    border-radius: 4px;
 }
 
 .tracking-steps {
@@ -221,18 +241,21 @@
 }
 
 .step-dot {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: var(--white);
     border: 2px solid #CBD5E1;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: #64748B;
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    z-index: 10;
+    position: relative;
 }
 
 .step-label {
@@ -248,11 +271,13 @@
     background: var(--green-dark);
     border-color: var(--green-dark);
     color: var(--white);
+    box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.15);
+    transform: scale(1.05);
 }
 
 .tracking-step.active .step-label {
     color: var(--green-dark);
-    font-weight: 700;
+    font-weight: 800;
 }
 
 /* ===== SIDEBAR (PRICE & ACTION) ===== */
@@ -281,55 +306,60 @@
 }
 
 .price-val {
-    font-size: 1.15rem;
+    font-size: 1.3rem;
     font-weight: 800;
     color: var(--text-dark);
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 .action-buttons {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .btn-action-primary {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 12px 16px;
     background: var(--green-dark);
     color: var(--white);
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    font-weight: 600;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
     text-align: center;
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(45, 90, 39, 0.2);
 }
 
 .btn-action-primary:hover {
     background: var(--green-darker);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(45, 90, 39, 0.3);
 }
 
 .btn-action-outline {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    border: 1px solid var(--border);
-    color: var(--text-medium);
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 12px 16px;
+    border: 1px solid rgba(45, 90, 39, 0.3);
+    color: var(--green-dark);
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
     text-align: center;
     background: var(--white);
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 .btn-action-outline:hover {
     border-color: var(--green-dark);
-    color: var(--green-dark);
-    background: var(--green-light);
+    color: var(--white);
+    background: var(--green-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45, 90, 39, 0.15);
 }
 
 /* Empty riwayat styling */

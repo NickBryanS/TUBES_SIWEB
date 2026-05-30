@@ -40,8 +40,10 @@
         if (in_array($rawStatus, ['dikirim', 'selesai'])) {
             $delivStep3 = true;
         }
-        if ($rawStatus === 'selesai') {
+        if (($rawStatus === 'dikirim' && ($trx['barang_diterima'] ?? false)) || $rawStatus === 'selesai') {
             $delivStep4 = true;
+        }
+        if ($rawStatus === 'selesai') {
             $delivStep5 = true;
         }
     }
