@@ -150,6 +150,38 @@
     background: var(--green-dark);
 }
 
+/* ===== PICKUP STEPPER (4-step numbered) ===== */
+.tracking-stepper--pickup {
+    padding: 28px 40px;
+}
+
+.tracking-stepper--pickup .track-line {
+    height: 3px;
+    max-width: 100px;
+    margin-top: 22px;
+}
+
+.tracking-stepper--pickup .track-circle {
+    width: 44px;
+    height: 44px;
+    border-width: 3px;
+    font-size: 0.9rem;
+}
+
+.tracking-stepper--pickup .track-step.active .track-circle {
+    box-shadow: 0 0 0 5px rgba(23, 54, 36, 0.12);
+}
+
+.track-number {
+    font-weight: 700;
+    font-size: 0.88rem;
+}
+
+.tracking-stepper--pickup .track-step-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
 /* ===== MAIN GRID ===== */
 .pesanan-grid {
     display: grid;

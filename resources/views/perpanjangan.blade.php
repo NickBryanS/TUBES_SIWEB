@@ -4,226 +4,279 @@
 @section('nav-katalog', 'active')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/checkout.css') }}">
-<style>
-    .perpanjangan-page {
-        min-height: 100vh;
-        padding: 120px 20px 60px;
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-    }
-
-    .perpanjangan-container {
-        max-width: 700px;
-        margin: 0 auto;
-    }
-
-    .perpanjangan-card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 32px;
-        backdrop-filter: blur(10px);
-    }
-
-    .perpanjangan-card h1 {
-        font-size: 1.6rem;
-        color: #fff;
-        margin-bottom: 8px;
-    }
-
-    .perpanjangan-card .subtitle {
-        color: rgba(255, 255, 255, 0.5);
-        margin-bottom: 24px;
-        font-size: 0.9rem;
-    }
-
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.95rem;
-    }
-
-    .info-row span:last-child {
-        color: #fff;
-        font-weight: 600;
-    }
-
-    .form-group {
-        margin-top: 24px;
-    }
-
-    .form-group label {
-        display: block;
-        color: rgba(255, 255, 255, 0.7);
-        margin-bottom: 8px;
-        font-size: 0.9rem;
-    }
-
-    .form-group input {
-        width: 100%;
-        padding: 12px 16px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
-        color: #fff;
-        font-size: 1rem;
-        outline: none;
-        transition: border-color 0.3s;
-    }
-
-    .form-group input:focus {
-        border-color: #e8a838;
-    }
-
-    .form-group .hint {
-        color: rgba(255, 255, 255, 0.4);
-        font-size: 0.8rem;
-        margin-top: 6px;
-    }
-
-    .estimasi-biaya {
-        margin-top: 20px;
-        padding: 16px;
-        background: rgba(232, 168, 56, 0.1);
-        border: 1px solid rgba(232, 168, 56, 0.3);
-        border-radius: 10px;
-        color: #e8a838;
-        font-size: 0.95rem;
-        display: none;
-    }
-
-    .estimasi-biaya strong {
-        display: block;
-        font-size: 1.1rem;
-        margin-top: 4px;
-    }
-
-    .btn-submit-perpanjangan {
-        width: 100%;
-        margin-top: 24px;
-        padding: 14px;
-        background: linear-gradient(135deg, #e8a838, #d4943a);
-        border: none;
-        border-radius: 10px;
-        color: #fff;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn-submit-perpanjangan:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(232, 168, 56, 0.3);
-    }
-
-    .btn-back {
-        display: inline-block;
-        margin-top: 16px;
-        color: rgba(255, 255, 255, 0.5);
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: color 0.3s;
-    }
-
-    .btn-back:hover {
-        color: #fff;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/perpanjangan.css') }}">
 @endsection
+
+@php
+    $totalHarianRaw = $transaction->details->sum(function($d) { return $d->product->harga_sewa * $d->jumlah; });
+    $currentDays = $transaction->tanggal_mulai->diffInDays($transaction->tanggal_selesai);
+@endphp
 
 @section('content')
 <div class="perpanjangan-page">
-    <div class="perpanjangan-container">
-        <div class="perpanjangan-card">
-            <h1><i class="fas fa-calendar-plus"></i> Perpanjangan Sewa</h1>
-            <p class="subtitle">Ajukan perpanjangan durasi sewa untuk pesanan Anda.</p>
+    <!-- BREADCRUMB -->
+    <div class="perpanjangan-breadcrumb">
+        <a href="/riwayat">Pesanan Saya</a>
+        <i class="fas fa-chevron-right"></i>
+        <a href="{{ route('pesanan.detail', $transaction->id) }}">Detail Pesanan</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>Perpanjangan</span>
+    </div>
 
-            {{-- Info Pesanan --}}
-            <div class="info-row">
-                <span>No. Pesanan</span>
-                <span>#GK-{{ str_pad($transaction->id, 4, '0', STR_PAD_LEFT) }}</span>
-            </div>
-            <div class="info-row">
-                <span>Tanggal Mulai</span>
-                <span>{{ $transaction->tanggal_mulai->format('d M Y') }}</span>
-            </div>
-            <div class="info-row">
-                <span>Tanggal Selesai (Saat Ini)</span>
-                <span>{{ $transaction->tanggal_selesai->format('d M Y') }}</span>
-            </div>
-            <div class="info-row">
-                <span>Total Biaya Saat Ini</span>
-                <span>Rp {{ number_format($transaction->total_biaya, 0, ',', '.') }}</span>
+    <!-- HEADER -->
+    <div class="perpanjangan-header">
+        <h1>Perpanjangan Sewa</h1>
+        <p>Ajukan perpanjangan durasi sewa untuk pesanan #GK-{{ str_pad($transaction->id, 4, '0', STR_PAD_LEFT) }}</p>
+    </div>
+
+    {{-- ALERT MESSAGES --}}
+    @if(session('success'))
+        <div style="background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.25); color: #27ae60; padding: 14px 20px; border-radius: 12px; margin-bottom: 20px; font-size: 0.88rem; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+        </div>
+    @endif
+    @if(session('error'))
+        <div style="background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.25); color: #e74c3c; padding: 14px 20px; border-radius: 12px; margin-bottom: 20px; font-size: 0.88rem; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+        </div>
+    @endif
+
+    <!-- MAIN GRID -->
+    <div class="perpanjangan-grid">
+        <!-- LEFT COLUMN -->
+        <div class="perpanjangan-left">
+            <!-- Info Pesanan Saat Ini -->
+            <div class="perpanjangan-section">
+                <h3><i class="fas fa-info-circle"></i> Informasi Pesanan Saat Ini</h3>
+                <div class="perpanjangan-info-line">
+                    <span>No. Pesanan</span>
+                    <span>#GK-{{ str_pad($transaction->id, 4, '0', STR_PAD_LEFT) }}</span>
+                </div>
+                <div class="perpanjangan-info-line">
+                    <span>Tanggal Mulai</span>
+                    <span>{{ $transaction->tanggal_mulai->format('d M Y') }}</span>
+                </div>
+                <div class="perpanjangan-info-line">
+                    <span>Tanggal Selesai (Saat Ini)</span>
+                    <span>{{ $transaction->tanggal_selesai->format('d M Y') }}</span>
+                </div>
+                <div class="perpanjangan-info-line">
+                    <span>Durasi Sewa</span>
+                    <span>{{ $currentDays }} hari</span>
+                </div>
+                <div class="perpanjangan-info-line total">
+                    <span>Total Biaya Saat Ini</span>
+                    <span>Rp {{ number_format($transaction->total_biaya, 0, ',', '.') }}</span>
+                </div>
             </div>
 
-            {{-- Daftar Item --}}
-            <div style="margin-top: 20px;">
+            <!-- Alat yang Disewa -->
+            <div class="perpanjangan-section">
+                <h3><i class="fas fa-box"></i> Alat yang Disewa</h3>
                 @foreach($transaction->details as $detail)
-                <div class="info-row">
-                    <span>{{ $detail->product->nama_produk }} (x{{ $detail->jumlah }})</span>
-                    <span>Rp {{ number_format($detail->product->harga_sewa, 0, ',', '.') }}/hari</span>
+                <div class="perpanjangan-item">
+                    <div class="perpanjangan-item-img">
+                        <img src="{{ asset($detail->product->url_gambar ?? 'images/placeholder.png') }}" alt="{{ $detail->product->nama_produk }}">
+                    </div>
+                    <div class="perpanjangan-item-info">
+                        <h4>{{ $detail->product->nama_produk }}</h4>
+                        <p>{{ $detail->jumlah }} unit &middot; Rp {{ number_format($detail->product->harga_sewa, 0, ',', '.') }}/hari</p>
+                    </div>
+                    <span class="perpanjangan-item-price">
+                        Rp {{ number_format($detail->product->harga_sewa * $detail->jumlah, 0, ',', '.') }}/hari
+                    </span>
                 </div>
                 @endforeach
             </div>
 
-            {{-- Form --}}
-            <form action="{{ route('perpanjangan.store', $transaction->id) }}" method="POST">
-                @csrf
-                <div class="form-group">
-                    <label for="perpanjangan_hari">Jumlah Hari Perpanjangan</label>
-                    <input type="number" name="perpanjangan_hari" id="perpanjangan_hari"
-                           min="1" max="30" value="{{ old('perpanjangan_hari', 1) }}"
-                           required>
-                    <p class="hint">Minimal 1 hari, maksimal 30 hari.</p>
+            <!-- Form Perpanjangan -->
+            <div class="perpanjangan-section">
+                <h3><i class="fas fa-calendar-plus"></i> Ajukan Perpanjangan</h3>
 
-                    @error('perpanjangan_hari')
-                        <p style="color: #ff6b6b; font-size: 0.85rem; margin-top: 4px;">{{ $message }}</p>
-                    @enderror
+                <form action="{{ route('perpanjangan.store', $transaction->id) }}" method="POST" id="form-perpanjangan">
+                    @csrf
+
+                    <!-- Quick Day Selector -->
+                    <div class="perpanjangan-form-group">
+                        <label class="perpanjangan-form-label">Pilih Cepat</label>
+                        <div class="day-selector">
+                            <button type="button" class="day-chip" data-days="1">1 Hari</button>
+                            <button type="button" class="day-chip" data-days="3">3 Hari</button>
+                            <button type="button" class="day-chip" data-days="5">5 Hari</button>
+                            <button type="button" class="day-chip" data-days="7">7 Hari</button>
+                            <button type="button" class="day-chip" data-days="14">14 Hari</button>
+                            <button type="button" class="day-chip" data-days="30">30 Hari</button>
+                        </div>
+                    </div>
+
+                    <!-- Manual Input -->
+                    <div class="perpanjangan-form-group">
+                        <label class="perpanjangan-form-label" for="perpanjangan_hari">Jumlah Hari Perpanjangan</label>
+                        <div class="perpanjangan-input-wrapper">
+                            <input type="number"
+                                   class="perpanjangan-input"
+                                   name="perpanjangan_hari"
+                                   id="perpanjangan_hari"
+                                   min="1"
+                                   max="30"
+                                   value="{{ old('perpanjangan_hari', 1) }}"
+                                   placeholder="Masukkan jumlah hari"
+                                   required>
+                        </div>
+                        <p class="perpanjangan-hint">
+                            <i class="fas fa-info-circle"></i> Minimal 1 hari, maksimal 30 hari.
+                        </p>
+
+                        @error('perpanjangan_hari')
+                            <p class="perpanjangan-error">
+                                <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    <!-- Tanggal Baru Preview -->
+                    <div class="perpanjangan-date-preview" id="date-preview">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="date-preview-content">
+                            <div class="date-preview-label">Tanggal Selesai Baru</div>
+                            <div class="date-preview-value" id="new-end-date">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Estimasi Biaya -->
+                    <div class="perpanjangan-estimasi" id="estimasi-biaya">
+                        <div class="estimasi-label">Estimasi Biaya Tambahan</div>
+                        <div class="estimasi-value" id="estimasi-total">Rp 0</div>
+                        <div class="estimasi-breakdown" id="estimasi-breakdown"></div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn-perpanjangan-submit" id="btn-submit">
+                        <i class="fas fa-paper-plane"></i> Ajukan Perpanjangan
+                    </button>
+                </form>
+
+                <a href="{{ route('pesanan.detail', $transaction->id) }}" class="perpanjangan-back-link">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Detail Pesanan
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN - SUMMARY -->
+        <div class="perpanjangan-right">
+            <div class="perpanjangan-summary-card">
+                <h3><i class="fas fa-receipt"></i> Ringkasan Perpanjangan</h3>
+
+                <div class="perpanjangan-info-line">
+                    <span>Harga sewa/hari</span>
+                    <span>Rp {{ number_format($totalHarianRaw, 0, ',', '.') }}</span>
+                </div>
+                <div class="perpanjangan-info-line" id="summary-days-line">
+                    <span>Tambahan hari</span>
+                    <span id="summary-days">1 hari</span>
                 </div>
 
-                {{-- Estimasi Biaya Tambahan (dihitung via JS) --}}
-                <div class="estimasi-biaya" id="estimasi-biaya">
-                    Estimasi biaya tambahan:
-                    <strong id="estimasi-total">Rp 0</strong>
+                <hr class="summary-divider">
+
+                <div class="perpanjangan-info-line total">
+                    <span>Biaya Tambahan</span>
+                    <span id="summary-total">Rp {{ number_format($totalHarianRaw, 0, ',', '.') }}</span>
                 </div>
 
-                <button type="submit" class="btn-submit-perpanjangan">
-                    <i class="fas fa-paper-plane"></i> Ajukan Perpanjangan
-                </button>
-            </form>
+                <div class="perpanjangan-alert info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Perpanjangan akan menunggu persetujuan admin sebelum diproses. Pembayaran tambahan dilakukan setelah disetujui.</span>
+                </div>
 
-            <a href="{{ route('pesanan.detail', $transaction->id) }}" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Kembali ke Detail Pesanan
-            </a>
+                <div class="perpanjangan-secure-badge">
+                    <i class="fas fa-shield-alt"></i> TRANSAKSI AMAN & TERPERCAYA
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Hitung estimasi biaya tambahan secara real-time
+    // Elements
     const inputHari = document.getElementById('perpanjangan_hari');
     const estimasiDiv = document.getElementById('estimasi-biaya');
     const estimasiTotal = document.getElementById('estimasi-total');
+    const estimasiBreakdown = document.getElementById('estimasi-breakdown');
+    const datePreview = document.getElementById('date-preview');
+    const newEndDate = document.getElementById('new-end-date');
+    const summaryDays = document.getElementById('summary-days');
+    const summaryTotal = document.getElementById('summary-total');
+    const dayChips = document.querySelectorAll('.day-chip');
 
-    // Total harga sewa harian semua item
-    const totalHarian = {{ $transaction->details->sum(function($d) { return $d->product->harga_sewa * $d->jumlah; }) }};
+    // Data
+    const totalHarian = {{ $totalHarianRaw }};
+    const currentEndDate = new Date('{{ $transaction->tanggal_selesai->format("Y-m-d") }}');
 
-    inputHari.addEventListener('input', function() {
-        const hari = parseInt(this.value) || 0;
-        if (hari > 0) {
-            const total = totalHarian * hari;
-            estimasiTotal.textContent = 'Rp ' + total.toLocaleString('id-ID');
-            estimasiDiv.style.display = 'block';
-        } else {
-            estimasiDiv.style.display = 'none';
-        }
+    // Formatter
+    function formatRupiah(num) {
+        return 'Rp ' + num.toLocaleString('id-ID');
+    }
+
+    function formatDate(date) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+        return date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+
+    // Day chip click
+    dayChips.forEach(chip => {
+        chip.addEventListener('click', function() {
+            const days = parseInt(this.dataset.days);
+            inputHari.value = days;
+            dayChips.forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            updateEstimation();
+        });
     });
 
+    // Input change
+    inputHari.addEventListener('input', function() {
+        const val = parseInt(this.value) || 0;
+        dayChips.forEach(c => {
+            c.classList.toggle('active', parseInt(c.dataset.days) === val);
+        });
+        updateEstimation();
+    });
+
+    function updateEstimation() {
+        const hari = parseInt(inputHari.value) || 0;
+
+        if (hari > 0) {
+            const total = totalHarian * hari;
+
+            // Estimasi box
+            estimasiTotal.textContent = formatRupiah(total);
+            estimasiBreakdown.textContent = formatRupiah(totalHarian) + '/hari × ' + hari + ' hari';
+            estimasiDiv.style.display = 'block';
+
+            // Date preview
+            const newDate = new Date(currentEndDate);
+            newDate.setDate(newDate.getDate() + hari);
+            newEndDate.textContent = formatDate(newDate);
+            datePreview.style.display = 'flex';
+
+            // Summary sidebar
+            summaryDays.textContent = hari + ' hari';
+            summaryTotal.textContent = formatRupiah(total);
+        } else {
+            estimasiDiv.style.display = 'none';
+            datePreview.style.display = 'none';
+            summaryDays.textContent = '0 hari';
+            summaryTotal.textContent = formatRupiah(0);
+        }
+    }
+
     // Trigger on load
-    inputHari.dispatchEvent(new Event('input'));
+    updateEstimation();
+
+    // Set initial active chip
+    const initialVal = parseInt(inputHari.value) || 0;
+    dayChips.forEach(c => {
+        if (parseInt(c.dataset.days) === initialVal) c.classList.add('active');
+    });
 </script>
 @endsection

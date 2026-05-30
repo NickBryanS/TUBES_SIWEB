@@ -1,0 +1,508 @@
+/* ===== PERPANJANGAN SEWA PAGE ===== */
+.perpanjangan-page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+/* Breadcrumb */
+.perpanjangan-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-bottom: 16px;
+}
+
+.perpanjangan-breadcrumb a {
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.perpanjangan-breadcrumb a:hover {
+    color: var(--green-dark);
+}
+
+.perpanjangan-breadcrumb i {
+    font-size: 0.6rem;
+}
+
+.perpanjangan-breadcrumb span {
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+/* Header */
+.perpanjangan-header {
+    margin-bottom: 28px;
+}
+
+.perpanjangan-header h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.perpanjangan-header p {
+    font-size: 0.88rem;
+    color: var(--text-light);
+}
+
+/* Main Grid */
+.perpanjangan-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+/* Sections / Cards */
+.perpanjangan-section {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+}
+
+.perpanjangan-section h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.perpanjangan-section h3 i {
+    color: var(--green-dark);
+    font-size: 0.95rem;
+}
+
+/* Info Lines */
+.perpanjangan-info-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--text-medium);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.perpanjangan-info-line:last-child {
+    border-bottom: none;
+}
+
+.perpanjangan-info-line span:last-child {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.perpanjangan-info-line.total {
+    border-top: 2px solid var(--border);
+    border-bottom: none;
+    padding-top: 14px;
+    margin-top: 4px;
+}
+
+.perpanjangan-info-line.total span:last-child {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--green-dark);
+}
+
+/* Item Row */
+.perpanjangan-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.perpanjangan-item:last-child {
+    border-bottom: none;
+}
+
+.perpanjangan-item-img {
+    width: 52px;
+    height: 52px;
+    background: var(--cream);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    flex-shrink: 0;
+}
+
+.perpanjangan-item-img img {
+    max-height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.perpanjangan-item-info {
+    flex: 1;
+}
+
+.perpanjangan-item-info h4 {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 2px;
+}
+
+.perpanjangan-item-info p {
+    font-size: 0.75rem;
+    color: var(--text-light);
+}
+
+.perpanjangan-item-price {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    white-space: nowrap;
+}
+
+/* Form Elements */
+.perpanjangan-form-group {
+    margin-bottom: 20px;
+}
+
+.perpanjangan-form-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.perpanjangan-input-wrapper {
+    position: relative;
+}
+
+.perpanjangan-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--text-dark);
+    background: var(--white);
+    transition: var(--transition);
+    text-align: center;
+    letter-spacing: 0.02em;
+}
+
+.perpanjangan-input:focus {
+    outline: none;
+    border-color: var(--green-dark);
+    box-shadow: 0 0 0 4px rgba(23, 54, 36, 0.08);
+}
+
+.perpanjangan-input::-webkit-inner-spin-button,
+.perpanjangan-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.perpanjangan-input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.perpanjangan-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.perpanjangan-hint i {
+    font-size: 0.7rem;
+}
+
+.perpanjangan-error {
+    font-size: 0.8rem;
+    color: var(--red-soft);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.perpanjangan-error i {
+    font-size: 0.75rem;
+}
+
+/* Day Selector */
+.day-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.day-chip {
+    padding: 8px 16px;
+    border: 2px solid var(--border);
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-medium);
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--white);
+}
+
+.day-chip:hover {
+    border-color: var(--green-dark);
+    color: var(--green-dark);
+    background: rgba(23, 54, 36, 0.03);
+}
+
+.day-chip.active {
+    background: var(--green-dark);
+    color: var(--white);
+    border-color: var(--green-dark);
+}
+
+/* Estimasi Box */
+.perpanjangan-estimasi {
+    background: rgba(23, 54, 36, 0.04);
+    border: 1px solid rgba(23, 54, 36, 0.12);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    margin-top: 16px;
+    display: none;
+    animation: fadeSlideUp 0.3s ease-out;
+}
+
+.perpanjangan-estimasi .estimasi-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.perpanjangan-estimasi .estimasi-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--green-dark);
+}
+
+.perpanjangan-estimasi .estimasi-breakdown {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: 6px;
+}
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* New Date Preview */
+.perpanjangan-date-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--cream);
+    border-radius: var(--radius-sm);
+    margin-top: 12px;
+    display: none;
+    animation: fadeSlideUp 0.3s ease-out;
+}
+
+.perpanjangan-date-preview i {
+    font-size: 1.1rem;
+    color: var(--green-dark);
+}
+
+.perpanjangan-date-preview .date-preview-content {
+    flex: 1;
+}
+
+.perpanjangan-date-preview .date-preview-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.perpanjangan-date-preview .date-preview-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* Submit Button */
+.btn-perpanjangan-submit {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--green-dark);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-perpanjangan-submit:hover {
+    background: var(--green-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-perpanjangan-submit:active {
+    transform: translateY(0);
+}
+
+.btn-perpanjangan-submit i {
+    margin-right: 6px;
+}
+
+/* Back Link */
+.perpanjangan-back-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.perpanjangan-back-link:hover {
+    color: var(--green-dark);
+}
+
+/* Sidebar Summary Card */
+.perpanjangan-summary-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    position: sticky;
+    top: 100px;
+}
+
+.perpanjangan-summary-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.perpanjangan-summary-card h3 i {
+    color: var(--green-dark);
+}
+
+.summary-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 12px 0;
+}
+
+/* Alert Info */
+.perpanjangan-alert {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    margin-top: 16px;
+}
+
+.perpanjangan-alert.info {
+    background: rgba(52, 152, 219, 0.08);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+.perpanjangan-alert.warning {
+    background: rgba(241, 196, 15, 0.08);
+    border: 1px solid rgba(241, 196, 15, 0.2);
+    color: #c9a20d;
+}
+
+.perpanjangan-alert i {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Secure Badge */
+.perpanjangan-secure-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .perpanjangan-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .perpanjangan-summary-card {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .perpanjangan-page {
+        padding: 16px;
+    }
+
+    .perpanjangan-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .day-selector {
+        gap: 6px;
+    }
+
+    .day-chip {
+        padding: 6px 12px;
+        font-size: 0.78rem;
+    }
+}
