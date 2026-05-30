@@ -8,23 +8,43 @@
 @endsection
 
 @php
-    $statusMap = [
-        'menunggu'       => 0,
-        'menunggu_admin' => 0,
-        'diproses'       => 1,
-        'dikirim'        => 2,
-        'selesai'        => 4,
-        'dibatalkan'     => -1,
-    ];
-    $currentStep = $statusMap[$transaction->status_transaksi] ?? 0;
+    $isPickup = $transaction->metode_pengambilan === 'pickup';
 
-    $steps = [
-        ['title' => 'Pesanan Dibuat',       'icon' => 'fas fa-check'],
-        ['title' => 'Barang Disiapkan',      'icon' => 'fas fa-box'],
-        ['title' => 'Barang Sedang Diantar', 'icon' => 'fas fa-truck'],
-        ['title' => 'Barang Diterima',       'icon' => 'fas fa-hand-holding'],
-        ['title' => 'Selesai',              'icon' => 'fas fa-flag-checkered'],
-    ];
+    if ($isPickup) {
+        // 4-step stepper untuk Ambil di Toko
+        $statusMap = [
+            'menunggu'       => 0,
+            'menunggu_admin' => 1,
+            'diproses'       => 2,
+            'dikirim'        => 2,
+            'selesai'        => 3,
+            'dibatalkan'     => -1,
+        ];
+        $steps = [
+            ['title' => 'Dipesan',        'icon' => 'fas fa-check'],
+            ['title' => 'Dibayar',        'icon' => 'fas fa-credit-card'],
+            ['title' => 'Dipinjam',       'icon' => 'fas fa-box-open'],
+            ['title' => 'Dikembalikan',   'icon' => 'fas fa-undo-alt'],
+        ];
+    } else {
+        // 5-step stepper untuk Diantar
+        $statusMap = [
+            'menunggu'       => 0,
+            'menunggu_admin' => 0,
+            'diproses'       => 1,
+            'dikirim'        => 2,
+            'selesai'        => 4,
+            'dibatalkan'     => -1,
+        ];
+        $steps = [
+            ['title' => 'Pesanan Dibuat',       'icon' => 'fas fa-check'],
+            ['title' => 'Barang Disiapkan',      'icon' => 'fas fa-box'],
+            ['title' => 'Barang Sedang Diantar', 'icon' => 'fas fa-truck'],
+            ['title' => 'Barang Diterima',       'icon' => 'fas fa-hand-holding'],
+            ['title' => 'Selesai',              'icon' => 'fas fa-flag-checkered'],
+        ];
+    }
+    $currentStep = $statusMap[$transaction->status_transaksi] ?? 0;
 @endphp
 
 @section('content')
@@ -65,33 +85,63 @@
                 <h3 style="color: #e74c3c; margin-top: 8px;">Pesanan Dibatalkan</h3>
             </div>
         @else
-            <!-- TRACKING STEPPER (FR-USR-027: Dinamis dari Database) -->
-            <div class="tracking-stepper" id="tracking-stepper">
-                @foreach($steps as $index => $step)
-                    @if($index > 0)
-                        <div class="track-line {{ $index <= $currentStep ? 'completed-line' : '' }}"></div>
-                    @endif
-                    <div class="track-step {{ $index < $currentStep ? 'completed' : ($index === $currentStep ? 'active' : '') }}">
-                        <div class="track-circle">
-                            @if($index < $currentStep)
-                                <i class="fas fa-check"></i>
-                            @elseif($index === $currentStep)
-                                <i class="{{ $step['icon'] }}"></i>
-                            @endif
+            @if($isPickup)
+                {{-- ===== 4-STEP STEPPER (PICKUP / Ambil di Toko) ===== --}}
+                <div class="tracking-stepper tracking-stepper--pickup" id="tracking-stepper">
+                    @foreach($steps as $index => $step)
+                        @if($index > 0)
+                            <div class="track-line {{ $index <= $currentStep ? 'completed-line' : '' }}"></div>
+                        @endif
+                        <div class="track-step {{ $index < $currentStep ? 'completed' : ($index === $currentStep ? 'active' : '') }}">
+                            <div class="track-circle">
+                                @if($index < $currentStep)
+                                    <i class="fas fa-check"></i>
+                                @else
+                                    <span class="track-number">{{ $index + 1 }}</span>
+                                @endif
+                            </div>
+                            <div class="track-info">
+                                <span class="track-step-title">{{ $step['title'] }}</span>
+                                @if($index === 0)
+                                    <span class="track-step-date">{{ $transaction->created_at->format('d M Y, H:i') }}</span>
+                                @elseif($index === $currentStep && $index > 0)
+                                    <span class="track-step-date">Saat ini</span>
+                                @elseif($index === 3 && $currentStep >= 3 && $transaction->tanggal_kembali_aktual)
+                                    <span class="track-step-date">{{ $transaction->tanggal_kembali_aktual->format('d M Y') }}</span>
+                                @endif
+                            </div>
                         </div>
-                        <div class="track-info">
-                            <span class="track-step-title">{{ $step['title'] }}</span>
-                            @if($index === 0)
-                                <span class="track-step-date">{{ $transaction->created_at->format('d M Y, H:i') }}</span>
-                            @elseif($index === $currentStep && $index > 0)
-                                <span class="track-step-date">Saat ini</span>
-                            @elseif($index === 4 && $currentStep >= 4 && $transaction->tanggal_kembali_aktual)
-                                <span class="track-step-date">{{ $transaction->tanggal_kembali_aktual->format('d M Y') }}</span>
-                            @endif
+                    @endforeach
+                </div>
+            @else
+                {{-- ===== 5-STEP STEPPER (DELIVERY / Diantar) ===== --}}
+                <div class="tracking-stepper" id="tracking-stepper">
+                    @foreach($steps as $index => $step)
+                        @if($index > 0)
+                            <div class="track-line {{ $index <= $currentStep ? 'completed-line' : '' }}"></div>
+                        @endif
+                        <div class="track-step {{ $index < $currentStep ? 'completed' : ($index === $currentStep ? 'active' : '') }}">
+                            <div class="track-circle">
+                                @if($index < $currentStep)
+                                    <i class="fas fa-check"></i>
+                                @elseif($index === $currentStep)
+                                    <i class="{{ $step['icon'] }}"></i>
+                                @endif
+                            </div>
+                            <div class="track-info">
+                                <span class="track-step-title">{{ $step['title'] }}</span>
+                                @if($index === 0)
+                                    <span class="track-step-date">{{ $transaction->created_at->format('d M Y, H:i') }}</span>
+                                @elseif($index === $currentStep && $index > 0)
+                                    <span class="track-step-date">Saat ini</span>
+                                @elseif($index === 4 && $currentStep >= 4 && $transaction->tanggal_kembali_aktual)
+                                    <span class="track-step-date">{{ $transaction->tanggal_kembali_aktual->format('d M Y') }}</span>
+                                @endif
+                            </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
+            @endif
         @endif
 
         <!-- MAIN GRID -->

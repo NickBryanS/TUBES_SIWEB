@@ -61,6 +61,7 @@
                     'id' => $t->id,
                     'filterStatus' => $filterStatus,
                     'rawStatus' => $t->status_transaksi,
+                    'metode_pengambilan' => $t->metode_pengambilan,
                     'image' => $image,
                     'ref' => 'GK-' . str_pad($t->id, 4, '0', STR_PAD_LEFT),
                     'name' => $name . ($t->details->count() > 1 ? ' + lainnya' : ''),

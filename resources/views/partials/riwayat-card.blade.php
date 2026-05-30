@@ -1,18 +1,18 @@
 {{-- Redesigned Riwayat Card (Transaction History) --}}
 @php
     $rawStatus = $trx['rawStatus'] ?? 'menunggu';
+    $isPickup = ($trx['metode_pengambilan'] ?? 'pickup') === 'pickup';
+    $isCancelled = ($rawStatus === 'dibatalkan');
     
-    // Status progress definition
+    // Status progress definition for Pickup (4 steps)
     // Steps: Dipesan -> Dibayar -> Dipinjam -> Dikembalikan
     $step1 = false; // Dipesan
     $step2 = false; // Dibayar
     $step3 = false; // Dipinjam
     $step4 = false; // Dikembalikan
-    $isCancelled = ($rawStatus === 'dibatalkan');
 
     if (!$isCancelled) {
-        $step1 = true; // Dipesan is always complete if not cancelled
-        
+        $step1 = true;
         if (in_array($rawStatus, ['menunggu_admin', 'diproses', 'dikirim', 'selesai'])) {
             $step2 = true;
         }
@@ -21,6 +21,28 @@
         }
         if ($rawStatus === 'selesai') {
             $step4 = true;
+        }
+    }
+
+    // Status progress definition for Delivery (5 steps)
+    // Steps: Pesanan Dibuat -> Barang Disiapkan -> Barang Sedang Diantar -> Barang Diterima -> Selesai
+    $delivStep1 = false; // Pesanan Dibuat
+    $delivStep2 = false; // Barang Disiapkan
+    $delivStep3 = false; // Barang Sedang Diantar
+    $delivStep4 = false; // Barang Diterima
+    $delivStep5 = false; // Selesai
+
+    if (!$isCancelled) {
+        $delivStep1 = true;
+        if (in_array($rawStatus, ['diproses', 'dikirim', 'selesai'])) {
+            $delivStep2 = true;
+        }
+        if (in_array($rawStatus, ['dikirim', 'selesai'])) {
+            $delivStep3 = true;
+        }
+        if ($rawStatus === 'selesai') {
+            $delivStep4 = true;
+            $delivStep5 = true;
         }
     }
 
@@ -63,39 +85,94 @@
             {{-- Order Tracking Progress --}}
             @if(!$isCancelled)
                 <div class="order-tracking-wrapper">
-                    <div class="tracking-progress-bar">
-                        <div class="progress-line-fill" style="width: {{ $step4 ? '100%' : ($step3 ? '66%' : ($step2 ? '33%' : '0%')) }}"></div>
-                    </div>
-                    <div class="tracking-steps">
-                        {{-- Step 1 --}}
-                        <div class="tracking-step {{ $step1 ? 'active' : '' }}">
-                            <div class="step-dot">
-                                @if($step2) <i class="fas fa-check"></i> @else 1 @endif
-                            </div>
-                            <span class="step-label">Dipesan</span>
+                    @if($isPickup)
+                        <div class="tracking-progress-bar">
+                            <div class="progress-line-fill" style="width: {{ $step4 ? '100%' : ($step3 ? '66%' : ($step2 ? '33%' : '0%')) }}"></div>
                         </div>
-                        {{-- Step 2 --}}
-                        <div class="tracking-step {{ $step2 ? 'active' : '' }}">
-                            <div class="step-dot">
-                                @if($step3) <i class="fas fa-check"></i> @else 2 @endif
+                        <div class="tracking-steps">
+                            {{-- Step 1 --}}
+                            <div class="tracking-step {{ $step1 ? 'active' : '' }}">
+                                <div class="step-dot">
+                                    @if($step2) <i class="fas fa-check"></i> @else 1 @endif
+                                </div>
+                                <span class="step-label">Dipesan</span>
                             </div>
-                            <span class="step-label">Dibayar</span>
-                        </div>
-                        {{-- Step 3 --}}
-                        <div class="tracking-step {{ $step3 ? 'active' : '' }}">
-                            <div class="step-dot">
-                                @if($step4) <i class="fas fa-check"></i> @else 3 @endif
+                            {{-- Step 2 --}}
+                            <div class="tracking-step {{ $step2 ? 'active' : '' }}">
+                                <div class="step-dot">
+                                    @if($step3) <i class="fas fa-check"></i> @else 2 @endif
+                                </div>
+                                <span class="step-label">Dibayar</span>
                             </div>
-                            <span class="step-label">Dipinjam</span>
-                        </div>
-                        {{-- Step 4 --}}
-                        <div class="tracking-step {{ $step4 ? 'active' : '' }}">
-                            <div class="step-dot">
-                                @if($step4) <i class="fas fa-check"></i> @else 4 @endif
+                            {{-- Step 3 --}}
+                            <div class="tracking-step {{ $step3 ? 'active' : '' }}">
+                                <div class="step-dot">
+                                    @if($step4) <i class="fas fa-check"></i> @else 3 @endif
+                                </div>
+                                <span class="step-label">Dipinjam</span>
                             </div>
-                            <span class="step-label">Dikembalikan</span>
+                            {{-- Step 4 --}}
+                            <div class="tracking-step {{ $step4 ? 'active' : '' }}">
+                                <div class="step-dot">
+                                    @if($step4) <i class="fas fa-check"></i> @else 4 @endif
+                                </div>
+                                <span class="step-label">Dikembalikan</span>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        @php
+                            $delivWidth = '0%';
+                            if ($delivStep5) {
+                                $delivWidth = '100%';
+                            } elseif ($delivStep4) {
+                                $delivWidth = '75%';
+                            } elseif ($delivStep3) {
+                                $delivWidth = '50%';
+                            } elseif ($delivStep2) {
+                                $delivWidth = '25%';
+                            }
+                        @endphp
+                        <div class="tracking-progress-bar">
+                            <div class="progress-line-fill" style="width: {{ $delivWidth }}"></div>
+                        </div>
+                        <div class="tracking-steps">
+                            {{-- Step 1 --}}
+                            <div class="tracking-step {{ $delivStep1 ? 'active' : '' }}">
+                                <div class="step-dot">
+                                    @if($delivStep2) <i class="fas fa-check"></i> @else 1 @endif
+                                </div>
+                                <span class="step-label">Pesanan Dibuat</span>
+                            </div>
+                            {{-- Step 2 --}}
+                            <div class="tracking-step {{ $delivStep2 ? 'active' : '' }}">
+                                <div class="step-dot">
+                                    @if($delivStep3) <i class="fas fa-check"></i> @else 2 @endif
+                                </div>
+                                <span class="step-label">Barang Disiapkan</span>
+                            </div>
+                            {{-- Step 3 --}}
+                            <div class="tracking-step {{ $delivStep3 ? 'active' : '' }}">
+                                <div class="step-dot">
+                                    @if($delivStep4) <i class="fas fa-check"></i> @else 3 @endif
+                                </div>
+                                <span class="step-label">Barang Sedang Diantar</span>
+                            </div>
+                            {{-- Step 4 --}}
+                            <div class="tracking-step {{ $delivStep4 ? 'active' : '' }}">
+                                <div class="step-dot">
+                                    @if($delivStep5) <i class="fas fa-check"></i> @else 4 @endif
+                                </div>
+                                <span class="step-label">Barang Diterima</span>
+                            </div>
+                            {{-- Step 5 --}}
+                            <div class="tracking-step {{ $delivStep5 ? 'active' : '' }}">
+                                <div class="step-dot">
+                                    @if($delivStep5) <i class="fas fa-check"></i> @else 5 @endif
+                                </div>
+                                <span class="step-label">Selesai</span>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @else
                 <div class="cancelled-notice">
