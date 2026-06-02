@@ -825,38 +825,178 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     color: rgba(255,255,255,0.4);
 }
 
+/* ===== SIDEBAR OVERLAY ===== */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 1049;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
 /* ===== RESPONSIVE ===== */
+
+/* --- Tablet (≤ 1024px) --- */
 @media (max-width: 1024px) {
     .footer-grid { grid-template-columns: 1fr 1fr; }
     .user-sidebar { width: 220px; }
+    .portal-header { padding: 0 20px; }
 }
 
+/* --- Mobile (≤ 768px) --- */
 @media (max-width: 768px) {
+
+    /* Layout */
     .app-layout-container {
         flex-direction: column;
     }
+
+    /* Sidebar → off-canvas drawer */
     .user-sidebar {
-        width: 100%;
-        height: auto;
-        position: static;
-        padding: 16px;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        z-index: 1050;
+        transform: translateX(-100%);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        border-right: 1px solid var(--border);
+        padding: 24px 20px;
+        background: var(--white);
+        overflow-y: auto;
     }
+    .user-sidebar.open {
+        transform: translateX(0);
+    }
+
     .sidebar-menu {
-        flex-direction: row;
-        overflow-x: auto;
-        padding-bottom: 8px;
+        flex-direction: column;
+        gap: 6px;
     }
     .sidebar-menu-item {
-        padding: 8px 16px;
-        white-space: nowrap;
+        padding: 12px 18px;
+        white-space: normal;
     }
-    .sidebar-help-card {
+    .sidebar-bottom-wrapper {
+        margin-top: auto;
+    }
+
+    /* Show hamburger button */
+    .btn-sidebar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--green-light);
+        color: var(--green-dark);
+        font-size: 1.15rem;
+        flex-shrink: 0;
+    }
+    .btn-sidebar-toggle:hover {
+        background: var(--border);
+    }
+
+    /* Portal Header */
+    .portal-header {
+        padding: 0 16px;
+        height: 64px;
+    }
+    .portal-search-box {
         display: none;
     }
-    .footer-grid { grid-template-columns: 1fr; }
+    .portal-header-right {
+        gap: 8px;
+    }
+    .portal-profile-name {
+        display: none;
+    }
+    .portal-profile-trigger {
+        padding: 4px;
+    }
+
+    /* Navbar (public pages) */
     .nav-search-container {
         display: none;
+    }
+    .navbar {
+        height: 60px;
+    }
+    .app-layout-container.public-layout {
+        margin-top: 60px;
+        min-height: calc(100vh - 60px);
+    }
+    .nav-container {
+        padding: 0 12px;
+    }
+    .nav-logo {
+        font-size: 1rem;
+        gap: 8px;
+    }
+    .nav-logo i {
+        font-size: 1.2rem;
+    }
+    .nav-icons {
+        gap: 4px;
+    }
+    .nav-icon-link {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+    }
+    .nav-profile-trigger {
+        padding: 4px 10px 4px 6px;
+        gap: 6px;
+    }
+    .nav-profile-name {
+        display: none;
+    }
+    .nav-avatar-img {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* Footer */
+    .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    .footer { padding: 40px 0 0; }
+
+    /* Notification dropdown full-width on mobile */
+    .portal-notification-dropdown,
+    .notification-dropdown-menu {
+        width: calc(100vw - 32px);
+        right: -60px;
+    }
+    .profile-dropdown-menu {
+        width: calc(100vw - 32px);
+        right: -16px;
+    }
+}
+
+/* --- Small Mobile (≤ 480px) --- */
+@media (max-width: 480px) {
+    .user-sidebar {
+        width: 260px;
+    }
+    .portal-header {
+        padding: 0 12px;
+    }
+    .portal-icon-link {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+    }
+    .portal-profile-img {
+        width: 28px;
+        height: 28px;
     }
 }

@@ -27,6 +27,7 @@
         {{-- SIDEBAR (partial) --}}
         @if($isPortal)
             @include('partials.sidebar')
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
         @endif
 
         {{-- MAIN CONTENT AREA --}}
@@ -48,5 +49,49 @@
     </div>
 
     @yield('scripts')
+
+    {{-- Sidebar Toggle Script (portal pages) --}}
+    @if($isPortal)
+    <script>
+    (function() {
+        var toggleBtn = document.getElementById('sidebar-toggle');
+        var sidebar = document.getElementById('user-sidebar');
+        var overlay = document.getElementById('sidebar-overlay');
+
+        function openSidebar() {
+            if (sidebar) sidebar.classList.add('open');
+            if (overlay) overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                if (sidebar && sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+
+        // Close sidebar on resize to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+    })();
+    </script>
+    @endif
 </body>
 </html>

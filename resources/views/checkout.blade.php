@@ -113,6 +113,11 @@
                         <label class="form-label">ALAMAT LENGKAP</label>
                         <textarea class="form-textarea" name="alamat_pengiriman" rows="3" form="checkout-form" placeholder="Masukkan alamat lengkap pengiriman..."></textarea>
                     </div>
+                    <div class="form-group full-width" style="margin-top: 15px;">
+                        <label class="form-label">JARAK TEMPUH (KM)</label>
+                        <input type="number" step="0.1" min="0" class="form-input" name="jarak_tempuh" id="jarak-tempuh" form="checkout-form" placeholder="Masukkan jarak tempuh dari basecamp ke alamat Anda...">
+                        <small style="color: #666; font-size: 0.8rem; margin-top: 5px; display: block;">Biaya pengiriman Rp 5.000 / km.</small>
+                    </div>
                 </div>
 
                 <!-- IDENTITY UPLOAD (shown when method=deliver) -->
@@ -136,14 +141,7 @@
                         <span>Subtotal Alat</span>
                         <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
-                    <div class="summary-line">
-                        <span>Ongkos Kirim</span>
-                        <span>Gratis</span>
-                    </div>
-                    <div class="summary-line">
-                        <span>Biaya Admin</span>
-                        <span>Gratis</span>
-                    </div>
+
                     <div class="summary-total-line">
                         <span>Total Pembayaran</span>
                         <span class="summary-total-price">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>

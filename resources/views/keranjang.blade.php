@@ -98,19 +98,11 @@
                         <span>Biaya Sewa Alat</span>
                         <span>Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
                     </div>
-                    @php
-                        $pajak = $totalPrice * 0.11;
-                        $totalAkhir = $totalPrice + $pajak;
-                    @endphp
-                    <div class="summary-detail-row">
-                        <span>Pajak (PPN 11%)</span>
-                        <span>Rp {{ number_format($pajak, 0, ',', '.') }}</span>
-                    </div>
                 </div>
 
                 <div class="summary-total-block">
                     <span>Total Estimasi</span>
-                    <span class="total-price-green">Rp {{ number_format($totalAkhir, 0, ',', '.') }}</span>
+                    <span class="total-price-green">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
                 </div>
 
                 <a href="{{ route('checkout') }}" class="btn-checkout-primary">
