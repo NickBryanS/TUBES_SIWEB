@@ -22,23 +22,13 @@
         {{-- TOP BAR --}}
         <header class="admin-topbar" id="admin-topbar">
             <div class="topbar-left">
-                <div class="topbar-breadcrumb">
-                    <i class="fas fa-crown sa-crown-icon"></i>
-                    <span class="sa-topbar-label">EXECUTIVE DASHBOARD</span>
-                </div>
+                <span class="topbar-section-label">Store Management</span>
                 <div class="topbar-search">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Cari data penyewaan..." id="admin-search">
+                    <input type="text" placeholder="Cari laporan..." id="admin-search">
                 </div>
             </div>
             <div class="topbar-right">
-                <button class="topbar-icon" aria-label="Notifikasi">
-                    <i class="fas fa-bell"></i>
-                    <span class="topbar-badge">3</span>
-                </button>
-                <button class="topbar-icon" aria-label="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
                 <div class="sa-topbar-avatar">
                     <span>{{ strtoupper(substr(Auth::user()->nama_lengkap ?? 'P', 0, 1)) }}</span>
                 </div>

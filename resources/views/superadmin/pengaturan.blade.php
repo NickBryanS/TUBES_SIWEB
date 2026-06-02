@@ -13,7 +13,7 @@
     <div class="sa-set-header">
         <div>
             <span class="sa-set-label">Pengaturan Sistem</span>
-            <h1 class="sa-set-title">Manajemen Toko & Tim</h1>
+            <h1 class="sa-set-title">Pengaturan Toko</h1>
             <p class="sa-set-subtitle">Konfigurasi operasional dan kontrol admin ke jaringan Anda.</p>
         </div>
     </div>
@@ -153,56 +153,6 @@
         </div>
     </div>
 
-    {{-- SECTION: Tim --}}
-    <div class="sa-card sa-set-section">
-        <div class="sa-set-section-header">
-            <h3 class="sa-set-section-title"><i class="fas fa-users-gear"></i> Manajemen Tim</h3>
-            <a href="{{ route('superadmin.admin.index') }}" class="sa-btn-primary sa-btn-sm">
-                <i class="fas fa-external-link"></i> Kelola Admin
-            </a>
-        </div>
-        <table class="sa-team-table">
-            <thead>
-                <tr>
-                    <th>NAMA ANGGOTA</th>
-                    <th>POSISI</th>
-                    <th>TERAKHIR AKTIF</th>
-                    <th>STATUS</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($timAdmin as $ta)
-                @php
-                    $initials = collect(explode(' ', $ta->nama_lengkap ?? 'A'))->map(fn($w)=>strtoupper(substr($w,0,1)))->take(2)->implode('');
-                    $colors = ['#1a3a17','#2D5A27','#5a9e50','#c8a951','#6a1b9a'];
-                    $avatarColor = $colors[$ta->id % count($colors)];
-                    $posisi = $ta->peran === 'superadmin' ? 'Pemilik' : 'Admin Operasional';
-                    $lastActive = $ta->updated_at ? $ta->updated_at->diffForHumans() : 'Tidak diketahui';
-                @endphp
-                <tr>
-                    <td>
-                        <div class="sa-team-cell">
-                            <div class="sa-team-avatar" style="background:{{ $avatarColor }};">{{ $initials }}</div>
-                            <div class="sa-team-info">
-                                <span class="sa-team-name">{{ $ta->nama_lengkap }}</span>
-                                <span class="sa-team-email">{{ $ta->email }}</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="sa-team-role {{ $ta->peran === 'superadmin' ? 'role-owner' : 'role-admin' }}">{{ $posisi }}</span></td>
-                    <td class="sa-team-active">{{ $lastActive }}</td>
-                    <td>
-                        <span class="sa-status-dot {{ $ta->status_akun === 'aktif' ? 'dot-aktif' : 'dot-nonaktif' }}">
-                            {{ ucfirst($ta->status_akun) }}
-                        </span>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="4" class="sa-empty-text">Belum ada anggota tim.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
 </div>
 
 {{-- MODAL: TAMBAH REKENING --}}

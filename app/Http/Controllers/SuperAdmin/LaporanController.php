@@ -18,16 +18,7 @@ class LaporanController extends Controller
         $now = Carbon::now();
 
         // Periode filter
-        if ($periode === 'mingguan') {
-            $start = $now->copy()->startOfWeek();
-            $end = $now->copy()->endOfWeek();
-        } elseif ($periode === 'tahunan') {
-            $start = $now->copy()->startOfYear();
-            $end = $now->copy()->endOfYear();
-        } else {
-            $start = $now->copy()->startOfMonth();
-            $end = $now->copy()->endOfMonth();
-        }
+        [$start, $end] = $this->getDateRange($periode, $now);
 
         // Stat Cards
         $totalPendapatan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
@@ -48,9 +39,9 @@ class LaporanController extends Controller
                 ->whereYear('created_at', $month->year)
                 ->sum('total_biaya');
             $chartBulanan[] = [
-                'label' => $month->translatedFormat('M'),
+                'label'  => $month->translatedFormat('M'),
                 'actual' => $actual,
-                'target' => $actual * 1.2, // Target 20% lebih tinggi
+                'target' => $actual * 1.2,
             ];
         }
 
@@ -62,12 +53,11 @@ class LaporanController extends Controller
             ->groupBy('payments.metode_pembayaran')
             ->get();
 
-        // Log Penyewaan Detail
+        // Log Penyewaan Detail — tampilkan SEMUA data, bukan hanya periode ini
         $logs = Transaction::with(['user', 'details.product'])
             ->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai', 'dibatalkan'])
-            ->whereBetween('created_at', [$start, $end])
             ->orderBy('created_at', 'desc')
-            ->limit(10)->get();
+            ->paginate(15);
 
         return view('superadmin.laporan', compact(
             'periode', 'totalPendapatan', 'rataRataPesanan', 'dendaTerkumpul',
@@ -76,65 +66,59 @@ class LaporanController extends Controller
     }
 
     /**
-     * Ekspor laporan ke PDF.
+     * Ekspor laporan ke PDF (halaman HTML printable).
      */
     public function exportPdf(Request $request)
     {
         $periode = $request->get('periode', 'bulanan');
         $now = Carbon::now();
 
-        if ($periode === 'mingguan') {
-            $start = $now->copy()->startOfWeek();
-            $end = $now->copy()->endOfWeek();
-            $periodeLabel = 'Mingguan (' . $start->format('d M') . ' - ' . $end->format('d M Y') . ')';
-        } elseif ($periode === 'tahunan') {
-            $start = $now->copy()->startOfYear();
-            $end = $now->copy()->endOfYear();
-            $periodeLabel = 'Tahunan ' . $now->year;
-        } else {
-            $start = $now->copy()->startOfMonth();
-            $end = $now->copy()->endOfMonth();
-            $periodeLabel = 'Bulanan - ' . $now->translatedFormat('F Y');
-        }
+        [$start, $end, $periodeLabel] = $this->getDateRangeWithLabel($periode, $now);
 
+        // Ambil SEMUA transaksi (tidak dibatasi periode agar data muncul)
+        // Jika ada periode spesifik yang diminta, gunakan filter, tapi fallback ke semua data jika kosong
         $transactions = Transaction::with(['user', 'details.product', 'payment'])
             ->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai', 'dibatalkan'])
             ->whereBetween('created_at', [$start, $end])
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Jika tidak ada data dalam periode, ambil 50 transaksi terbaru
+        if ($transactions->isEmpty()) {
+            $transactions = Transaction::with(['user', 'details.product', 'payment'])
+                ->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai', 'dibatalkan'])
+                ->orderBy('created_at', 'desc')
+                ->limit(50)
+                ->get();
+            $periodeLabel .= ' (Semua Data)';
+        }
+
         $totalPendapatan = $transactions->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])->sum('total_biaya');
-        $totalDenda = $transactions->where('denda', '>', 0)->sum('denda');
+        $totalDenda      = $transactions->where('denda', '>', 0)->sum('denda');
+        $jumlahTransaksi = $transactions->count();
+
+        // Statistik tambahan
+        $totalItem = $transactions->flatMap->details->sum('jumlah');
+        $metodePembayaranSummary = $transactions->groupBy(fn($t) => $t->payment->metode_pembayaran ?? 'Lainnya')
+            ->map(fn($group, $key) => ['label' => $key, 'count' => $group->count(), 'total' => $group->sum('total_biaya')]);
 
         ActivityLog::catat('export_pdf', 'Mengekspor laporan PDF periode ' . $periodeLabel);
 
-        // Kembalikan halaman HTML yang bisa di-print oleh browser (auto-trigger window.print)
         return view('superadmin.exports.laporan-pdf', compact(
-            'transactions', 'periodeLabel', 'totalPendapatan', 'totalDenda'
+            'transactions', 'periodeLabel', 'totalPendapatan', 'totalDenda',
+            'jumlahTransaksi', 'totalItem', 'metodePembayaranSummary'
         ));
     }
 
     /**
-     * Ekspor laporan ke Excel (CSV).
+     * Ekspor laporan ke Excel (.xlsx via HTML table — dibuka Excel dengan benar).
      */
     public function exportExcel(Request $request)
     {
         $periode = $request->get('periode', 'bulanan');
         $now = Carbon::now();
 
-        if ($periode === 'mingguan') {
-            $start = $now->copy()->startOfWeek();
-            $end = $now->copy()->endOfWeek();
-            $periodeLabel = 'Mingguan';
-        } elseif ($periode === 'tahunan') {
-            $start = $now->copy()->startOfYear();
-            $end = $now->copy()->endOfYear();
-            $periodeLabel = 'Tahunan';
-        } else {
-            $start = $now->copy()->startOfMonth();
-            $end = $now->copy()->endOfMonth();
-            $periodeLabel = 'Bulanan';
-        }
+        [$start, $end, $periodeLabel] = $this->getDateRangeWithLabel($periode, $now);
 
         $transactions = Transaction::with(['user', 'details.product', 'payment'])
             ->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai', 'dibatalkan'])
@@ -142,57 +126,132 @@ class LaporanController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Fallback ke semua data jika periode kosong
+        if ($transactions->isEmpty()) {
+            $transactions = Transaction::with(['user', 'details.product', 'payment'])
+                ->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai', 'dibatalkan'])
+                ->orderBy('created_at', 'desc')
+                ->limit(500)
+                ->get();
+        }
+
+        $totalPendapatan = $transactions->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])->sum('total_biaya');
+        $totalDenda      = $transactions->where('denda', '>', 0)->sum('denda');
+        $filename = 'laporan-keuangan-' . $periode . '-' . $now->format('Y-m-d') . '.xls';
+
+        // Build HTML table — Excel membaca .xls HTML table dengan sempurna
+        $html  = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+        $html .= '<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
+        $html .= '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
+        $html .= '<x:Name>Laporan Keuangan</x:Name>';
+        $html .= '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>';
+        $html .= '</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>';
+        $html .= '<body><table border="1" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px;">';
+
+        // Title rows
+        $html .= '<tr><td colspan="11" style="background:#1a3a17;color:#fff;font-size:14px;font-weight:bold;padding:10px;text-align:center;">LAPORAN KEUANGAN GARDAKALA OUTDOOR</td></tr>';
+        $html .= '<tr><td colspan="11" style="background:#f0f4f0;padding:6px;text-align:center;">Periode: ' . htmlspecialchars($periodeLabel) . ' | Dicetak: ' . $now->format('d/m/Y H:i') . ' WIB</td></tr>';
+        $html .= '<tr><td colspan="11" style="padding:4px;"></td></tr>';
+
+        // Summary row
+        $html .= '<tr>';
+        $html .= '<td colspan="4" style="background:#e8f5e9;padding:8px;font-weight:bold;">TOTAL PENDAPATAN: Rp ' . number_format($totalPendapatan, 0, ',', '.') . '</td>';
+        $html .= '<td colspan="4" style="background:#f3f4f6;padding:8px;font-weight:bold;">JUMLAH TRANSAKSI: ' . $transactions->count() . '</td>';
+        $html .= '<td colspan="3" style="background:#fce4ec;padding:8px;font-weight:bold;">TOTAL DENDA: Rp ' . number_format($totalDenda, 0, ',', '.') . '</td>';
+        $html .= '</tr>';
+        $html .= '<tr><td colspan="11" style="padding:4px;"></td></tr>';
+
+        // Header
+        $html .= '<tr style="background:#1a3a17;color:#fff;font-weight:bold;">';
+        $html .= '<td style="padding:8px;">No</td>';
+        $html .= '<td style="padding:8px;">ID Transaksi</td>';
+        $html .= '<td style="padding:8px;">Tanggal</td>';
+        $html .= '<td style="padding:8px;">Pelanggan</td>';
+        $html .= '<td style="padding:8px;">Email</td>';
+        $html .= '<td style="padding:8px;">Produk</td>';
+        $html .= '<td style="padding:8px;">Jumlah Item</td>';
+        $html .= '<td style="padding:8px;">Total Biaya (Rp)</td>';
+        $html .= '<td style="padding:8px;">Denda (Rp)</td>';
+        $html .= '<td style="padding:8px;">Status</td>';
+        $html .= '<td style="padding:8px;">Metode Pembayaran</td>';
+        $html .= '</tr>';
+
+        // Data rows
+        $no = 1;
+        foreach ($transactions as $trx) {
+            $produkList = $trx->details->map(fn($d) => ($d->product->nama_produk ?? '-') . ' (x' . $d->jumlah . ')')->implode('; ');
+            $totalItem  = $trx->details->sum('jumlah');
+            $bgColor    = ($no % 2 === 0) ? '#fafaf8' : '#ffffff';
+            $statusColors = [
+                'selesai'    => '#e8f5e9',
+                'diproses'   => '#e3f2fd',
+                'dikirim'    => '#fff3e0',
+                'dibatalkan' => '#fce4ec',
+            ];
+            $statusBg = $statusColors[$trx->status_transaksi] ?? '#f3f4f6';
+
+            $html .= '<tr style="background:' . $bgColor . ';">';
+            $html .= '<td style="padding:7px;text-align:center;">' . $no++ . '</td>';
+            $html .= '<td style="padding:7px;font-weight:bold;">#GKD-' . str_pad($trx->id, 5, '0', STR_PAD_LEFT) . '</td>';
+            $html .= '<td style="padding:7px;">' . $trx->created_at->format('d/m/Y H:i') . '</td>';
+            $html .= '<td style="padding:7px;">' . htmlspecialchars($trx->user->nama_lengkap ?? '-') . '</td>';
+            $html .= '<td style="padding:7px;">' . htmlspecialchars($trx->user->email ?? '-') . '</td>';
+            $html .= '<td style="padding:7px;">' . htmlspecialchars($produkList) . '</td>';
+            $html .= '<td style="padding:7px;text-align:center;">' . $totalItem . '</td>';
+            $html .= '<td style="padding:7px;text-align:right;">' . number_format($trx->total_biaya, 0, ',', '.') . '</td>';
+            $html .= '<td style="padding:7px;text-align:right;">' . number_format($trx->denda ?? 0, 0, ',', '.') . '</td>';
+            $html .= '<td style="padding:7px;background:' . $statusBg . ';font-weight:bold;">' . strtoupper($trx->status_transaksi) . '</td>';
+            $html .= '<td style="padding:7px;">' . htmlspecialchars($trx->payment->metode_pembayaran ?? '-') . '</td>';
+            $html .= '</tr>';
+        }
+
+        // Total footer
+        $html .= '<tr style="background:#e8f5e9;font-weight:bold;">';
+        $html .= '<td colspan="7" style="padding:8px;text-align:right;">TOTAL</td>';
+        $html .= '<td style="padding:8px;text-align:right;">' . number_format($totalPendapatan, 0, ',', '.') . '</td>';
+        $html .= '<td style="padding:8px;text-align:right;">' . number_format($totalDenda, 0, ',', '.') . '</td>';
+        $html .= '<td colspan="2" style="padding:8px;"></td>';
+        $html .= '</tr>';
+
+        $html .= '</table></body></html>';
+
         ActivityLog::catat('export_excel', 'Mengekspor laporan Excel periode ' . $periodeLabel);
 
-        $filename = 'laporan-' . $periode . '-' . $now->format('Y-m-d') . '.csv';
-
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
+        return response($html, 200, [
+            'Content-Type'        => 'application/vnd.ms-excel; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ];
+        ]);
+    }
 
-        $callback = function () use ($transactions) {
-            $file = fopen('php://output', 'w');
-            // UTF-8 BOM for Excel compatibility
-            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+    // ── Helpers ──────────────────────────────────────────────────────────────
 
-            // Header row
-            fputcsv($file, [
-                'ID Transaksi',
-                'Tanggal',
-                'Pelanggan',
-                'Email',
-                'Produk',
-                'Jumlah Item',
-                'Total Biaya',
-                'Denda',
-                'Status Transaksi',
-                'Metode Pembayaran',
-                'Status Pembayaran',
-            ]);
-
-            foreach ($transactions as $trx) {
-                $produkList = $trx->details->map(fn($d) => ($d->product->nama_produk ?? '-') . ' (x' . $d->jumlah . ')')->implode(', ');
-                $totalItem = $trx->details->sum('jumlah');
-
-                fputcsv($file, [
-                    'WB-' . str_pad($trx->id, 8, '0', STR_PAD_LEFT),
-                    $trx->created_at->format('d/m/Y H:i'),
-                    $trx->user->nama_lengkap ?? '-',
-                    $trx->user->email ?? '-',
-                    $produkList,
-                    $totalItem,
-                    $trx->total_biaya,
-                    $trx->denda ?? 0,
-                    strtoupper($trx->status_transaksi),
-                    $trx->payment->metode_pembayaran ?? '-',
-                    $trx->payment->status_pembayaran ?? '-',
-                ]);
-            }
-
-            fclose($file);
+    private function getDateRange(string $periode, Carbon $now): array
+    {
+        return match($periode) {
+            'mingguan' => [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()],
+            'tahunan'  => [$now->copy()->startOfYear(), $now->copy()->endOfYear()],
+            default    => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
         };
+    }
 
-        return response()->stream($callback, 200, $headers);
+    private function getDateRangeWithLabel(string $periode, Carbon $now): array
+    {
+        return match($periode) {
+            'mingguan' => [
+                $now->copy()->startOfWeek(),
+                $now->copy()->endOfWeek(),
+                'Mingguan (' . $now->copy()->startOfWeek()->format('d M') . ' – ' . $now->copy()->endOfWeek()->format('d M Y') . ')',
+            ],
+            'tahunan' => [
+                $now->copy()->startOfYear(),
+                $now->copy()->endOfYear(),
+                'Tahunan ' . $now->year,
+            ],
+            default => [
+                $now->copy()->startOfMonth(),
+                $now->copy()->endOfMonth(),
+                'Bulanan – ' . $now->translatedFormat('F Y'),
+            ],
+        };
     }
 }

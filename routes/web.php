@@ -130,7 +130,7 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     // Inventory Routes (export & bulk-delete harus sebelum resource agar tidak konflik)
     Route::get('/inventory/export', [InventoryController::class, 'export'])->name('admin.inventory.export');
     Route::post('/inventory/bulk-delete', [InventoryController::class, 'bulkDelete'])->name('admin.inventory.bulk-delete');
-    Route::resource('inventory', InventoryController::class)->names('admin.inventory');
+    Route::resource('inventory', InventoryController::class)->names('admin.inventory')->parameters(['inventory' => 'product']);
 
     // Kategori Routes
     Route::resource('kategori', CategoryController::class)->names('admin.kategori');
@@ -165,6 +165,10 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::get('/pengiriman', [ShippingController::class, 'index'])->name('admin.pengiriman.index');
     Route::get('/pengiriman/{id}', [ShippingController::class, 'show'])->name('admin.pengiriman.show');
     Route::post('/pengiriman/{id}/status', [ShippingController::class, 'updateStatus'])->name('admin.pengiriman.status');
+
+    // Perpanjangan Sewa (admin approve/reject dari notifikasi)
+    Route::post('/pesanan/{id}/perpanjangan/approve', [\App\Http\Controllers\OrderController::class, 'approvePerpanjangan'])->name('admin.perpanjangan.approve');
+    Route::post('/pesanan/{id}/perpanjangan/reject', [\App\Http\Controllers\OrderController::class, 'rejectPerpanjangan'])->name('admin.perpanjangan.reject');
 });
 
 /*

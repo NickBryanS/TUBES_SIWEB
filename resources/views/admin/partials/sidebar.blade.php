@@ -6,8 +6,8 @@
             <i class="fas fa-mountain"></i>
         </div>
         <div>
-            <span class="sidebar-brand">Garkadala Outdoor</span>
-            <span class="sidebar-subtitle">Admin Portal</span>
+            <span class="sidebar-brand">Admin Portal</span>
+            <span class="sidebar-subtitle">Executive View</span>
         </div>
     </div>
 

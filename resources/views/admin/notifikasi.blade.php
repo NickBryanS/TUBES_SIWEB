@@ -1,4 +1,4 @@
-@extends('admin.layouts.admin')
+@extends(Auth::user()->isSuperAdmin() ? 'superadmin.layouts.superadmin' : 'admin.layouts.admin')
 
 @section('title', 'Pusat Notifikasi - Admin GKDL (Full)')
 @section('sidebar-notifikasi', 'active')

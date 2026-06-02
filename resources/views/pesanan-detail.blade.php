@@ -179,7 +179,7 @@
                                 
                                 @php
                                     $waMessage = urlencode("Halo Gardakala, saya ingin menanyakan status pengantaran untuk pesanan #GK-" . str_pad($transaction->id, 4, '0', STR_PAD_LEFT) . ". Apakah kurir sudah dekat?");
-                                    $waNumber = "6281234567890"; // Bisa disesuaikan dengan nomor asli toko
+                                    $waNumber = "6287715778007"; // Nomor WhatsApp Gardakala (sama dengan Hubungi Kami)
                                 @endphp
                                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                                     <a href="https://wa.me/{{ $waNumber }}?text={{ $waMessage }}" target="_blank" class="btn-hubungi-kurir" style="flex: 1; text-align: center;">

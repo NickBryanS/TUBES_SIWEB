@@ -19,42 +19,43 @@
 
     {{-- MAIN WRAPPER --}}
     <div class="admin-main">
-        {{-- TOP BAR --}}
-        <header class="admin-topbar" id="admin-topbar">
-            <div class="topbar-left">
-                <div class="topbar-search">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Cari transaksi atau barang..." id="admin-search">
-                </div>
+    {{-- TOP BAR --}}
+    <header class="admin-topbar" id="admin-topbar">
+        <div class="topbar-left">
+            <span class="topbar-section-label">Store Management</span>
+            <div class="topbar-search">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Cari laporan..." id="admin-search">
             </div>
-            <div class="topbar-right">
-                @php
-                    // Hitung notifikasi aktif secara dinamis
-                    $notifCount = \App\Models\Transaction::whereIn('status_transaksi', ['menunggu', 'menunggu_admin'])->count()
-                                + \App\Models\Payment::where('status_pembayaran', 'menunggu')->count();
-                @endphp
-                <a href="{{ route('admin.notifikasi.index') }}" class="topbar-icon" id="btn-notification"
-                   aria-label="Notifikasi" title="Pusat Notifikasi" style="text-decoration:none; position:relative;">
-                    <i class="fas fa-bell"></i>
-                    @if($notifCount > 0)
-                        <span class="topbar-badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
-                    @endif
-                </a>
-                <a href="{{ route('admin.pengguna.index') }}" class="topbar-icon" id="btn-settings"
-                   aria-label="Settings" title="Manajemen Pengguna" style="text-decoration:none;">
-                    <i class="fas fa-cog"></i>
-                </a>
-                <a href="{{ route('admin.pengguna.export') }}" class="btn-ekspor" id="btn-ekspor">
-                    <i class="fas fa-download"></i> Ekspor Data
-                </a>
-                <form action="{{ route('admin.logout') }}" method="POST" style="display: inline-block;">
-                    @csrf
-                    <button type="submit" class="btn-logout" aria-label="Logout" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
-            </div>
-        </header>
+        </div>
+        <div class="topbar-right">
+            @php
+                // Hitung notifikasi aktif secara dinamis
+                $notifCount = \App\Models\Transaction::whereIn('status_transaksi', ['menunggu', 'menunggu_admin'])->count()
+                            + \App\Models\Payment::where('status_pembayaran', 'menunggu')->count();
+            @endphp
+            <a href="{{ route('admin.notifikasi.index') }}" class="topbar-icon" id="btn-notification"
+               aria-label="Notifikasi" title="Pusat Notifikasi" style="text-decoration:none; position:relative;">
+                <i class="fas fa-bell"></i>
+                @if($notifCount > 0)
+                    <span class="topbar-badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
+                @endif
+            </a>
+            <a href="{{ route('admin.pengguna.index') }}" class="topbar-icon" id="btn-settings"
+               aria-label="Pengguna" title="Manajemen Pengguna" style="text-decoration:none;">
+                <i class="fas fa-users"></i>
+            </a>
+            <a href="{{ route('admin.pengguna.export') }}" class="btn-ekspor" id="btn-ekspor">
+                <i class="fas fa-download"></i> Ekspor Data
+            </a>
+            <form action="{{ route('admin.logout') }}" method="POST" style="display: inline-block;">
+                @csrf
+                <button type="submit" class="btn-logout" aria-label="Logout" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </div>
+    </header>
 
         {{-- PAGE CONTENT --}}
         <div class="admin-content">

@@ -64,9 +64,41 @@
 .log-batal { background: #fef2f2; color: #991b1b; }
 .log-default { background: #f3f4f6; color: #6b7280; }
 .log-empty { text-align: center; color: #9ca3af; padding: 30px 18px !important; }
-.sa-log-footer { text-align: right; padding: 14px 20px; border-top: 1px solid #f3f1ed; }
-.sa-link { font-size: 0.78rem; font-weight: 700; color: #2D5A27; text-decoration: none; letter-spacing: 0.04em; }
-.sa-link:hover { text-decoration: underline; }
+.sa-log-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-top: 1px solid #f3f1ed;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+.sa-pagination { display: flex; gap: 4px; }
+.sa-pg-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dde2d9;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+}
+.sa-pg-btn:hover { border-color: #1a3a17; color: #1a3a17; }
+.sa-pg-btn.pg-active {
+    background: #1a3a17;
+    color: #fff;
+    border-color: #1a3a17;
+    font-weight: 700;
+}
+.sa-pg-btn.pg-nav { color: #9ca3af; }
 
 /* Responsive */
 @media (max-width: 900px) { .sa-lap-stats { grid-template-columns: 1fr; } .sa-chart-row { grid-template-columns: 1fr; } .sa-lap-header { flex-direction: column; } }
+
