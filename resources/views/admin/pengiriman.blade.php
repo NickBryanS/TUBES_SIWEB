@@ -201,26 +201,7 @@
         @endif
     </div>
 
-    {{-- BOTTOM BANNER: Pantauan Rute --}}
-    <div class="ship-bottom-grid">
-        <div class="ship-banner-card">
-            <div class="ship-banner-bg"></div>
-            <div class="ship-banner-content">
-                <h3 class="ship-banner-title">Pantauan Rute Real-time</h3>
-                <p class="ship-banner-desc">Lihat lokasi armada dan optimalisasi rute pengiriman langsung dari pusat kontrol Wildwood.</p>
-                <button class="ship-banner-btn" type="button">
-                    <i class="fas fa-map-location-dot"></i> Buka Peta Pengiriman
-                </button>
-            </div>
-        </div>
-        <div class="ship-help-card">
-            <h4 class="ship-help-title">Butuh Bantuan Rute?</h4>
-            <p class="ship-help-desc">Gunakan algoritma Wildwood AI untuk membagi paket ke armada yang tersedia paling efisien.</p>
-            <button class="ship-help-btn" type="button">
-                Gunakan Wildwood AI
-            </button>
-        </div>
-    </div>
+
 </div>
 
 {{-- ============================== --}}

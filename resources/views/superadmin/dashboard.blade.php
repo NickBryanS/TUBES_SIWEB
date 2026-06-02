@@ -153,49 +153,7 @@
         {{-- RIGHT COLUMN --}}
         <div class="sa-dash-right">
 
-            {{-- Jadwal Pengembalian Hari Ini --}}
-            <div class="sa-card" id="card-jadwal">
-                <div class="sa-card-head">
-                    <h2 class="sa-card-title"><i class="fas fa-calendar-day"></i> Jadwal Hari Ini</h2>
-                </div>
 
-                @if($terlambatKembali->count() > 0)
-                <div class="sa-jadwal-section">
-                    <span class="sa-jadwal-badge badge-late"><i class="fas fa-exclamation-circle"></i> Terlambat ({{ $terlambatKembali->count() }})</span>
-                    @foreach($terlambatKembali as $late)
-                    <div class="sa-jadwal-item late">
-                        <div class="sa-jadwal-avatar">{{ strtoupper(substr($late->user->nama_lengkap ?? 'X', 0, 1)) }}</div>
-                        <div class="sa-jadwal-info">
-                            <span class="sa-jadwal-name">{{ $late->user->nama_lengkap ?? '-' }}</span>
-                            <span class="sa-jadwal-detail">{{ $late->details->sum('jumlah') }} alat · Harusnya {{ \Carbon\Carbon::parse($late->tanggal_selesai)->format('d M') }}</span>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
-
-                @if($jadwalPengembalian->count() > 0)
-                <div class="sa-jadwal-section">
-                    <span class="sa-jadwal-badge badge-today"><i class="fas fa-clock"></i> Hari Ini ({{ $jadwalPengembalian->count() }})</span>
-                    @foreach($jadwalPengembalian as $jdw)
-                    <div class="sa-jadwal-item">
-                        <div class="sa-jadwal-avatar">{{ strtoupper(substr($jdw->user->nama_lengkap ?? 'X', 0, 1)) }}</div>
-                        <div class="sa-jadwal-info">
-                            <span class="sa-jadwal-name">{{ $jdw->user->nama_lengkap ?? '-' }}</span>
-                            <span class="sa-jadwal-detail">{{ $jdw->details->sum('jumlah') }} alat · #GKD-{{ str_pad($jdw->id, 5, '0', STR_PAD_LEFT) }}</span>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @endif
-
-                @if($jadwalPengembalian->count() === 0 && $terlambatKembali->count() === 0)
-                <div class="sa-empty-state small">
-                    <i class="fas fa-calendar-check"></i>
-                    <p>Tidak ada pengembalian hari ini.</p>
-                </div>
-                @endif
-            </div>
 
             {{-- Barang Terlaris --}}
             <div class="sa-card" id="card-terlaris">
