@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -115,11 +116,13 @@ class ShippingController extends Controller
 
         if ($action === 'siapkan' && $transaction->status_transaksi === 'diproses') {
             $transaction->update(['siap_kirim' => true]);
+            ActivityLog::catat('siapkan_pengiriman', 'Menyiapkan pengiriman untuk transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
             return back()->with('success', 'Pesanan #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' siap dikirim.');
         }
 
         if ($action === 'kirim' && in_array($transaction->status_transaksi, ['diproses'])) {
             $transaction->update(['status_transaksi' => 'dikirim']);
+            ActivityLog::catat('kirim_pesanan', 'Mengirim pesanan transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
             return back()->with('success', 'Pesanan #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' sedang dalam pengiriman.');
         }
 
@@ -135,6 +138,8 @@ class ShippingController extends Controller
                 $path = $request->file('bukti_pengiriman')->store('bukti-pengiriman', 'public');
                 // Simpan path jika ada kolom — jika belum, skip saja
             }
+
+            ActivityLog::catat('selesai_pengiriman', 'Menyelesaikan pengiriman transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' (Penerima: ' . $request->nama_penerima . ')', 'Transaction', $transaction->id);
 
             return back()->with('success', 'Pengiriman #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' dikonfirmasi selesai. Penerima: ' . $request->nama_penerima);
         }

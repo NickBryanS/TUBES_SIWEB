@@ -117,6 +117,26 @@
                 @endforelse
             </tbody>
         </table>
+        <div class="sa-log-footer">
+            <span>Menampilkan {{ $logs->firstItem() ?? 0 }}–{{ $logs->lastItem() ?? 0 }} dari {{ $logs->total() }} log penyewaan</span>
+            <div class="sa-pagination">
+                @if($logs->onFirstPage())
+                    <span class="sa-pg-btn pg-nav" style="opacity:0.4;cursor:default;"><i class="fas fa-chevron-left"></i></span>
+                @else
+                    <a class="sa-pg-btn pg-nav" href="{{ $logs->appends(request()->query())->previousPageUrl() }}"><i class="fas fa-chevron-left"></i></a>
+                @endif
+
+                @foreach($logs->getUrlRange(1, min($logs->lastPage(), 5)) as $page => $url)
+                    <a class="sa-pg-btn {{ $page == $logs->currentPage() ? 'pg-active' : '' }}" href="{{ $logs->appends(request()->query())->url($page) }}">{{ $page }}</a>
+                @endforeach
+
+                @if($logs->hasMorePages())
+                    <a class="sa-pg-btn pg-nav" href="{{ $logs->appends(request()->query())->nextPageUrl() }}"><i class="fas fa-chevron-right"></i></a>
+                @else
+                    <span class="sa-pg-btn pg-nav" style="opacity:0.4;cursor:default;"><i class="fas fa-chevron-right"></i></span>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
 @endsection

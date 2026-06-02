@@ -30,7 +30,10 @@ class Transaction extends Model
         'status_transaksi',
         'metode_pengambilan',
         'siap_kirim',
+        'barang_diterima',
         'alamat_pengiriman',
+        'nama_penerima',
+        'telepon_penerima',
         'foto_ktp',
         'jenis_jaminan',
         'status_jaminan',
@@ -54,6 +57,7 @@ class Transaction extends Model
             'denda'                  => 'decimal:2',
             'perpanjangan_hari'      => 'integer',
             'siap_kirim'             => 'boolean',
+            'barang_diterima'        => 'boolean',
         ];
     }
 

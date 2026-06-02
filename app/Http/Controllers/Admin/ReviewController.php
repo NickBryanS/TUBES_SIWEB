@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -53,7 +54,12 @@ class ReviewController extends Controller
      */
     public function destroy(Review $ulasan)
     {
+        $namaUser = $ulasan->user->nama_lengkap ?? 'Anonim';
+        $namaProduk = $ulasan->product->nama_produk ?? 'Produk';
+        $id = $ulasan->id;
         $ulasan->delete();
+
+        ActivityLog::catat('hapus_ulasan', 'Menghapus ulasan dari ' . $namaUser . ' pada produk ' . $namaProduk, 'Review', $id);
 
         return response()->json([
             'success' => true,

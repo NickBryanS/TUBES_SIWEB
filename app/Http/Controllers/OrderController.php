@@ -550,6 +550,17 @@ class OrderController extends Controller
             'status_perpanjangan'  => 'approved',
         ]);
 
+        // Notify user
+        try {
+            $transaction->user->notify(new \App\Notifications\OrderStatusUpdated($transaction));
+        } catch (\Exception $e) {}
+
+        // Redirect: admin ke notifikasi, user ke detail pesanan
+        if (auth()->user()->peran === 'admin' || auth()->user()->peran === 'superadmin') {
+            return redirect()->route('admin.notifikasi.index')
+                             ->with('success', 'Perpanjangan ' . $hariTambahan . ' hari disetujui. Biaya tambahan: Rp ' . number_format($biayaTambahan, 0, ',', '.'));
+        }
+
         return redirect()->route('pesanan.detail', $transaction->id)
                          ->with('success', 'Perpanjangan ' . $hariTambahan . ' hari disetujui. Biaya tambahan: Rp ' . number_format($biayaTambahan, 0, ',', '.'));
     }
@@ -569,6 +580,12 @@ class OrderController extends Controller
             'perpanjangan_hari'    => 0,
             'status_perpanjangan'  => 'rejected',
         ]);
+
+        // Redirect: admin ke notifikasi, user ke detail pesanan
+        if (auth()->user()->peran === 'admin' || auth()->user()->peran === 'superadmin') {
+            return redirect()->route('admin.notifikasi.index')
+                             ->with('info', 'Pengajuan perpanjangan ditolak.');
+        }
 
         return redirect()->route('pesanan.detail', $transaction->id)
                          ->with('info', 'Pengajuan perpanjangan ditolak.');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -52,6 +53,8 @@ class CategoryController extends Controller
 
         $category = Category::create($validated);
 
+        ActivityLog::catat('tambah_kategori', 'Menambahkan kategori produk: ' . $category->nama_kategori, 'Category', $category->id);
+
         return response()->json([
             'success' => true,
             'message' => 'Kategori berhasil ditambahkan!',
@@ -83,6 +86,8 @@ class CategoryController extends Controller
 
         $kategori->update($validated);
 
+        ActivityLog::catat('update_kategori', 'Memperbarui kategori produk: ' . $kategori->nama_kategori, 'Category', $kategori->id);
+
         return response()->json([
             'success' => true,
             'message' => 'Kategori berhasil diperbarui!',
@@ -103,7 +108,11 @@ class CategoryController extends Controller
             ], 422);
         }
 
+        $nama = $kategori->nama_kategori;
+        $id = $kategori->id;
         $kategori->delete();
+
+        ActivityLog::catat('hapus_kategori', 'Menghapus kategori produk: ' . $nama, 'Category', $id);
 
         return response()->json([
             'success' => true,

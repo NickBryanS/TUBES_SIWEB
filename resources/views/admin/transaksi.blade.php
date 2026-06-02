@@ -614,35 +614,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     // ── Footer buttons ──
                     const isPending = ['menunggu', 'menunggu_admin'].includes(data.status_transaksi);
 
+                    // Tombol Cetak Nota selalu di kiri
+                    footerLeft.innerHTML = `
+                        <a href="{{ url('admin/transaksi') }}/${data.id}/nota" target="_blank" class="btn btn-outline-dark"><i class="fas fa-print"></i> Cetak Nota</a>
+                    `;
+
+                    // Tombol di kanan: TOLAK (untuk pending), lalu KONFIRMASI LUNAS (jika belum lunas)
+                    footerRight.innerHTML = '';
+
                     if (isPending) {
-                        footerLeft.innerHTML = `
+                        footerRight.innerHTML += `
                             <form action="{{ url('admin/transaksi') }}/${data.id}/reject" method="POST" onsubmit="return confirm('Tolak transaksi ini?')" style="display:inline;">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-outline-danger"><i class="fas fa-times"></i> TOLAK</button>
                             </form>
                         `;
-                        footerRight.innerHTML = `
-                            <form action="{{ url('admin/transaksi') }}/${data.id}/approve" method="POST" onsubmit="return confirm('Validasi transaksi ini?')" style="display:inline;">
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> VALIDASI</button>
-                            </form>
-                        `;
-                    } else {
-                        footerLeft.innerHTML = '';
-                        footerRight.innerHTML = '';
                     }
 
-                    // Buat tombol Cetak Nota & Buat Perjanjian
-                    let extraButtons = `
-                        <a href="{{ url('admin/transaksi') }}/${data.id}/nota" target="_blank" class="btn btn-outline-dark"><i class="fas fa-print"></i> Cetak Nota</a>
-                    `;
-                    if (!isPending) {
-                        footerLeft.innerHTML = extraButtons;
-                    } else {
-                        footerLeft.innerHTML += extraButtons;
-                    }
-
-                    // Konfirmasi Lunas button
+                    // Konfirmasi Lunas button (menggantikan VALIDASI)
                     if (data.payment && data.payment.status_pembayaran !== 'terverifikasi' && !['dibatalkan'].includes(data.status_transaksi)) {
                         footerRight.innerHTML += `
                             <form action="{{ url('admin/transaksi') }}/${data.id}/lunas" method="POST" onsubmit="return confirm('Konfirmasi pembayaran lunas?')" style="display:inline;">
