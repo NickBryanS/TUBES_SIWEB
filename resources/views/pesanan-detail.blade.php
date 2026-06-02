@@ -261,10 +261,12 @@
                             <span>Subtotal Sewa</span>
                             <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                         </div>
+                        @if($transaction->ongkos_kirim > 0)
                         <div class="payment-line">
-                            <span>Biaya Admin</span>
-                            <span>Rp {{ number_format($biayaAdmin, 0, ',', '.') }}</span>
+                            <span>Ongkos Kirim ({{ $transaction->jarak_tempuh }} km)</span>
+                            <span>Rp {{ number_format($transaction->ongkos_kirim, 0, ',', '.') }}</span>
                         </div>
+                        @endif
                         @if($transaction->denda > 0)
                         <div class="payment-line" style="color: #e74c3c;">
                             <span><i class="fas fa-exclamation-triangle"></i> Denda Keterlambatan</span>

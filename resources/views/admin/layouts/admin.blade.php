@@ -16,17 +16,18 @@
 <body>
     {{-- SIDEBAR --}}
     @include('admin.partials.sidebar')
+    <div class="admin-sidebar-overlay" id="admin-sidebar-overlay"></div>
 
     {{-- MAIN WRAPPER --}}
     <div class="admin-main">
     {{-- TOP BAR --}}
     <header class="admin-topbar" id="admin-topbar">
         <div class="topbar-left">
+            <button class="admin-sidebar-toggle" id="admin-sidebar-toggle" aria-label="Toggle Sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
             <span class="topbar-section-label">Store Management</span>
-            <div class="topbar-search">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Cari laporan..." id="admin-search">
-            </div>
+
         </div>
         <div class="topbar-right">
             @php
@@ -70,5 +71,41 @@
     </div>
 
     @yield('scripts')
+
+    {{-- Admin Sidebar Toggle Script --}}
+    <script>
+    (function() {
+        var toggleBtn = document.getElementById('admin-sidebar-toggle');
+        var sidebar = document.getElementById('admin-sidebar');
+        var overlay = document.getElementById('admin-sidebar-overlay');
+
+        function openSidebar() {
+            if (sidebar) sidebar.classList.add('open');
+            if (overlay) overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                if (sidebar && sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+        }
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) closeSidebar();
+        });
+    })();
+    </script>
 </body>
 </html>

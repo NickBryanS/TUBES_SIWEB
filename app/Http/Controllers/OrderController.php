@@ -82,6 +82,7 @@ class OrderController extends Controller
             'nama_penerima'      => 'required|string|max:255',
             'telepon_penerima'   => 'required|string|max:30',
             'alamat_pengiriman'  => 'nullable|required_if:metode_pengambilan,deliver|string',
+            'jarak_tempuh'       => 'nullable|required_if:metode_pengambilan,deliver|numeric|min:0',
             'foto_ktp'           => 'nullable|required_if:metode_pengambilan,deliver|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
@@ -98,6 +99,7 @@ class OrderController extends Controller
             'nama_penerima'      => $request->nama_penerima,
             'telepon_penerima'   => $request->telepon_penerima,
             'alamat_pengiriman'  => $request->alamat_pengiriman,
+            'jarak_tempuh'       => $request->jarak_tempuh,
             'foto_ktp'           => $fotoKtpPath,
         ]);
 
@@ -128,15 +130,20 @@ class OrderController extends Controller
             $subtotal += $cart->product->harga_sewa * $cart->quantity * $cart->days;
         }
 
-        $biayaAdmin = 2500;
-        $total = $subtotal + $biayaAdmin;
-
+        $biayaAdmin = 0;
         $checkoutData = $request->session()->get('checkout_data');
+        
+        $ongkosKirim = 0;
+        if (isset($checkoutData['metode_pengambilan']) && $checkoutData['metode_pengambilan'] === 'deliver' && isset($checkoutData['jarak_tempuh'])) {
+            $ongkosKirim = $checkoutData['jarak_tempuh'] * 5000;
+        }
+
+        $total = $subtotal + $biayaAdmin + $ongkosKirim;
 
         // Ambil daftar rekening aktif dari pengaturan admin
         $paymentSettings = \App\Models\PaymentSetting::where('is_active', true)->get();
 
-        return view('pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'total', 'checkoutData', 'paymentSettings'));
+        return view('pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'ongkosKirim', 'total', 'checkoutData', 'paymentSettings'));
     }
 
     /**
@@ -157,6 +164,10 @@ class OrderController extends Controller
             return redirect()->route('checkout')->with('error', 'Sesi checkout telah berakhir. Silakan ulangi pemesanan.');
         }
 
+        if ($request->metode_pembayaran === 'bayar_di_toko' && isset($checkoutData['metode_pengambilan']) && $checkoutData['metode_pengambilan'] === 'deliver') {
+            return redirect()->back()->with('error', 'Pembayaran di toko tidak tersedia untuk metode pengiriman ke alamat.');
+        }
+
         // Ambil keranjang dari database
         $userId = Auth::id();
         $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
@@ -173,7 +184,13 @@ class OrderController extends Controller
             foreach ($carts as $cart) {
                 $totalBiaya += $cart->product->harga_sewa * $cart->quantity * $cart->days;
             }
-            $totalBiaya += 2500; // Biaya admin
+            $totalBiaya += 0; // Biaya admin dihapus
+
+            $ongkosKirim = 0;
+            if ($checkoutData['metode_pengambilan'] === 'deliver' && isset($checkoutData['jarak_tempuh'])) {
+                $ongkosKirim = $checkoutData['jarak_tempuh'] * 5000;
+            }
+            $totalBiaya += $ongkosKirim;
 
             // 1. Simpan transaksi utama
             $transactionData = [
@@ -184,6 +201,8 @@ class OrderController extends Controller
                 'status_transaksi'   => 'menunggu',
                 'metode_pengambilan' => $checkoutData['metode_pengambilan'],
                 'alamat_pengiriman'  => $checkoutData['alamat_pengiriman'],
+                'jarak_tempuh'       => $checkoutData['jarak_tempuh'] ?? null,
+                'ongkos_kirim'       => $ongkosKirim,
                 'nama_penerima'      => $checkoutData['nama_penerima'],
                 'telepon_penerima'   => $checkoutData['telepon_penerima'],
             ];

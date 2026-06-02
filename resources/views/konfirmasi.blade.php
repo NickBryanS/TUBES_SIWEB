@@ -11,7 +11,7 @@
 @section('content')
 <div class="konfirmasi-page">
     <!-- Stepper -->
-    @include('partials.checkout-stepper', ['currentStep' => 3])
+
 
     <!-- Background Mountain -->
     <div class="konfirmasi-hero">

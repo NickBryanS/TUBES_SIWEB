@@ -32,9 +32,11 @@
                     <button class="payment-tab" data-tab="qris" data-value="qris">
                         <i class="fas fa-qrcode"></i> QRIS
                     </button>
+                    @if(isset($checkoutData['metode_pengambilan']) && $checkoutData['metode_pengambilan'] === 'pickup')
                     <button class="payment-tab" data-tab="cod" data-value="bayar_di_toko">
                         <i class="fas fa-store"></i> Bayar di Toko
                     </button>
+                    @endif
                 </div>
 
                 <!-- Transfer Bank Content -->
@@ -125,10 +127,12 @@
                         <span>Subtotal</span>
                         <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
+                    @if(isset($ongkosKirim) && $ongkosKirim > 0)
                     <div class="summary-line">
-                        <span>Biaya Admin</span>
-                        <span>Rp {{ number_format($biayaAdmin, 0, ',', '.') }}</span>
+                        <span>Ongkos Kirim</span>
+                        <span>Rp {{ number_format($ongkosKirim, 0, ',', '.') }}</span>
                     </div>
+                    @endif
                     <div class="summary-total-line">
                         <span>Total</span>
                         <span class="summary-total-price">Rp {{ number_format($total, 0, ',', '.') }}</span>
