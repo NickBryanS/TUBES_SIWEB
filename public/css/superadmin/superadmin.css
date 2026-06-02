@@ -12,14 +12,14 @@
 .sa-sidebar-bottom form { display: block; }
 
 .sa-logout-link {
-    width: 100%; display: flex; align-items: center; gap: 12px;
-    padding: 10px 16px; background: none; border: none;
-    color: var(--admin-text-lt); font-size: 0.85rem;
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 16px; background: #c62828; border: none;
+    color: #fff; font-size: 0.85rem; font-weight: 600;
     font-family: inherit; cursor: pointer; border-radius: 8px;
     transition: var(--admin-transition);
 }
 
-.sa-logout-link:hover { background: rgba(0,0,0,0.04); color: #c62828; }
+.sa-logout-link:hover { background: #d32f2f; color: #fff; transform: translateY(-1px); }
 
 .sa-logo-icon { background: #1a3a17 !important; }
 

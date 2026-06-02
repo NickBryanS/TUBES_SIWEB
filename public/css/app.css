@@ -705,18 +705,23 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 18px;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--red-soft);
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: #c62828;
+    color: #fff;
+    border: none;
+    cursor: pointer;
     transition: var(--transition);
 }
 
 .btn-sidebar-logout:hover {
-    background: #fef2f2;
-    color: #e24c4c;
+    background: #d32f2f;
+    color: #fff;
+    transform: translateY(-1px);
 }
 
 /* ===== FOOTER ===== */

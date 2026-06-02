@@ -47,14 +47,24 @@
         </a>
     </nav>
 
-    {{-- ADMIN PROFILE (bottom) --}}
-    <div class="sidebar-profile">
-        <div class="sidebar-avatar">
-            <span>{{ strtoupper(substr(Auth::user()->nama_lengkap ?? 'A', 0, 1)) }}</span>
+    {{-- BOTTOM SECTION --}}
+    <div class="sidebar-bottom">
+        <div class="sidebar-profile" style="padding-bottom: 12px; border-top: 1px solid rgba(255,255,255,0.08);">
+            <div class="sidebar-avatar">
+                <span>{{ strtoupper(substr(Auth::user()->nama_lengkap ?? 'A', 0, 1)) }}</span>
+            </div>
+            <div class="sidebar-profile-info">
+                <span class="sidebar-profile-name">{{ Auth::user()->nama_lengkap ?? 'Administrator' }}</span>
+                <span class="sidebar-profile-role">ADMINISTRATOR</span>
+            </div>
         </div>
-        <div class="sidebar-profile-info">
-            <span class="sidebar-profile-name">{{ Auth::user()->nama_lengkap ?? 'Administrator' }}</span>
-            <span class="sidebar-profile-role">ADMINISTRATOR</span>
+        <div style="padding: 0 16px 20px;">
+            <form action="{{ route('admin.logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn-logout" style="width: 100%; justify-content: center; margin-left: 0;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
     </div>
 </aside>

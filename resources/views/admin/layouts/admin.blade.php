@@ -41,19 +41,9 @@
                     <span class="topbar-badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
                 @endif
             </a>
-            <a href="{{ route('admin.pengguna.index') }}" class="topbar-icon" id="btn-settings"
-               aria-label="Pengguna" title="Manajemen Pengguna" style="text-decoration:none;">
-                <i class="fas fa-users"></i>
-            </a>
             <a href="{{ route('admin.pengguna.export') }}" class="btn-ekspor" id="btn-ekspor">
                 <i class="fas fa-download"></i> Ekspor Data
             </a>
-            <form action="{{ route('admin.logout') }}" method="POST" style="display: inline-block;">
-                @csrf
-                <button type="submit" class="btn-logout" aria-label="Logout" title="Logout">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </form>
         </div>
     </header>
 

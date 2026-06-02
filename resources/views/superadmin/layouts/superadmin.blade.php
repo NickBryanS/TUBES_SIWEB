@@ -29,9 +29,7 @@
                 </div>
             </div>
             <div class="topbar-right">
-                <div class="sa-topbar-avatar">
-                    <span>{{ strtoupper(substr(Auth::user()->nama_lengkap ?? 'P', 0, 1)) }}</span>
-                </div>
+
             </div>
         </header>
 
