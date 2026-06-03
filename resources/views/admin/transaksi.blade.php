@@ -631,12 +631,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         `;
                     }
 
-                    // Konfirmasi Lunas button (menggantikan VALIDASI)
+                    // Konfirmasi Lunas / Sudah Bayar button (kontekstual)
                     if (data.payment && data.payment.status_pembayaran !== 'terverifikasi' && !['dibatalkan'].includes(data.status_transaksi)) {
+                        const hasBukti = data.payment.bukti_pembayaran;
+                        const btnLabel = hasBukti ? 'KONFIRMASI LUNAS' : 'SUDAH BAYAR';
+                        const btnIcon = hasBukti ? 'fa-check-double' : 'fa-money-bill-wave';
+                        const confirmMsg = hasBukti
+                            ? 'Konfirmasi pembayaran lunas berdasarkan bukti transfer yang diunggah?'
+                            : 'Konfirmasi bahwa pelanggan sudah membayar langsung (cash) di toko?';
+
                         footerRight.innerHTML += `
-                            <form action="{{ url('admin/transaksi') }}/${data.id}/lunas" method="POST" onsubmit="return confirm('Konfirmasi pembayaran lunas?')" style="display:inline;">
+                            <form action="{{ url('admin/transaksi') }}/${data.id}/lunas" method="POST" onsubmit="return confirm('${confirmMsg}')" style="display:inline;">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-success"><i class="fas fa-check-double"></i> KONFIRMASI LUNAS</button>
+                                <button type="submit" class="btn btn-success"><i class="fas ${btnIcon}"></i> ${btnLabel}</button>
                             </form>
                         `;
                     }

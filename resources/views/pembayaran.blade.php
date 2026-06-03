@@ -106,6 +106,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- RIGHT: ORDER SUMMARY -->

@@ -115,7 +115,7 @@ class AdminDashboardController extends Controller
                 'fill'    => 'fill-2',
             ],
             [
-                'label'   => 'QRIS / DP',
+                'label'   => 'QRIS',
                 'count'   => \App\Models\Payment::where('metode_pembayaran', 'qris')->count(),
                 'fill'    => 'fill-3',
             ],
