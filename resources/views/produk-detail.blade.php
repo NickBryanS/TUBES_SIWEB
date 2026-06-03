@@ -63,10 +63,10 @@
                 {{-- Interactive Rent Calendar Selection --}}
                 <div class="calendar-card-section">
                     <div class="calendar-card-header">
-                        <h4>Pilih Tanggal Sewa</h4>
+                        <h4 id="calendar-month-year">Pilih Tanggal Sewa</h4>
                         <div class="cal-nav-arrows">
-                            <i class="fas fa-chevron-left"></i>
-                            <i class="fas fa-chevron-right"></i>
+                            <i class="fas fa-chevron-left" id="cal-prev-month"></i>
+                            <i class="fas fa-chevron-right" id="cal-next-month"></i>
                         </div>
                     </div>
                     <div class="calendar-grid-wrapper">
@@ -74,27 +74,7 @@
                             <span>S</span><span>S</span><span>R</span><span>K</span><span>J</span><span>S</span><span>M</span>
                         </div>
                         <div class="cal-days-grid" id="calendar-days-grid">
-                            <div class="cal-day disabled">28</div>
-                            <div class="cal-day disabled">29</div>
-                            <div class="cal-day disabled">30</div>
-                            <div class="cal-day">1</div>
-                            <div class="cal-day">2</div>
-                            <div class="cal-day">3</div>
-                            <div class="cal-day">4</div>
-                            <div class="cal-day">5</div>
-                            <div class="cal-day">6</div>
-                            <div class="cal-day">7</div>
-                            <div class="cal-day selected active">8</div>
-                            <div class="cal-day selected">9</div>
-                            <div class="cal-day selected active">10</div>
-                            <div class="cal-day">11</div>
-                            <div class="cal-day">12</div>
-                            <div class="cal-day">13</div>
-                            <div class="cal-day">14</div>
-                            <div class="cal-day">15</div>
-                            <div class="cal-day">16</div>
-                            <div class="cal-day">17</div>
-                            <div class="cal-day">18</div>
+                            {{-- Will be generated dynamically via JS --}}
                         </div>
                     </div>
                 </div>
@@ -111,6 +91,20 @@
                             <button type="button" class="btn-qty-adj" id="qty-minus"><i class="fas fa-minus"></i></button>
                             <span class="qty-display-val" id="qty-display-value">1</span>
                             <button type="button" class="btn-qty-adj" id="qty-plus"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+
+                    {{-- Rent Summary --}}
+                    <div class="rent-summary-box" style="background: #F8F9F8; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 8px 0 4px;">
+                        <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Ringkasan Estimasi Biaya</h4>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                            <span id="summary-dur-text" style="color: var(--text-medium);">Sewa 3 hari x 1 unit</span>
+                            <span id="summary-dur-price" style="font-weight: 600; color: var(--text-dark);">Rp 0</span>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid var(--border); margin: 8px 0;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 700;">
+                            <span style="color: var(--green-dark);">Total Estimasi</span>
+                            <span id="summary-total-price" style="color: var(--green-dark);">Rp 0</span>
                         </div>
                     </div>
 
@@ -328,7 +322,6 @@
         });
 
         const formattedTotal = formatter.format(total).replace("IDR", "Rp");
-        const formattedBase = formatter.format(pricePerDay * days).replace("IDR", "Rp");
 
         document.getElementById('summary-dur-text').innerText = `Sewa ${days} hari x ${qty} unit`;
         document.getElementById('summary-dur-price').innerText = formattedTotal;
@@ -357,39 +350,132 @@
         }
     });
 
-    // Calendar selection range handler
-    let calStartDate = null;
-    const calDays = Array.from(document.querySelectorAll('.cal-day:not(.disabled)'));
+    // Dynamic Monthly Calendar implementation
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+    const todayDate = new Date();
+    todayDate.setHours(0,0,0,0);
 
-    calDays.forEach((day, index) => {
-        day.addEventListener('click', function() {
-            if (!calStartDate || document.querySelectorAll('.cal-day.active').length === 2) {
-                // First click: reset and activate single day
-                calDays.forEach(d => { d.classList.remove('selected', 'active'); });
-                this.classList.add('selected', 'active');
-                calStartDate = index;
-                document.getElementById('input-days').value = 1;
-                updateSummary();
+    let startDate = null;
+    let endDate = null;
+
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+    function generateCalendar(month, year) {
+        const grid = document.getElementById('calendar-days-grid');
+        const headerText = document.getElementById('calendar-month-year');
+        if (!grid || !headerText) return;
+
+        grid.innerHTML = '';
+        headerText.innerText = `${monthNames[month]} ${year}`;
+
+        // Get first day of the month
+        const firstDay = new Date(year, month, 1).getDay();
+        // Convert Sunday as 0 to Sunday as 7, so Monday is 1, Sunday is 7 to align with S-S-R-K-J-S-M
+        let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+
+        // Get total days in the month
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        // Get total days in the previous month
+        const prevMonthTotalDays = new Date(year, month, 0).getDate();
+
+        // Add padding from previous month
+        for (let i = startOffset; i > 0; i--) {
+            const dayNum = prevMonthTotalDays - i + 1;
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'cal-day disabled';
+            dayDiv.innerText = dayNum;
+            grid.appendChild(dayDiv);
+        }
+
+        // Add actual days
+        for (let i = 1; i <= totalDays; i++) {
+            const dayDate = new Date(year, month, i);
+            dayDate.setHours(0,0,0,0);
+
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'cal-day';
+            dayDiv.innerText = i;
+            dayDiv.dataset.date = dayDate.toISOString();
+
+            if (dayDate < todayDate) {
+                dayDiv.classList.add('disabled');
             } else {
-                // Second click: create date range highlight
-                let startIdx = Math.min(calStartDate, index);
-                let endIdx = Math.max(calStartDate, index);
-                
-                calDays.forEach((d, i) => {
-                    if (i >= startIdx && i <= endIdx) {
-                        d.classList.add('selected');
-                    }
-                    if (i === startIdx || i === endIdx) {
-                        d.classList.add('active');
-                    }
-                });
-                
-                const numDays = endIdx - startIdx + 1;
-                document.getElementById('input-days').value = numDays;
-                updateSummary();
-                calStartDate = null; // reset anchor
+                dayDiv.addEventListener('click', () => handleDayClick(dayDate));
             }
-        });
+
+            // Highlight selected range
+            highlightDay(dayDiv, dayDate);
+
+            grid.appendChild(dayDiv);
+        }
+        
+        // Add padding for next month to complete the grid (42 cells / rows)
+        const totalCells = startOffset + totalDays;
+        const nextMonthPadding = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+        for (let i = 1; i <= nextMonthPadding; i++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'cal-day disabled';
+            dayDiv.innerText = i;
+            grid.appendChild(dayDiv);
+        }
+    }
+
+    function highlightDay(dayDiv, dayDate) {
+        if (startDate && dayDate.getTime() === startDate.getTime()) {
+            dayDiv.classList.add('selected', 'active');
+        } else if (endDate && dayDate.getTime() === endDate.getTime()) {
+            dayDiv.classList.add('selected', 'active');
+        } else if (startDate && endDate && dayDate > startDate && dayDate < endDate) {
+            dayDiv.classList.add('selected');
+        }
+    }
+
+    function handleDayClick(date) {
+        if (!startDate || (startDate && endDate)) {
+            // First click or resetting range
+            startDate = date;
+            endDate = null;
+            document.getElementById('input-days').value = 1;
+        } else if (startDate && !endDate) {
+            if (date < startDate) {
+                // Clicked a date before start date: set as new start date
+                startDate = date;
+            } else {
+                // Set as end date
+                endDate = date;
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // inclusive
+                document.getElementById('input-days').value = diffDays;
+            }
+        }
+        
+        // Re-generate to update visuals
+        generateCalendar(currentMonth, currentYear);
+        updateSummary();
+    }
+
+    document.getElementById('cal-prev-month')?.addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        generateCalendar(currentMonth, currentYear);
     });
+
+    document.getElementById('cal-next-month')?.addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        generateCalendar(currentMonth, currentYear);
+    });
+
+    // Initialize calendar and summary on load
+    generateCalendar(currentMonth, currentYear);
+    updateSummary();
 </script>
 @endsection

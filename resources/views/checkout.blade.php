@@ -15,9 +15,6 @@
 
         <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <!-- Hidden inputs untuk tanggal sewa -->
-            <input type="hidden" name="tanggal_mulai" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
-            <input type="hidden" name="tanggal_selesai" value="{{ \Carbon\Carbon::now()->addDays($carts->max('days') ?? 1)->format('Y-m-d') }}">
         </form>
 
         <div class="checkout-grid">
@@ -49,6 +46,24 @@
                         </div>
                     </div>
                     @endforeach
+                </div>
+
+                <!-- RENTAL DATES -->
+                <div class="checkout-section">
+                    <h3 class="checkout-section-title"><i class="fas fa-calendar-alt"></i> Tanggal Sewa</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">TANGGAL MULAI</label>
+                            <input type="date" class="form-input" name="tanggal_mulai" id="tanggal-mulai" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" form="checkout-form" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">TANGGAL SELESAI</label>
+                            <input type="date" class="form-input" name="tanggal_selesai" id="tanggal-selesai" value="{{ \Carbon\Carbon::now()->addDays($carts->max('days') ?? 1)->format('Y-m-d') }}" min="{{ \Carbon\Carbon::now()->addDay()->format('Y-m-d') }}" form="checkout-form" readonly required style="background-color: #f1f3f1; cursor: not-allowed;">
+                        </div>
+                    </div>
+                    <small style="color: #666; font-size: 0.8rem; margin-top: 8px; display: block; line-height: 1.4;">
+                        * Tanggal selesai disesuaikan otomatis dengan durasi sewa terlama di keranjang Anda ({{ $carts->max('days') ?? 1 }} hari).
+                    </small>
                 </div>
 
                 <!-- METHOD -->
@@ -188,6 +203,26 @@ document.querySelectorAll('input[name="metode_pengambilan"]').forEach(function(r
         }
     });
 });
+
+// Automatically update tanggal_selesai based on selected tanggal_mulai and cart duration
+const tanggalMulaiInput = document.getElementById('tanggal-mulai');
+const tanggalSelesaiInput = document.getElementById('tanggal-selesai');
+const cartMaxDays = {{ $carts->max('days') ?? 1 }};
+
+if (tanggalMulaiInput && tanggalSelesaiInput) {
+    tanggalMulaiInput.addEventListener('change', function() {
+        const startDate = new Date(this.value);
+        if (!isNaN(startDate.getTime())) {
+            startDate.setDate(startDate.getDate() + cartMaxDays);
+            
+            const year = startDate.getFullYear();
+            const month = String(startDate.getMonth() + 1).padStart(2, '0');
+            const day = String(startDate.getDate()).padStart(2, '0');
+            
+            tanggalSelesaiInput.value = `${year}-${month}-${day}`;
+        }
+    });
+}
 
 // File upload preview
 document.getElementById('foto_ktp')?.addEventListener('change', function() {

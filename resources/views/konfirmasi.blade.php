@@ -75,7 +75,7 @@
             @endforeach
 
             @php
-                $biayaAdmin = 2500;
+                $biayaAdmin = 0;
                 $total = $transaction->total_biaya;
             @endphp
 
