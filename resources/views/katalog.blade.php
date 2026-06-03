@@ -11,6 +11,16 @@
 @section('content')
 <div class="katalog-page">
     <div class="katalog-main">
+        <div class="katalog-header">
+            <div>
+                <h1 class="katalog-title">Katalog Peralatan</h1>
+                <p class="katalog-subtitle">Temukan perlengkapan camping dan mendaki terbaik untuk petualangan Anda.</p>
+            </div>
+            <div style="display: flex; align-items: flex-end; font-size: 0.85rem; color: var(--text-light); margin-bottom: 4px;">
+                Menampilkan <span id="product-count" style="font-weight: 700; color: var(--green-dark); margin: 0 4px;">{{ $products->count() }}</span> produk
+            </div>
+        </div>
+
         {{-- FILTER BAR --}}
         <div class="katalog-filters">
             <div class="filter-search-box">

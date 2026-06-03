@@ -289,7 +289,7 @@
     foreach($transaction->details as $detail) {
         $subtotal += $detail->product->harga_sewa * $detail->jumlah * $durasi;
     }
-    $biayaAdmin = 2500;
+    $biayaAdmin = 0;
     $isLunas = in_array($transaction->status_transaksi, ['diproses', 'dikirim', 'selesai']);
 
     $statusLabels = [

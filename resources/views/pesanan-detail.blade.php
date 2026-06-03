@@ -255,7 +255,7 @@
                             foreach($transaction->details as $detail) {
                                 $subtotal += $detail->product->harga_sewa * $detail->jumlah * $transaction->tanggal_mulai->diffInDays($transaction->tanggal_selesai);
                             }
-                            $biayaAdmin = 2500;
+                            $biayaAdmin = 0;
                         @endphp
                         <div class="payment-line">
                             <span>Subtotal Sewa</span>
