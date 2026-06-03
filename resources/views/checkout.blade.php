@@ -100,8 +100,8 @@
                         <div class="pickup-icon"><i class="fas fa-map-marker-alt"></i></div>
                         <div>
                             <strong>Basecamp GKDL Outdoor</strong>
-                            <p>Jl. Percobaan No. 45, Jakarta Selatan (Dekat Area Parkir Utama)</p>
-                            <p class="pickup-hours"><i class="fas fa-clock"></i> Operasional: 08:00 - 20:00 WIB</p>
+                            <p>Jl. Raya Soreang - Banjaran No.216, RT.02/RW.01, Ciluncat, Kec. Cangkuang, Kabupaten Bandung, Jawa Barat 40238</p>
+                            <p class="pickup-hours"><i class="fas fa-clock"></i> Operasional: 08:00 - 21:00 WIB</p>
                         </div>
                     </div>
                 </div>

@@ -62,11 +62,13 @@
 
                     @if($activeRental)
                     @php
-                        $tanggalMulai = \Carbon\Carbon::parse($activeRental->tanggal_mulai);
-                        $tanggalSelesai = \Carbon\Carbon::parse($activeRental->tanggal_selesai);
-                        $totalHari = max(1, $tanggalMulai->diffInDays($tanggalSelesai));
-                        $hariTerlewat = max(0, $tanggalMulai->diffInDays(now()));
-                        $sisaHari = max(0, now()->diffInDays($tanggalSelesai, false));
+                        $tanggalMulai = \Carbon\Carbon::parse($activeRental->tanggal_mulai)->startOfDay();
+                        $tanggalSelesai = \Carbon\Carbon::parse($activeRental->tanggal_selesai)->startOfDay();
+                        $hariIni = \Carbon\Carbon::now()->startOfDay();
+                        
+                        $totalHari = max(1, (int) $tanggalMulai->diffInDays($tanggalSelesai));
+                        $hariTerlewat = max(0, (int) $tanggalMulai->diffInDays($hariIni, false));
+                        $sisaHari = max(0, (int) $hariIni->diffInDays($tanggalSelesai, false));
                         $progress = min(100, round(($hariTerlewat / $totalHari) * 100));
                     @endphp
                     <div class="active-rental-card-premium" id="active-rental">
