@@ -279,6 +279,11 @@ class OrderController extends Controller
         ]);
 
         $transaction = Transaction::findOrFail($id);
+
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
         $payment = $transaction->payment;
 
         if (!$payment) {
@@ -313,6 +318,10 @@ class OrderController extends Controller
     {
         $transaction = Transaction::with(['details.product', 'payment'])
             ->findOrFail($id);
+
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
 
         return view('user.konfirmasi', compact('transaction'));
     }

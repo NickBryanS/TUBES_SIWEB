@@ -25,6 +25,12 @@ class CartController extends Controller
         $quantity = $request->input('quantity', 1);
         $days = $request->input('days', 1);
 
+        // Validate stock availability
+        $currentCartQty = Cart::where('user_id', $userId)->where('product_id', $product->id)->value('quantity') ?? 0;
+        if (($currentCartQty + $quantity) > $product->stok_tersedia) {
+            return redirect()->back()->with('error', "Stok tidak mencukupi. Hanya tersedia {$product->stok_tersedia} unit.");
+        }
+
         $cart = Cart::where('user_id', $userId)->where('product_id', $product->id)->first();
 
         if ($cart) {
@@ -50,6 +56,12 @@ class CartController extends Controller
         
         $quantity = $request->input('quantity', 1);
         $days = $request->input('days', 1);
+
+        // Validate stock availability
+        $currentCartQty = Cart::where('user_id', $userId)->where('product_id', $product->id)->value('quantity') ?? 0;
+        if (($currentCartQty + $quantity) > $product->stok_tersedia) {
+            return redirect()->back()->with('error', "Stok tidak mencukupi. Hanya tersedia {$product->stok_tersedia} unit.");
+        }
 
         $cart = Cart::where('user_id', $userId)->where('product_id', $product->id)->first();
 
@@ -82,6 +94,12 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
             'days' => 'nullable|integer|min:1'
         ]);
+
+        // Validate stock availability
+        $product = $cart->product;
+        if ($request->quantity > $product->stok_tersedia) {
+            return redirect()->back()->with('error', "Stok tidak mencukupi. Hanya tersedia {$product->stok_tersedia} unit.");
+        }
 
         $updateData = ['quantity' => $request->quantity];
         if ($request->has('days')) {

@@ -40,6 +40,8 @@ class Transaction extends Model
         'rekening_pengembalian',
         'bank_pengembalian',
         'atas_nama_pengembalian',
+        'jarak_tempuh',
+        'ongkos_kirim',
     ];
 
     /**
@@ -55,7 +57,9 @@ class Transaction extends Model
             'tanggal_kembali_aktual' => 'date',
             'total_biaya'            => 'decimal:2',
             'denda'                  => 'decimal:2',
+            'ongkos_kirim'           => 'decimal:2',
             'perpanjangan_hari'      => 'integer',
+            'jarak_tempuh'           => 'decimal:2',
             'siap_kirim'             => 'boolean',
             'barang_diterima'        => 'boolean',
         ];

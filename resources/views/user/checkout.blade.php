@@ -116,7 +116,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">NOMOR HP</label>
-                            <input type="text" class="form-input" name="telepon_penerima" value="{{ Auth::user()->no_telepon ?? '' }}" id="nomor-hp" form="checkout-form" required>
+                            <input type="text" class="form-input" name="telepon_penerima" value="{{ Auth::user()->nomor_telepon ?? '' }}" id="nomor-hp" form="checkout-form" required>
                         </div>
                     </div>
                 </div>
