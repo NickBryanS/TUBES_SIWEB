@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Transaction;
@@ -358,7 +359,7 @@ class OrderController extends Controller
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
-        return view('nota', compact('transaction'));
+        return view('user.nota', compact('transaction'));
     }
 
     /**
@@ -504,7 +505,7 @@ class OrderController extends Controller
             return redirect()->back()->with('info', 'Pengajuan perpanjangan Anda sedang menunggu persetujuan admin.');
         }
 
-        return view('perpanjangan', compact('transaction'));
+        return view('user.perpanjangan', compact('transaction'));
     }
 
     /**

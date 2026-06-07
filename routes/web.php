@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\SocialiteController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\User\OrderController;
+use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\WishlistController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\AddressController;
@@ -133,7 +133,7 @@ Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
     Route::post('/pesanan/{id}/pengembalian', [OrderController::class, 'konfirmasiPengembalian'])->name('pesanan.pengembalian');
 
     // Ulasan Produk
-    Route::post('/produk/{id}/ulasan', [\App\Http\Controllers\ReviewController::class, 'store'])->name('ulasan.store');
+    Route::post('/produk/{id}/ulasan', [\App\Http\Controllers\User\ReviewController::class, 'store'])->name('ulasan.store');
 
     // Notifikasi User
     Route::post('/notifikasi/read', function () {
@@ -191,8 +191,8 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::post('/pengiriman/{id}/status', [ShippingController::class, 'updateStatus'])->name('admin.pengiriman.status');
 
     // Perpanjangan Sewa (admin approve/reject dari notifikasi)
-    Route::post('/pesanan/{id}/perpanjangan/approve', [\App\Http\Controllers\OrderController::class, 'approvePerpanjangan'])->name('admin.perpanjangan.approve');
-    Route::post('/pesanan/{id}/perpanjangan/reject', [\App\Http\Controllers\OrderController::class, 'rejectPerpanjangan'])->name('admin.perpanjangan.reject');
+    Route::post('/pesanan/{id}/perpanjangan/approve', [\App\Http\Controllers\User\OrderController::class, 'approvePerpanjangan'])->name('admin.perpanjangan.approve');
+    Route::post('/pesanan/{id}/perpanjangan/reject', [\App\Http\Controllers\User\OrderController::class, 'rejectPerpanjangan'])->name('admin.perpanjangan.reject');
 });
 
 /*

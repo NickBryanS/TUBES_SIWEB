@@ -168,11 +168,11 @@
                 <div class="sa-form-row">
                     <div class="sa-form-group">
                         <label class="sa-form-label">PASSWORD</label>
-                        <input type="password" name="password" class="sa-form-input" required minlength="6" placeholder="Min. 6 karakter">
+                        <input type="password" name="password" class="sa-form-input" required minlength="6" placeholder="Min. 6 karakter" autocomplete="new-password">
                     </div>
                     <div class="sa-form-group">
                         <label class="sa-form-label">KONFIRMASI PASSWORD</label>
-                        <input type="password" name="password_confirmation" class="sa-form-input" required placeholder="Ulangi password">
+                        <input type="password" name="password_confirmation" class="sa-form-input" required placeholder="Ulangi password" autocomplete="new-password">
                     </div>
                 </div>
             </div>
@@ -209,7 +209,7 @@
                 </div>
                 <div class="sa-form-group">
                     <label class="sa-form-label">PASSWORD BARU <small>(kosongkan jika tidak diubah)</small></label>
-                    <input type="password" name="password" class="sa-form-input" minlength="6" placeholder="Kosongkan jika tetap">
+                    <input type="password" name="password" class="sa-form-input" minlength="6" placeholder="Kosongkan jika tetap" autocomplete="new-password">
                 </div>
             </div>
             <div class="sa-modal-footer">
