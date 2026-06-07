@@ -130,7 +130,7 @@
                                 <div class="customer-avatar" style="background:{{ $avatarColor }};">{{ $initials }}</div>
                                 <div class="customer-info">
                                     <span class="customer-name">{{ $s->user->nama_lengkap ?? 'User' }}</span>
-                                    <span class="customer-phone">{{ $s->user->no_telepon ?? '-' }}</span>
+                                    <span class="customer-phone">{{ $s->user->nomor_telepon ?? '-' }}</span>
                                 </div>
                             </div>
                         </td>

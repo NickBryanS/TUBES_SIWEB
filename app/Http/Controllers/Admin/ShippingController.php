@@ -40,7 +40,7 @@ class ShippingController extends Controller
                 $q->whereHas('user', function ($u) use ($search) {
                     $u->where('nama_lengkap', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('no_telepon', 'like', "%{$search}%");
+                      ->orWhere('nomor_telepon', 'like', "%{$search}%");
                 })->orWhere('id', 'like', "%{$search}%");
             });
         }

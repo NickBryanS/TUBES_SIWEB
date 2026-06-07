@@ -1,10 +1,13 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\SocialiteController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\User\OrderController;
+use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\WishlistController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\User\ProfileController;
+use App\Http\Controllers\User\AddressController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\TransactionController;
@@ -35,6 +38,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Google OAuth (Socialite)
 Route::get('/auth/google', [SocialiteController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
+
+// Lupa & Reset Password
+Route::get('/lupa-password', [PasswordResetController::class, 'showForgotForm'])->name('password.forgot');
+Route::post('/lupa-password', [PasswordResetController::class, 'sendResetToken'])->name('password.send-token');
+Route::get('/reset-password', [PasswordResetController::class, 'showResetForm'])->name('password.reset.form');
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.reset');
 
 /*
 |--------------------------------------------------------------------------
@@ -67,12 +76,27 @@ Route::middleware('redirect_if_admin')->group(function () {
 Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
     Route::get('/dashboard', [OrderController::class, 'dashboard'])->name('dashboard');
 
+    // ─── USER: Profil & Pengaturan ───
+    Route::get('/user/profil', [ProfileController::class, 'index'])->name('user.profil');
+    Route::put('/user/profil', [ProfileController::class, 'update'])->name('user.profil.update');
+    Route::delete('/user/profil/foto', [ProfileController::class, 'removeFoto'])->name('user.profil.remove-foto');
+    Route::put('/user/profil/password', [ProfileController::class, 'updatePassword'])->name('user.profil.password');
+
+    // ─── USER: Manajemen Alamat ───
+    Route::get('/user/alamat', [AddressController::class, 'index'])->name('user.alamat');
+    Route::post('/user/alamat', [AddressController::class, 'store'])->name('user.alamat.store');
+    Route::put('/user/alamat/{address}', [AddressController::class, 'update'])->name('user.alamat.update');
+    Route::put('/user/alamat/{address}/utama', [AddressController::class, 'setUtama'])->name('user.alamat.set-utama');
+    Route::delete('/user/alamat/{address}', [AddressController::class, 'destroy'])->name('user.alamat.destroy');
+
+    // ─── Cart ───
     Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
     Route::post('/keranjang/{product}', [CartController::class, 'store'])->name('cart.store');
     Route::post('/keranjang/{product}/checkout', [CartController::class, 'directCheckout'])->name('cart.directCheckout');
     Route::put('/keranjang/{cart}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/keranjang/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
 
+    // ─── Wishlist ───
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
@@ -109,7 +133,7 @@ Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
     Route::post('/pesanan/{id}/pengembalian', [OrderController::class, 'konfirmasiPengembalian'])->name('pesanan.pengembalian');
 
     // Ulasan Produk
-    Route::post('/produk/{id}/ulasan', [\App\Http\Controllers\ReviewController::class, 'store'])->name('ulasan.store');
+    Route::post('/produk/{id}/ulasan', [\App\Http\Controllers\User\ReviewController::class, 'store'])->name('ulasan.store');
 
     // Notifikasi User
     Route::post('/notifikasi/read', function () {
@@ -167,8 +191,8 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::post('/pengiriman/{id}/status', [ShippingController::class, 'updateStatus'])->name('admin.pengiriman.status');
 
     // Perpanjangan Sewa (admin approve/reject dari notifikasi)
-    Route::post('/pesanan/{id}/perpanjangan/approve', [\App\Http\Controllers\OrderController::class, 'approvePerpanjangan'])->name('admin.perpanjangan.approve');
-    Route::post('/pesanan/{id}/perpanjangan/reject', [\App\Http\Controllers\OrderController::class, 'rejectPerpanjangan'])->name('admin.perpanjangan.reject');
+    Route::post('/pesanan/{id}/perpanjangan/approve', [\App\Http\Controllers\User\OrderController::class, 'approvePerpanjangan'])->name('admin.perpanjangan.approve');
+    Route::post('/pesanan/{id}/perpanjangan/reject', [\App\Http\Controllers\User\OrderController::class, 'rejectPerpanjangan'])->name('admin.perpanjangan.reject');
 });
 
 /*

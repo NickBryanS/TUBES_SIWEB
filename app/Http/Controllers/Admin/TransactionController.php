@@ -278,6 +278,6 @@ class TransactionController extends Controller
         $transaction = Transaction::with(['details.product', 'payment', 'user'])
             ->findOrFail($id);
 
-        return view('nota', compact('transaction'));
+        return view('user.nota', compact('transaction'));
     }
 }

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Transaction;
@@ -45,7 +46,7 @@ class OrderController extends Controller
         // 5 transaksi terakhir
         $recentTransactions = $allTransactions->take(5);
 
-        return view('dashboard', compact(
+        return view('user.dashboard', compact(
             'sewaAktif', 'totalPesanan', 'selesai', 'menungguBayar',
             'activeRental', 'activeRentals', 'recentTransactions'
         ));
@@ -65,7 +66,7 @@ class OrderController extends Controller
             $subtotal += $cart->product->harga_sewa * $cart->quantity * $cart->days;
         }
 
-        return view('checkout', compact('carts', 'subtotal'));
+        return view('user.checkout', compact('carts', 'subtotal'));
     }
 
     /**
@@ -143,7 +144,7 @@ class OrderController extends Controller
         // Ambil daftar rekening aktif dari pengaturan admin
         $paymentSettings = \App\Models\PaymentSetting::where('is_active', true)->get();
 
-        return view('pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'ongkosKirim', 'total', 'checkoutData', 'paymentSettings'));
+        return view('user.pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'ongkosKirim', 'total', 'checkoutData', 'paymentSettings'));
     }
 
     /**
@@ -278,6 +279,11 @@ class OrderController extends Controller
         ]);
 
         $transaction = Transaction::findOrFail($id);
+
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
         $payment = $transaction->payment;
 
         if (!$payment) {
@@ -313,7 +319,11 @@ class OrderController extends Controller
         $transaction = Transaction::with(['details.product', 'payment'])
             ->findOrFail($id);
 
-        return view('konfirmasi', compact('transaction'));
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        return view('user.konfirmasi', compact('transaction'));
     }
 
     /**
@@ -326,7 +336,7 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('riwayat', compact('transactions'));
+        return view('user.riwayat', compact('transactions'));
     }
 
     /**
@@ -342,7 +352,7 @@ class OrderController extends Controller
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
-        return view('pesanan-detail', compact('transaction'));
+        return view('user.pesanan-detail', compact('transaction'));
     }
 
     /**
@@ -358,7 +368,7 @@ class OrderController extends Controller
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
-        return view('nota', compact('transaction'));
+        return view('user.nota', compact('transaction'));
     }
 
     /**
@@ -504,7 +514,7 @@ class OrderController extends Controller
             return redirect()->back()->with('info', 'Pengajuan perpanjangan Anda sedang menunggu persetujuan admin.');
         }
 
-        return view('perpanjangan', compact('transaction'));
+        return view('user.perpanjangan', compact('transaction'));
     }
 
     /**

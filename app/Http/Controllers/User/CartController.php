@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Cart;
@@ -14,7 +15,7 @@ class CartController extends Controller
     {
         $userId = Auth::id();
         $carts = Cart::where('user_id', $userId)->with('product')->get();
-        return view('keranjang', compact('carts'));
+        return view('user.keranjang', compact('carts'));
     }
 
     public function store(Request $request, Product $product)
@@ -23,6 +24,12 @@ class CartController extends Controller
         
         $quantity = $request->input('quantity', 1);
         $days = $request->input('days', 1);
+
+        // Validate stock availability
+        $currentCartQty = Cart::where('user_id', $userId)->where('product_id', $product->id)->value('quantity') ?? 0;
+        if (($currentCartQty + $quantity) > $product->stok_tersedia) {
+            return redirect()->back()->with('error', "Stok tidak mencukupi. Hanya tersedia {$product->stok_tersedia} unit.");
+        }
 
         $cart = Cart::where('user_id', $userId)->where('product_id', $product->id)->first();
 
@@ -49,6 +56,12 @@ class CartController extends Controller
         
         $quantity = $request->input('quantity', 1);
         $days = $request->input('days', 1);
+
+        // Validate stock availability
+        $currentCartQty = Cart::where('user_id', $userId)->where('product_id', $product->id)->value('quantity') ?? 0;
+        if (($currentCartQty + $quantity) > $product->stok_tersedia) {
+            return redirect()->back()->with('error', "Stok tidak mencukupi. Hanya tersedia {$product->stok_tersedia} unit.");
+        }
 
         $cart = Cart::where('user_id', $userId)->where('product_id', $product->id)->first();
 
@@ -81,6 +94,12 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
             'days' => 'nullable|integer|min:1'
         ]);
+
+        // Validate stock availability
+        $product = $cart->product;
+        if ($request->quantity > $product->stok_tersedia) {
+            return redirect()->back()->with('error', "Stok tidak mencukupi. Hanya tersedia {$product->stok_tersedia} unit.");
+        }
 
         $updateData = ['quantity' => $request->quantity];
         if ($request->has('days')) {
