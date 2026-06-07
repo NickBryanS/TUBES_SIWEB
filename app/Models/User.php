@@ -82,6 +82,7 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    /**
      * Relasi: User memiliki banyak Address.
      */
     public function addresses(): HasMany
