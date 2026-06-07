@@ -106,7 +106,7 @@ class NotificationController extends Controller
         // ── 4. Pengembalian (transaksi yang sedang berjalan mendekati/melewati tanggal selesai) ──
         if (in_array($filter, ['semua', 'pengembalian'])) {
             $perpanjangan = Transaction::with('user')
-                ->where('status_perpanjangan', 'diminta')
+                ->where('status_perpanjangan', 'pending')
                 ->orderBy('updated_at', 'desc')
                 ->get();
 
@@ -121,8 +121,33 @@ class NotificationController extends Controller
                     'order_id'   => '#GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
                     'message'    => 'Permintaan Perpanjangan Sewa (' . $durasi . ' Hari) untuk Pesanan #GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '.',
                     'actions'    => [
-                        ['label' => 'Konfirmasi', 'type' => 'primary', 'route' => route('perpanjangan.approve', $trx->id)],
+                        ['label' => 'Konfirmasi', 'type' => 'primary', 'route' => route('admin.perpanjangan.approve', $trx->id)],
                         ['label' => 'Lihat Kalender', 'type' => 'secondary', 'route' => route('admin.transaksi.index', ['highlight' => $trx->id])],
+                    ],
+                    'time'       => $trx->updated_at,
+                    'read'       => false,
+                ]);
+            }
+
+            // Permintaan Refund (pesanan dibatalkan setelah bayar, ada rekening pengembalian)
+            $refundRequests = Transaction::with('user')
+                ->where('status_transaksi', 'dibatalkan')
+                ->whereNotNull('rekening_pengembalian')
+                ->orderBy('updated_at', 'desc')
+                ->take(10)
+                ->get();
+
+            foreach ($refundRequests as $trx) {
+                $notifications->push([
+                    'id'          => 'rfnd-' . $trx->id,
+                    'type'        => 'pengembalian',
+                    'user_name'   => $trx->user->nama_lengkap ?? 'Pelanggan',
+                    'user_avatar' => $trx->user->avatar ?? null,
+                    'user_initial' => strtoupper(substr($trx->user->nama_lengkap ?? 'P', 0, 1)),
+                    'order_id'   => '#GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
+                    'message'    => 'Permintaan Refund: Pesanan #GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . ' dibatalkan. Kembalikan dana ke ' . ($trx->bank_pengembalian ?? '-') . ' - ' . ($trx->rekening_pengembalian ?? '-') . ' a/n ' . ($trx->atas_nama_pengembalian ?? '-') . '.',
+                    'actions'    => [
+                        ['label' => 'Lihat Detail', 'type' => 'secondary', 'route' => route('admin.transaksi.index', ['highlight' => $trx->id])],
                     ],
                     'time'       => $trx->updated_at,
                     'read'       => false,

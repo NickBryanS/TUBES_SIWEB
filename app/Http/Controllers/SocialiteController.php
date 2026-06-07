@@ -27,9 +27,9 @@ class SocialiteController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            $googleUser = Socialite::driver('google')
-                ->stateless()
-                ->user();
+            /** @var \Laravel\Socialite\Two\GoogleProvider $driver */
+            $driver = Socialite::driver('google');
+            $googleUser = $driver->stateless()->user();
         } catch (\Exception $e) {
             return redirect('/login')
                 ->withErrors(['google' => 'Gagal login dengan Google: ' . $e->getMessage()]);

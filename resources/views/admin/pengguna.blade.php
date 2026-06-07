@@ -74,11 +74,6 @@
                 <a href="{{ route('admin.pengguna.index', array_merge(request()->except('tab', 'page'), ['tab' => 'diblokir'])) }}"
                    class="tab-item {{ $tab === 'diblokir' ? 'active' : '' }}">Diblokir</a>
             </div>
-            <div class="toolbar-actions">
-                <button class="btn-filter-lanjutan" id="btn-filter-lanjutan">
-                    <i class="fas fa-sliders-h"></i> Filter Lanjutan
-                </button>
-            </div>
         </div>
 
         {{-- TABLE --}}

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -102,9 +103,11 @@ class UserController extends Controller
         if ($user->status_akun === 'aktif') {
             $user->status_akun = 'banned';
             $message = "Pengguna {$user->nama_lengkap} telah diblokir.";
+            ActivityLog::catat('blokir_pengguna', 'Memblokir pengguna: ' . $user->nama_lengkap, 'User', $user->id);
         } else {
             $user->status_akun = 'aktif';
             $message = "Pengguna {$user->nama_lengkap} telah diaktifkan kembali.";
+            ActivityLog::catat('aktifkan_pengguna', 'Mengaktifkan kembali pengguna: ' . $user->nama_lengkap, 'User', $user->id);
         }
 
         $user->save();
@@ -123,7 +126,32 @@ class UserController extends Controller
         $user->save();
 
         $status = $user->status_verifikasi ? 'terverifikasi' : 'belum terverifikasi';
+        
+        ActivityLog::catat('verifikasi_pengguna', 'Mengubah status verifikasi ' . $user->nama_lengkap . ' menjadi ' . $status, 'User', $user->id);
+
         return back()->with('success', "Pengguna {$user->nama_lengkap} sekarang {$status}.");
+    }
+
+    /**
+     * Export all users data as print-friendly PDF (via browser print).
+     */
+    public function export()
+    {
+        $users = User::where('peran', 'user')
+            ->withCount('transactions')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalPengguna  = $users->count();
+        $terverifikasi  = $users->where('status_verifikasi', true)->count();
+        $diblokir       = $users->whereIn('status_akun', ['banned', 'nonaktif'])->count();
+        $aktif          = $users->where('status_akun', 'aktif')->count();
+
+        ActivityLog::catat('export_pengguna', 'Mengekspor data pelanggan/pengguna ke PDF');
+
+        return view('admin.exports.pengguna-pdf', compact(
+            'users', 'totalPengguna', 'terverifikasi', 'diblokir', 'aktif'
+        ));
     }
 
     /**
@@ -133,7 +161,10 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $name = $user->nama_lengkap;
+        $uid = $user->id;
         $user->delete();
+
+        ActivityLog::catat('hapus_pengguna', 'Menghapus akun pengguna: ' . $name, 'User', $uid);
 
         return back()->with('success', "Pengguna {$name} telah dihapus.");
     }

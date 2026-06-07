@@ -16,9 +16,12 @@
             <h1 class="sa-lap-title">Ringkasan Performa Toko</h1>
         </div>
         <div class="sa-lap-actions">
-            <span class="sa-lap-status">Status Operasional:</span>
-            <button class="sa-export-btn" type="button"><i class="fas fa-file-excel"></i> Ekspor ke Excel</button>
-            <button class="sa-export-btn sa-export-pdf" type="button"><i class="fas fa-file-pdf"></i> Ekspor ke PDF</button>
+            <a href="{{ route('superadmin.laporan.excel', ['periode' => $periode]) }}" class="sa-export-btn">
+                <i class="fas fa-file-excel"></i> Ekspor Excel
+            </a>
+            <a href="{{ route('superadmin.laporan.pdf', ['periode' => $periode]) }}" target="_blank" class="sa-export-btn sa-export-pdf">
+                <i class="fas fa-file-pdf"></i> Ekspor PDF
+            </a>
         </div>
     </div>
 
@@ -115,7 +118,24 @@
             </tbody>
         </table>
         <div class="sa-log-footer">
-            <a href="#" class="sa-link">LIHAT SEMUA LOG</a>
+            <span>Menampilkan {{ $logs->firstItem() ?? 0 }}–{{ $logs->lastItem() ?? 0 }} dari {{ $logs->total() }} log penyewaan</span>
+            <div class="sa-pagination">
+                @if($logs->onFirstPage())
+                    <span class="sa-pg-btn pg-nav" style="opacity:0.4;cursor:default;"><i class="fas fa-chevron-left"></i></span>
+                @else
+                    <a class="sa-pg-btn pg-nav" href="{{ $logs->appends(request()->query())->previousPageUrl() }}"><i class="fas fa-chevron-left"></i></a>
+                @endif
+
+                @foreach($logs->getUrlRange(1, min($logs->lastPage(), 5)) as $page => $url)
+                    <a class="sa-pg-btn {{ $page == $logs->currentPage() ? 'pg-active' : '' }}" href="{{ $logs->appends(request()->query())->url($page) }}">{{ $page }}</a>
+                @endforeach
+
+                @if($logs->hasMorePages())
+                    <a class="sa-pg-btn pg-nav" href="{{ $logs->appends(request()->query())->nextPageUrl() }}"><i class="fas fa-chevron-right"></i></a>
+                @else
+                    <span class="sa-pg-btn pg-nav" style="opacity:0.4;cursor:default;"><i class="fas fa-chevron-right"></i></span>
+                @endif
+            </div>
         </div>
     </div>
 </div>

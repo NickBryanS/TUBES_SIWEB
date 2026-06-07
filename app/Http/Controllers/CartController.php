@@ -12,14 +12,14 @@ class CartController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id() ?? 1;
+        $userId = Auth::id();
         $carts = Cart::where('user_id', $userId)->with('product')->get();
         return view('user.keranjang', compact('carts'));
     }
 
     public function store(Request $request, Product $product)
     {
-        $userId = Auth::id() ?? 1;
+        $userId = Auth::id();
         
         $quantity = $request->input('quantity', 1);
         $days = $request->input('days', 1);
@@ -45,7 +45,7 @@ class CartController extends Controller
 
     public function directCheckout(Request $request, Product $product)
     {
-        $userId = Auth::id() ?? 1;
+        $userId = Auth::id();
         
         $quantity = $request->input('quantity', 1);
         $days = $request->input('days', 1);
@@ -71,7 +71,7 @@ class CartController extends Controller
 
     public function update(Request $request, Cart $cart)
     {
-        $userId = Auth::id() ?? 1;
+        $userId = Auth::id();
 
         if ($cart->user_id !== $userId) {
             abort(403);
@@ -94,7 +94,7 @@ class CartController extends Controller
 
     public function destroy(Cart $cart)
     {
-        $userId = Auth::id() ?? 1;
+        $userId = Auth::id();
 
         if ($cart->user_id !== $userId) {
             abort(403);

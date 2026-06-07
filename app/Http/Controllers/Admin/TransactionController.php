@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use App\Models\ActivityLog;
+use App\Notifications\OrderStatusNotification;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -95,6 +97,7 @@ class TransactionController extends Controller
             'tanggal_kembali_aktual' => $transaction->tanggal_kembali_aktual?->format('d M Y'),
             'total_biaya' => $transaction->total_biaya,
             'denda' => $transaction->denda,
+            'keterangan_denda' => $transaction->keterangan_denda,
             'perpanjangan_hari' => $transaction->perpanjangan_hari,
             'status_perpanjangan' => $transaction->status_perpanjangan,
             'status_transaksi' => $transaction->status_transaksi,
@@ -103,6 +106,9 @@ class TransactionController extends Controller
             'foto_ktp' => $transaction->foto_ktp ? asset('storage/' . $transaction->foto_ktp) : null,
             'jenis_jaminan' => $transaction->jenis_jaminan,
             'status_jaminan' => $transaction->status_jaminan,
+            'rekening_pengembalian' => $transaction->rekening_pengembalian,
+            'bank_pengembalian' => $transaction->bank_pengembalian,
+            'atas_nama_pengembalian' => $transaction->atas_nama_pengembalian,
             'created_at' => $transaction->created_at->format('d M Y, H:i'),
             'details' => $transaction->details->map(function ($d) use ($transaction) {
                 $hari = $transaction->tanggal_mulai->diffInDays($transaction->tanggal_selesai);
@@ -146,6 +152,10 @@ class TransactionController extends Controller
             $transaction->payment->update(['status_pembayaran' => 'terverifikasi']);
         }
 
+        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah divalidasi dan sedang diproses.'));
+
+        ActivityLog::catat('konfirmasi_transaksi', 'Menyetujui transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+
         return redirect()->route('admin.transaksi.index')
             ->with('success', 'Transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' berhasil divalidasi.');
     }
@@ -171,6 +181,10 @@ class TransactionController extends Controller
             'status_jaminan' => 'rejected',
         ]);
 
+        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah ditolak dan dibatalkan.'));
+
+        ActivityLog::catat('tolak_transaksi', 'Menolak transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+
         return redirect()->route('admin.transaksi.index')
             ->with('success', 'Transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' ditolak.');
     }
@@ -188,9 +202,45 @@ class TransactionController extends Controller
         $transaction->update(['status_transaksi' => $request->status]);
 
         $label = str_replace('_', ' ', ucfirst($request->status));
+        $transaction->user->notify(new OrderStatusNotification($transaction, 'Status pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah diperbarui menjadi ' . $label . '.'));
+
+        ActivityLog::catat('update_status_transaksi', 'Mengubah status transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' menjadi ' . strtoupper($request->status), 'Transaction', $transaction->id);
 
         return redirect()->route('admin.transaksi.index')
             ->with('success', "Status transaksi diubah ke \"{$label}\".");
+    }
+
+    /**
+     * Set denda manual oleh admin (barang rusak/hilang).
+     */
+    public function setDenda(Request $request, $id)
+    {
+        $request->validate([
+            'denda'            => 'required|numeric|min:0',
+            'keterangan_denda' => 'required|string|max:500',
+        ], [
+            'denda.required'            => 'Nominal denda wajib diisi.',
+            'denda.numeric'             => 'Nominal denda harus berupa angka.',
+            'denda.min'                 => 'Nominal denda tidak boleh negatif.',
+            'keterangan_denda.required' => 'Keterangan denda wajib diisi.',
+            'keterangan_denda.max'      => 'Keterangan maksimal 500 karakter.',
+        ]);
+
+        $transaction = Transaction::findOrFail($id);
+
+        $transaction->update([
+            'denda'            => $request->denda,
+            'keterangan_denda' => $request->keterangan_denda,
+        ]);
+
+        ActivityLog::catat('set_denda_transaksi', 'Menetapkan denda Rp ' . number_format($request->denda, 0, ',', '.') . ' pada transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Denda berhasil disimpan sebesar Rp ' . number_format($request->denda, 0, ',', '.') . '.',
+            'denda'   => $transaction->denda,
+            'keterangan_denda' => $transaction->keterangan_denda,
+        ]);
     }
 
     /**
@@ -209,9 +259,25 @@ class TransactionController extends Controller
                 'status_transaksi' => 'diproses',
                 'status_jaminan' => 'verified',
             ]);
+            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah dikonfirmasi dan pesanan sedang diproses.'));
+        } else {
+            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah dikonfirmasi.'));
         }
+
+        ActivityLog::catat('konfirmasi_lunas_transaksi', 'Mengonfirmasi pelunasan transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
 
         return redirect()->route('admin.transaksi.index')
             ->with('success', 'Pembayaran dikonfirmasi lunas.');
+    }
+
+    /**
+     * Admin mencetak nota transaksi.
+     */
+    public function cetakNota($id)
+    {
+        $transaction = Transaction::with(['details.product', 'payment', 'user'])
+            ->findOrFail($id);
+
+        return view('nota', compact('transaction'));
     }
 }

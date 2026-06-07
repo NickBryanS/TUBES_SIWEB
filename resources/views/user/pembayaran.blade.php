@@ -32,26 +32,45 @@
                     <button class="payment-tab" data-tab="qris" data-value="qris">
                         <i class="fas fa-qrcode"></i> QRIS
                     </button>
+                    @if(isset($checkoutData['metode_pengambilan']) && $checkoutData['metode_pengambilan'] === 'pickup')
                     <button class="payment-tab" data-tab="cod" data-value="bayar_di_toko">
                         <i class="fas fa-store"></i> Bayar di Toko
                     </button>
+                    @endif
                 </div>
 
                 <!-- Transfer Bank Content -->
                 <div class="payment-content" id="tab-transfer">
-                    <div class="bank-info-card">
-                        <div class="bank-header">
-                            <span class="bank-label">NOMOR REKENING</span>
-                        </div>
-                        <div class="bank-number-row">
-                            <div class="bank-icon"><i class="fas fa-university"></i></div>
-                            <div>
-                                <span class="bank-number">123-456-7890</span>
-                                <span class="bank-name">a/n GKDL OUTDOOR</span>
+                    @if(isset($paymentSettings) && $paymentSettings->count() > 0)
+                        @foreach($paymentSettings as $ps)
+                        <div class="bank-info-card" style="margin-bottom: 12px;">
+                            <div class="bank-header">
+                                <span class="bank-label">{{ $ps->nama_bank }}</span>
                             </div>
-                            <button type="button" class="copy-btn" id="copy-bank"><i class="fas fa-copy"></i> Salin Nomor</button>
+                            <div class="bank-number-row">
+                                <div class="bank-icon"><i class="fas fa-university"></i></div>
+                                <div>
+                                    <span class="bank-number">{{ $ps->nomor_rekening }}</span>
+                                    <span class="bank-name">a/n {{ $ps->atas_nama }}</span>
+                                </div>
+                                <button type="button" class="copy-btn" onclick="copyToClipboard('{{ $ps->nomor_rekening }}', this)"><i class="fas fa-copy"></i> Salin</button>
+                            </div>
                         </div>
-                    </div>
+                        @endforeach
+                    @else
+                        <div class="bank-info-card">
+                            <div class="bank-header">
+                                <span class="bank-label">NOMOR REKENING</span>
+                            </div>
+                            <div class="bank-number-row">
+                                <div class="bank-icon"><i class="fas fa-university"></i></div>
+                                <div>
+                                    <span class="bank-number">Hubungi Admin</span>
+                                    <span class="bank-name">Belum ada rekening aktif</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <h4 class="upload-title">Upload Bukti Transfer</h4>
                     <div class="upload-area" id="upload-proof" onclick="document.getElementById('bukti-file').click()">
@@ -87,6 +106,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- RIGHT: ORDER SUMMARY -->
@@ -108,10 +128,12 @@
                         <span>Subtotal</span>
                         <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
+                    @if(isset($ongkosKirim) && $ongkosKirim > 0)
                     <div class="summary-line">
-                        <span>Biaya Admin</span>
-                        <span>Rp {{ number_format($biayaAdmin, 0, ',', '.') }}</span>
+                        <span>Ongkos Kirim</span>
+                        <span>Rp {{ number_format($ongkosKirim, 0, ',', '.') }}</span>
                     </div>
+                    @endif
                     <div class="summary-total-line">
                         <span>Total</span>
                         <span class="summary-total-price">Rp {{ number_format($total, 0, ',', '.') }}</span>
@@ -150,14 +172,15 @@ document.querySelectorAll('.payment-tab').forEach(function(tab) {
     });
 });
 
-// Copy bank number
-document.getElementById('copy-bank')?.addEventListener('click', function() {
-    navigator.clipboard.writeText('1234567890');
-    this.innerHTML = '<i class="fas fa-check"></i> Disalin!';
-    setTimeout(() => {
-        this.innerHTML = '<i class="fas fa-copy"></i> Salin Nomor';
+// Copy nomor rekening (dinamis)
+function copyToClipboard(text, btn) {
+    navigator.clipboard.writeText(text.replace(/[^0-9a-zA-Z]/g, ''));
+    var originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> Disalin!';
+    setTimeout(function() {
+        btn.innerHTML = originalHTML;
     }, 2000);
-});
+}
 
 // File upload preview
 document.getElementById('bukti-file')?.addEventListener('change', function() {
@@ -166,6 +189,19 @@ document.getElementById('bukti-file')?.addEventListener('change', function() {
         textEl.innerHTML = '<strong><i class="fas fa-check-circle" style="color:var(--green-dark)"></i> ' + this.files[0].name + '</strong>';
         document.getElementById('upload-proof').style.borderColor = 'var(--green-dark)';
         document.getElementById('upload-proof').style.background = 'rgba(45,90,39,0.03)';
+    }
+});
+
+// Validation on submit
+document.getElementById('pembayaran-form').addEventListener('submit', function(e) {
+    let method = document.getElementById('metode_pembayaran').value;
+    if (method === 'transfer_bank') {
+        let bukti = document.getElementById('bukti-file').files.length;
+        if (bukti === 0) {
+            e.preventDefault();
+            alert('Peringatan: Anda harus mengupload bukti transfer pembayaran sebelum membuat pesanan.');
+            return false;
+        }
     }
 });
 </script>

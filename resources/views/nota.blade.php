@@ -289,7 +289,7 @@
     foreach($transaction->details as $detail) {
         $subtotal += $detail->product->harga_sewa * $detail->jumlah * $durasi;
     }
-    $biayaAdmin = 2500;
+    $biayaAdmin = 0;
     $isLunas = in_array($transaction->status_transaksi, ['diproses', 'dikirim', 'selesai']);
 
     $statusLabels = [
@@ -304,7 +304,7 @@
 
 <!-- Print Actions -->
 <div class="print-bar">
-    <a href="{{ route('pesanan.detail', $transaction->id) }}" class="btn-back-nota">← Kembali</a>
+    <a href="{{ route('riwayat') }}" class="btn-back-nota">← Kembali</a>
     <button onclick="window.print()" class="btn-print">🖨️ Cetak / Simpan PDF</button>
 </div>
 
@@ -388,10 +388,12 @@
                 <span>Subtotal Sewa</span>
                 <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
             </div>
+            @if($transaction->ongkos_kirim > 0)
             <div class="nota-total-row">
-                <span>Biaya Admin</span>
-                <span>Rp {{ number_format($biayaAdmin, 0, ',', '.') }}</span>
+                <span>Ongkos Kirim ({{ $transaction->jarak_tempuh }} km)</span>
+                <span>Rp {{ number_format($transaction->ongkos_kirim, 0, ',', '.') }}</span>
             </div>
+            @endif
             @if($transaction->denda > 0)
             <div class="nota-total-row denda">
                 <span>Denda Keterlambatan</span>

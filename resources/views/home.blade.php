@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Gardakala Outdoor - Sewa Alat Outdoor')
-@section('description', 'Gardakala Outdoor - Sewa alat outdoor terlengkap. Alam menunggu, kami siapkan semua.')
+@section('title', 'Gardakala Outdoor - Sewa Alat Outdoor Premium')
+@section('description', 'Gardakala Outdoor - Sewa perlengkapan outdoor premium untuk pendakian, kemping, dan petualangan alam bebas.')
 @section('nav-home', 'active')
 
 @section('styles')
@@ -9,173 +9,158 @@
 @endsection
 
 @section('content')
-    {{-- HERO SECTION (partial) --}}
+<div class="home-page-content">
+    {{-- PREMIUM HERO SECTION --}}
     @include('partials.hero')
 
-    {{-- STATS SECTION --}}
-    <section class="stats-section" id="stats-section">
-        <div class="stats-container">
-            <div class="stat-item">
-                <span class="stat-number">100+</span>
-                <span class="stat-label">ALAT OUTDOOR</span>
+    {{-- PERLENGKAPAN TERPOPULER (Top 3 Premium Products) --}}
+    <section class="popular-equipment-section">
+        <div class="home-section-header">
+            <div>
+                <h2 class="home-section-title">Perlengkapan Terpopuler</h2>
+                <p class="home-section-subtitle">Alat-alat outdoor paling favorit pilihan para petualang sejati.</p>
             </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-                <span class="stat-number">50+</span>
-                <span class="stat-label">BRAND TERPUAYA</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-                <span class="stat-number">4.9+</span>
-                <span class="stat-label">RATING KEPUASAN</span>
-            </div>
+            <a href="/katalog" class="home-see-all">Lihat Semua Alat <i class="fas fa-chevron-right"></i></a>
         </div>
-    </section>
+        
+        @php
+            $popularProducts = \App\Models\Product::with('category')->take(3)->get();
+        @endphp
 
-    {{-- POPULAR EQUIPMENT SECTION --}}
-    <section class="popular-section" id="popular-section">
-        <div class="section-container">
-            <div class="section-header">
-                <div>
-                    <h2 class="section-title">Perlengkapan Terpopuler</h2>
-                    <p class="section-subtitle">Gear pilihan terbaik untuk ekspedisi Anda bulan ini.</p>
-                </div>
-                <a href="/katalog" class="see-all-link">Lihat Semua <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="products-grid">
-                {{-- Product 1 --}}
-                <div class="product-card" id="product-1">
-                    <div class="product-image-wrapper">
-                        <span class="product-badge badge-recommended">PALING DICARI</span>
-                        <img src="{{ asset('images/tent-product.png') }}" alt="Tendaki Borneo Orange 4P" class="product-image">
+        <div class="popular-equipment-grid">
+            @forelse($popularProducts as $product)
+                @php
+                    $productId    = $product->id;
+                    $productImage = $product->url_gambar ?? 'images/tent-expedition.png';
+                    $productName  = $product->nama_produk;
+                    $productDesc  = $product->deskripsi;
+                    $productPrice = 'Rp ' . number_format($product->harga_sewa, 0, ',', '.');
+                    $categoryName = $product->category->nama_kategori ?? 'Outdoor';
+                @endphp
+                <div class="equipment-premium-card">
+                    <div class="equipment-card-image">
+                        <span class="equipment-badge">{{ $categoryName }}</span>
+                        <img src="{{ asset($productImage) }}" alt="{{ $productName }}">
                     </div>
-                    <div class="product-info">
-                        <div class="product-name-row">
-                            <h3 class="product-name">Tendaki Borneo Orange 4P</h3>
-                            <div class="product-rating"><i class="fas fa-star"></i> 4.9</div>
+                    <div class="equipment-card-body">
+                        <div class="equipment-card-meta">
+                            <span class="equipment-rating">
+                                <i class="fas fa-star"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '4.8' }}
+                            </span>
+                            <span class="equipment-reviews">({{ $product->reviewCount() > 0 ? $product->reviewCount() : '12' }} Ulasan)</span>
                         </div>
-                        <p class="product-brand">The North Face • Ultra Light</p>
-                        <div class="product-price-row">
-                            <span class="product-price">Rp 125.000<span class="price-period">/hari</span></span>
-                            <div class="product-actions">
-                                <button class="action-btn" aria-label="Favorite"><i class="far fa-heart"></i></button>
-                                <button class="action-btn" aria-label="Share"><i class="fas fa-share-alt"></i></button>
+                        <h3 class="equipment-title">{{ $productName }}</h3>
+                        <p class="equipment-desc">{{ Str::limit($productDesc, 80) }}</p>
+                        <div class="equipment-card-footer">
+                            <span class="equipment-price">{{ $productPrice }}<span class="price-unit">/hari</span></span>
+                            <div class="equipment-actions">
+                                <a href="{{ route('produk.detail', $productId) }}" class="btn-equipment-detail">Detail</a>
+                                <form action="{{ route('cart.store', $productId) }}" method="POST" style="margin:0;">
+                                    @csrf
+                                    <input type="hidden" name="quantity" value="1">
+                                    <input type="hidden" name="days" value="1">
+                                    <button type="submit" class="btn-equipment-cart"><i class="fas fa-shopping-bag"></i></button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-                {{-- Product 2 --}}
-                <div class="product-card" id="product-2">
-                    <div class="product-image-wrapper">
-                        <span class="product-badge badge-new">BARU</span>
-                        <img src="{{ asset('images/carrier-product.png') }}" alt="Summit Carrier 60L" class="product-image">
-                    </div>
-                    <div class="product-info">
-                        <div class="product-name-row">
-                            <h3 class="product-name">Summit Carrier 60L</h3>
-                            <div class="product-rating"><i class="fas fa-star"></i> 4.8</div>
-                        </div>
-                        <p class="product-brand">Osprey • Anti Gravity System</p>
-                        <div class="product-price-row">
-                            <span class="product-price">Rp 85.000<span class="price-period">/hari</span></span>
-                            <div class="product-actions">
-                                <button class="action-btn" aria-label="Favorite"><i class="far fa-heart"></i></button>
-                                <button class="action-btn" aria-label="Share"><i class="fas fa-share-alt"></i></button>
-                            </div>
-                        </div>
-                    </div>
+            @empty
+                <div class="empty-products">Belum ada perlengkapan outdoor populer yang tersedia.</div>
+            @endforelse
+        </div>
+    </section>
+
+    {{-- CARA KERJA KAMI (3 Steps) --}}
+    <section class="how-it-works-section" id="how-it-works">
+        <div class="home-section-header center-header">
+            <h2 class="home-section-title">Cara Kerja Kami</h2>
+            <p class="home-section-subtitle">Sewa peralatan camping & mendaki dengan 3 langkah praktis dan mudah.</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon">
+                    <i class="far fa-compass"></i>
                 </div>
-                {{-- Product 3 --}}
-                <div class="product-card" id="product-3">
-                    <div class="product-image-wrapper">
-                        <span class="product-badge badge-top">TOP CHOICE</span>
-                        <img src="{{ asset('images/sleeping-bag-product.png') }}" alt="Arctic Dreamer Bag" class="product-image">
-                    </div>
-                    <div class="product-info">
-                        <div class="product-name-row">
-                            <h3 class="product-name">Arctic Dreamer Bag</h3>
-                            <div class="product-rating"><i class="fas fa-star"></i> 4.7</div>
-                        </div>
-                        <p class="product-brand">Deuter • Dreamlite Series</p>
-                        <div class="product-price-row">
-                            <span class="product-price">Rp 60.000<span class="price-period">/hari</span></span>
-                            <div class="product-actions">
-                                <button class="action-btn" aria-label="Favorite"><i class="far fa-heart"></i></button>
-                                <button class="action-btn" aria-label="Share"><i class="fas fa-share-alt"></i></button>
-                            </div>
-                        </div>
-                    </div>
+                <h3>Pilih Alat</h3>
+                <p>Telusuri berbagai perlengkapan kemping & mendaki kelas atas dari katalog lengkap kami.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">
+                    <i class="far fa-calendar-check"></i>
                 </div>
+                <h3>Tentukan Tanggal</h3>
+                <p>Atur tanggal pengambilan dan pengembalian barang sesuai dengan jadwal perjalanan Anda.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">
+                    <i class="fas fa-route"></i>
+                </div>
+                <h3>Ambil & Jelajahi</h3>
+                <p>Ambil langsung barang di toko terdekat kami atau nikmati layanan pengiriman instan.</p>
             </div>
         </div>
     </section>
 
-    {{-- HOW IT WORKS SECTION --}}
-    <section class="how-it-works" id="how-it-works">
-        <div class="section-container">
-            <h2 class="section-title center">Cara Kerja Kami</h2>
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-icon-wrapper">
-                        <i class="fas fa-search"></i>
+    {{-- KEAMANAN DAN KENYAMANAN SEBAGAI PRIORITAS --}}
+    <section class="security-priority-section">
+        <div class="security-grid">
+            {{-- Left Side: 4 Benefit Cards Grid --}}
+            <div class="security-benefits-block">
+                <div class="benefit-modern-card">
+                    <div class="benefit-card-icon"><i class="fas fa-circle-check"></i></div>
+                    <div class="benefit-card-text">
+                        <h4>Alat Terawat & Bersih</h4>
+                        <p>Kami menjamin semua alat selalu steril dan dalam kondisi siap tempur di alam bebas.</p>
                     </div>
-                    <h3 class="step-title">Pilih Alat</h3>
-                    <p class="step-desc">Telusuri katalog lengkap kami dan pilih gear yang sesuai dengan kebutuhan petualangan Anda.</p>
                 </div>
-                <div class="step-card">
-                    <div class="step-icon-wrapper">
-                        <i class="fas fa-calendar-alt"></i>
+                <div class="benefit-modern-card">
+                    <div class="benefit-card-icon"><i class="fas fa-tags"></i></div>
+                    <div class="benefit-card-text">
+                        <h4>Harga Bersahabat</h4>
+                        <p>Tarif rental yang transparan, tanpa biaya tersembunyi, ramah untuk kantong petualang.</p>
                     </div>
-                    <h3 class="step-title">Tentukan Tanggal</h3>
-                    <p class="step-desc">Pilih durasi sewa mulai dari harian, mingguan, kami yang siap siap dan mudah digunakan.</p>
                 </div>
-                <div class="step-card">
-                    <div class="step-icon-wrapper">
-                        <i class="fas fa-mountain"></i>
+                <div class="benefit-modern-card">
+                    <div class="benefit-card-icon"><i class="fas fa-truck-fast"></i></div>
+                    <div class="benefit-card-text">
+                        <h4>Layanan Pengiriman Cepat</h4>
+                        <p>Nikmati kemudahan pengiriman peralatan langsung ke basecamp atau depan rumah Anda.</p>
                     </div>
-                    <h3 class="step-title">Ambil & Jelajahi</h3>
-                    <p class="step-desc">Ambil di lokasi atau kirim ke alamat Anda. Kit siap, saatnya bertualang! petualangan Anda.</p>
+                </div>
+                <div class="benefit-modern-card">
+                    <div class="benefit-card-icon"><i class="fas fa-mobile-screen"></i></div>
+                    <div class="benefit-card-text">
+                        <h4>Booking Mudah & Cepat</h4>
+                        <p>Sistem booking cerdas secara real-time kapan pun dan di mana pun Anda berada.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    {{-- PRIORITY / WHY US SECTION --}}
-    <section class="priority-section" id="priority-section">
-        <div class="section-container priority-container">
-            <div class="priority-left">
-                <div class="priority-features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon green"><i class="fas fa-tools"></i></div>
-                        <h4 class="feature-title">Alat Terawat</h4>
-                        <p class="feature-desc">Semua alat dalam pengecekan dan perawatan rutin semua.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon orange"><i class="fas fa-tags"></i></div>
-                        <h4 class="feature-title">Harga Bersahabat</h4>
-                        <p class="feature-desc">Tarif kompetitif untuk semua jenis sewa alat outdoor.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon blue"><i class="fas fa-truck"></i></div>
-                        <h4 class="feature-title">Pengiriman</h4>
-                        <p class="feature-desc">Layanan antar jemput yang cepat & aman.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon red"><i class="fas fa-calendar-check"></i></div>
-                        <h4 class="feature-title">Booking Mudah</h4>
-                        <p class="feature-desc">Pesan alat outdoor hanya dalam beberapa klik.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="priority-right">
-                <h2 class="priority-title">Keamanan dan Kenyamanan Anda Adalah Prioritas Kami</h2>
-                <p class="priority-desc">Di Gardakala Outdoor, kami memahami bahwa setiap petualangan di alam liar memerlukan kepercayaan. Itu mengapa kami hanya menyediakan alat dan gear dari brand-brand terkemuka yang telah teruji oleh para petualang berpengalaman.</p>
-                <ul class="priority-checklist">
-                    <li><i class="fas fa-check-circle"></i> Pengecekan Double Check setiap kali meminjamkan</li>
-                    <li><i class="fas fa-check-circle"></i> Garansi Penggantian jika terdapat kerusakan</li>
-                    <li><i class="fas fa-check-circle"></i> Sedia alat Terbaik, berkualitas tinggi serta berstandar</li>
+            {{-- Right Side: Content Banner + Checks --}}
+            <div class="security-info-block">
+                <span class="security-label"><i class="fas fa-shield-heart"></i> PRIORITAS UTAMA KAMI</span>
+                <h2 class="security-title">Keamanan dan Kenyamanan Anda Adalah Prioritas Kami</h2>
+                <p class="security-desc">Setiap peralatan yang kami sewakan melewati proses pemeliharaan ketat agar petualangan Anda tetap aman dan tak terlupakan.</p>
+                
+                <ul class="security-check-list">
+                    <li>
+                        <span class="check-bullet"><i class="fas fa-check"></i></span>
+                        <div>
+                            <strong>Pengecekan Kualitas Double-Check</strong>
+                            <p>Tim kami memeriksa fisik alat sebelum diserahterimakan untuk menghindari defect di lapangan.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="check-bullet"><i class="fas fa-check"></i></span>
+                        <div>
+                            <strong>Garansi Penggantian Alat Rusak</strong>
+                            <p>Apabila terjadi malfungsi teknis di jalan, kami siap mengirimkan alat pengganti dengan segera.</p>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
     </section>
+</div>
 @endsection

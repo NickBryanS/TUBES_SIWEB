@@ -13,11 +13,8 @@
         {{-- STEPPER (partial) --}}
         @include('partials.checkout-stepper', ['currentStep' => 1])
 
-        <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST">
+        <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <!-- Hidden inputs untuk tanggal sewa -->
-            <input type="hidden" name="tanggal_mulai" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
-            <input type="hidden" name="tanggal_selesai" value="{{ \Carbon\Carbon::now()->addDays($carts->max('days') ?? 1)->format('Y-m-d') }}">
         </form>
 
         <div class="checkout-grid">
@@ -49,6 +46,24 @@
                         </div>
                     </div>
                     @endforeach
+                </div>
+
+                <!-- RENTAL DATES -->
+                <div class="checkout-section">
+                    <h3 class="checkout-section-title"><i class="fas fa-calendar-alt"></i> Tanggal Sewa</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">TANGGAL MULAI</label>
+                            <input type="date" class="form-input" name="tanggal_mulai" id="tanggal-mulai" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" form="checkout-form" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">TANGGAL SELESAI</label>
+                            <input type="date" class="form-input" name="tanggal_selesai" id="tanggal-selesai" value="{{ \Carbon\Carbon::now()->addDays($carts->max('days') ?? 1)->format('Y-m-d') }}" min="{{ \Carbon\Carbon::now()->addDay()->format('Y-m-d') }}" form="checkout-form" readonly required style="background-color: #f1f3f1; cursor: not-allowed;">
+                        </div>
+                    </div>
+                    <small style="color: #666; font-size: 0.8rem; margin-top: 8px; display: block; line-height: 1.4;">
+                        * Tanggal selesai disesuaikan otomatis dengan durasi sewa terlama di keranjang Anda ({{ $carts->max('days') ?? 1 }} hari).
+                    </small>
                 </div>
 
                 <!-- METHOD -->
@@ -85,22 +100,23 @@
                         <div class="pickup-icon"><i class="fas fa-map-marker-alt"></i></div>
                         <div>
                             <strong>Basecamp GKDL Outdoor</strong>
-                            <p>Jl. Percobaan No. 45, Jakarta Selatan (Dekat Area Parkir Utama)</p>
-                            <p class="pickup-hours"><i class="fas fa-clock"></i> Operasional: 08:00 - 20:00 WIB</p>
+                            <p>Jl. Raya Soreang - Banjaran No.216, RT.02/RW.01, Ciluncat, Kec. Cangkuang, Kabupaten Bandung, Jawa Barat 40238</p>
+                            <p class="pickup-hours"><i class="fas fa-clock"></i> Operasional: 08:00 - 21:00 WIB</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- PERSONAL INFO -->
                 <div class="checkout-section">
+                    <h3 class="checkout-section-title"><i class="fas fa-user"></i> Info Penerima</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">NAMA PENERIMA</label>
-                            <input type="text" class="form-input" value="John Doe" id="nama-penerima" form="checkout-form">
+                            <input type="text" class="form-input" name="nama_penerima" value="{{ Auth::user()->nama_lengkap ?? '' }}" id="nama-penerima" form="checkout-form" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">NOMOR HP</label>
-                            <input type="text" class="form-input" value="0812.5456.7890" id="nomor-hp" form="checkout-form">
+                            <input type="text" class="form-input" name="telepon_penerima" value="{{ Auth::user()->no_telepon ?? '' }}" id="nomor-hp" form="checkout-form" required>
                         </div>
                     </div>
                 </div>
@@ -108,19 +124,14 @@
                 <!-- DELIVERY ADDRESS (initially hidden, shown when method=deliver) -->
                 <div class="checkout-section" id="delivery-address-section" style="display:none;">
                     <h3 class="checkout-section-title">Detail Pengiriman</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">NAMA LENGKAP</label>
-                            <input type="text" class="form-input" value="John Doe" form="checkout-form">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">NOMOR HP</label>
-                            <input type="text" class="form-input" value="0812.5456.7890" form="checkout-form">
-                        </div>
-                    </div>
                     <div class="form-group full-width">
                         <label class="form-label">ALAMAT LENGKAP</label>
-                        <textarea class="form-textarea" name="alamat_pengiriman" rows="3" form="checkout-form">Jl. Rimba No. 12, Jakarta Selatan</textarea>
+                        <textarea class="form-textarea" name="alamat_pengiriman" rows="3" form="checkout-form" placeholder="Masukkan alamat lengkap pengiriman..."></textarea>
+                    </div>
+                    <div class="form-group full-width" style="margin-top: 15px;">
+                        <label class="form-label">JARAK TEMPUH (KM)</label>
+                        <input type="number" step="0.1" min="0" class="form-input" name="jarak_tempuh" id="jarak-tempuh" form="checkout-form" placeholder="Masukkan jarak tempuh dari basecamp ke alamat Anda...">
+                        <small style="color: #666; font-size: 0.8rem; margin-top: 5px; display: block;">Biaya pengiriman Rp 5.000 / km.</small>
                     </div>
                 </div>
 
@@ -128,10 +139,11 @@
                 <div class="checkout-section" id="identity-section" style="display:none;">
                     <h3 class="checkout-section-title">Verifikasi Identitas (Jaminan)</h3>
                     <p class="upload-note">Wajib mengunggah tanda pengenal asli sebagai jaminan pengiriman alat.</p>
-                    <div class="upload-area" id="upload-area">
+                    <div class="upload-area" id="upload-area" onclick="document.getElementById('foto_ktp').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <p><strong>Klik untuk Upload atau seret file</strong></p>
+                        <p id="upload-ktp-text"><strong>Klik untuk Upload atau seret file</strong></p>
                         <span>Upload Foto KTP/SIM (maks. 5MB)</span>
+                        <input type="file" name="foto_ktp" id="foto_ktp" form="checkout-form" accept=".jpg,.jpeg,.png,.pdf" style="display:none;">
                     </div>
                 </div>
             </div>
@@ -144,14 +156,7 @@
                         <span>Subtotal Alat</span>
                         <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
-                    <div class="summary-line">
-                        <span>Ongkos Kirim</span>
-                        <span>Gratis</span>
-                    </div>
-                    <div class="summary-line">
-                        <span>Biaya Admin</span>
-                        <span>Gratis</span>
-                    </div>
+
                     <div class="summary-total-line">
                         <span>Total Pembayaran</span>
                         <span class="summary-total-price">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
@@ -197,6 +202,53 @@ document.querySelectorAll('input[name="metode_pengambilan"]').forEach(function(r
             identity.style.display = '';
         }
     });
+});
+
+// Automatically update tanggal_selesai based on selected tanggal_mulai and cart duration
+const tanggalMulaiInput = document.getElementById('tanggal-mulai');
+const tanggalSelesaiInput = document.getElementById('tanggal-selesai');
+const cartMaxDays = {{ $carts->max('days') ?? 1 }};
+
+if (tanggalMulaiInput && tanggalSelesaiInput) {
+    tanggalMulaiInput.addEventListener('change', function() {
+        const startDate = new Date(this.value);
+        if (!isNaN(startDate.getTime())) {
+            startDate.setDate(startDate.getDate() + cartMaxDays);
+            
+            const year = startDate.getFullYear();
+            const month = String(startDate.getMonth() + 1).padStart(2, '0');
+            const day = String(startDate.getDate()).padStart(2, '0');
+            
+            tanggalSelesaiInput.value = `${year}-${month}-${day}`;
+        }
+    });
+}
+
+// File upload preview
+document.getElementById('foto_ktp')?.addEventListener('change', function() {
+    var textEl = document.getElementById('upload-ktp-text');
+    if (this.files.length > 0) {
+        textEl.innerHTML = '<strong><i class="fas fa-check-circle" style="color:var(--green-dark)"></i> ' + this.files[0].name + '</strong>';
+        document.getElementById('upload-area').style.borderColor = 'var(--green-dark)';
+        document.getElementById('upload-area').style.background = 'rgba(45,90,39,0.03)';
+    } else {
+        textEl.innerHTML = '<strong>Klik untuk Upload atau seret file</strong>';
+        document.getElementById('upload-area').style.borderColor = '';
+        document.getElementById('upload-area').style.background = '';
+    }
+});
+
+// Validation on submit
+document.getElementById('checkout-form').addEventListener('submit', function(e) {
+    let method = document.querySelector('input[name="metode_pengambilan"]:checked').value;
+    if (method === 'deliver') {
+        let foto = document.getElementById('foto_ktp').files.length;
+        if (foto === 0) {
+            e.preventDefault();
+            alert('Peringatan: Anda harus mengupload bukti jaminan (KTP/SIM) untuk metode pengiriman ke alamat.');
+            return false;
+        }
+    }
 });
 </script>
 @endsection

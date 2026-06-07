@@ -6,8 +6,8 @@
             <i class="fas fa-mountain"></i>
         </div>
         <div>
-            <span class="sidebar-brand">Garkadala Outdoor</span>
-            <span class="sidebar-subtitle">Admin Portal</span>
+            <span class="sidebar-brand">Admin Portal</span>
+            <span class="sidebar-subtitle">Executive View</span>
         </div>
     </div>
 
@@ -20,6 +20,14 @@
         <a href="{{ route('admin.inventory.index') }}" class="sidebar-link @yield('sidebar-inventaris')" id="nav-inventaris">
             <i class="fas fa-boxes-stacked"></i>
             <span>Inventaris</span>
+        </a>
+        <a href="{{ route('admin.kategori.index') }}" class="sidebar-link @yield('sidebar-kategori')" id="nav-kategori">
+            <i class="fas fa-tags"></i>
+            <span>Kategori</span>
+        </a>
+        <a href="{{ route('admin.ulasan.index') }}" class="sidebar-link @yield('sidebar-ulasan')" id="nav-ulasan">
+            <i class="fas fa-star"></i>
+            <span>Ulasan</span>
         </a>
         <a href="{{ route('admin.transaksi.index') }}" class="sidebar-link @yield('sidebar-transaksi')" id="nav-transaksi">
             <i class="fas fa-receipt"></i>
@@ -39,14 +47,24 @@
         </a>
     </nav>
 
-    {{-- ADMIN PROFILE (bottom) --}}
-    <div class="sidebar-profile">
-        <div class="sidebar-avatar">
-            <span>{{ strtoupper(substr(Auth::user()->nama_lengkap ?? 'A', 0, 1)) }}</span>
+    {{-- BOTTOM SECTION --}}
+    <div class="sidebar-bottom">
+        <div class="sidebar-profile" style="padding-bottom: 12px; border-top: 1px solid rgba(255,255,255,0.08);">
+            <div class="sidebar-avatar">
+                <span>{{ strtoupper(substr(Auth::user()->nama_lengkap ?? 'A', 0, 1)) }}</span>
+            </div>
+            <div class="sidebar-profile-info">
+                <span class="sidebar-profile-name">{{ Auth::user()->nama_lengkap ?? 'Administrator' }}</span>
+                <span class="sidebar-profile-role">ADMINISTRATOR</span>
+            </div>
         </div>
-        <div class="sidebar-profile-info">
-            <span class="sidebar-profile-name">{{ Auth::user()->nama_lengkap ?? 'Administrator' }}</span>
-            <span class="sidebar-profile-role">ADMINISTRATOR</span>
+        <div style="padding: 0 16px 20px;">
+            <form action="{{ route('admin.logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn-logout" style="width: 100%; justify-content: center; margin-left: 0;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
     </div>
 </aside>

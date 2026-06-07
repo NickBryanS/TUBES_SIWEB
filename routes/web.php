@@ -14,9 +14,13 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ShippingController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\LaporanController;
 use App\Http\Controllers\SuperAdmin\PengaturanController;
+use App\Http\Controllers\SuperAdmin\ManajemenAdminController;
+use App\Http\Controllers\SuperAdmin\ActivityLogController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -54,7 +58,8 @@ Route::middleware('redirect_if_admin')->group(function () {
 
     Route::get('/katalog', function () {
         $products = Product::with('category')->get();
-        return view('katalog', compact('products'));
+        $categories = \App\Models\Category::all();
+        return view('katalog', compact('products', 'categories'));
     });
 
     // Product Detail page mapping
@@ -121,8 +126,20 @@ Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
     Route::post('/pesanan/{id}/perpanjangan/approve', [OrderController::class, 'approvePerpanjangan'])->name('perpanjangan.approve');
     Route::post('/pesanan/{id}/perpanjangan/reject', [OrderController::class, 'rejectPerpanjangan'])->name('perpanjangan.reject');
 
+    // Konfirmasi Penerimaan Barang (Pesanan Diterima)
+    Route::post('/pesanan/{id}/terima', [OrderController::class, 'terimaPesanan'])->name('pesanan.terima');
+
     // Konfirmasi Pengembalian & Denda (FR-USR-034)
     Route::post('/pesanan/{id}/pengembalian', [OrderController::class, 'konfirmasiPengembalian'])->name('pesanan.pengembalian');
+
+    // Ulasan Produk
+    Route::post('/produk/{id}/ulasan', [\App\Http\Controllers\ReviewController::class, 'store'])->name('ulasan.store');
+
+    // Notifikasi User
+    Route::post('/notifikasi/read', function () {
+        auth()->user()->unreadNotifications->markAsRead();
+        return redirect()->back();
+    })->name('notifikasi.read');
 });
 
 /*
@@ -132,14 +149,19 @@ Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
 */
 Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::post('/transaksi/{id}/approve', [AdminDashboardController::class, 'approveTransaksi'])->name('admin.transaksi.approve');
-    Route::post('/transaksi/{id}/reject', [AdminDashboardController::class, 'rejectTransaksi'])->name('admin.transaksi.reject');
     Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
     // Inventory Routes (export & bulk-delete harus sebelum resource agar tidak konflik)
     Route::get('/inventory/export', [InventoryController::class, 'export'])->name('admin.inventory.export');
     Route::post('/inventory/bulk-delete', [InventoryController::class, 'bulkDelete'])->name('admin.inventory.bulk-delete');
-    Route::resource('inventory', InventoryController::class)->names('admin.inventory');
+    Route::resource('inventory', InventoryController::class)->names('admin.inventory')->parameters(['inventory' => 'product']);
+
+    // Kategori Routes
+    Route::resource('kategori', CategoryController::class)->names('admin.kategori');
+
+    // Ulasan Routes (hanya index & destroy untuk moderasi)
+    Route::get('/ulasan', [ReviewController::class, 'index'])->name('admin.ulasan.index');
+    Route::delete('/ulasan/{ulasan}', [ReviewController::class, 'destroy'])->name('admin.ulasan.destroy');
 
     // Transaksi Routes
     Route::get('/transaksi', [TransactionController::class, 'index'])->name('admin.transaksi.index');
@@ -148,9 +170,12 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::post('/transaksi/{id}/reject', [TransactionController::class, 'reject'])->name('admin.transaksi.reject');
     Route::post('/transaksi/{id}/status', [TransactionController::class, 'updateStatus'])->name('admin.transaksi.status');
     Route::post('/transaksi/{id}/lunas', [TransactionController::class, 'konfirmasiLunas'])->name('admin.transaksi.lunas');
+    Route::post('/transaksi/{id}/denda', [TransactionController::class, 'setDenda'])->name('admin.transaksi.denda');
+    Route::get('/transaksi/{id}/nota', [TransactionController::class, 'cetakNota'])->name('admin.transaksi.nota');
 
     // Pengguna Routes
     Route::get('/pengguna', [UserController::class, 'index'])->name('admin.pengguna.index');
+    Route::get('/pengguna/export', [UserController::class, 'export'])->name('admin.pengguna.export');
     Route::get('/pengguna/{id}', [UserController::class, 'show'])->name('admin.pengguna.show');
     Route::post('/pengguna/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('admin.pengguna.toggle-status');
     Route::post('/pengguna/{id}/verifikasi', [UserController::class, 'toggleVerifikasi'])->name('admin.pengguna.verifikasi');
@@ -164,6 +189,10 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::get('/pengiriman', [ShippingController::class, 'index'])->name('admin.pengiriman.index');
     Route::get('/pengiriman/{id}', [ShippingController::class, 'show'])->name('admin.pengiriman.show');
     Route::post('/pengiriman/{id}/status', [ShippingController::class, 'updateStatus'])->name('admin.pengiriman.status');
+
+    // Perpanjangan Sewa (admin approve/reject dari notifikasi)
+    Route::post('/pesanan/{id}/perpanjangan/approve', [\App\Http\Controllers\OrderController::class, 'approvePerpanjangan'])->name('admin.perpanjangan.approve');
+    Route::post('/pesanan/{id}/perpanjangan/reject', [\App\Http\Controllers\OrderController::class, 'rejectPerpanjangan'])->name('admin.perpanjangan.reject');
 });
 
 /*
@@ -173,7 +202,30 @@ Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
 */
 Route::middleware('auth', 'is_superadmin')->prefix('superadmin')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('superadmin.dashboard');
+    Route::post('/backup-database', [SuperAdminDashboardController::class, 'backupDatabase'])->name('superadmin.backup');
+
+    // Manajemen Admin (Staff)
+    Route::get('/admin', [ManajemenAdminController::class, 'index'])->name('superadmin.admin.index');
+    Route::post('/admin', [ManajemenAdminController::class, 'store'])->name('superadmin.admin.store');
+    Route::put('/admin/{id}', [ManajemenAdminController::class, 'update'])->name('superadmin.admin.update');
+    Route::delete('/admin/{id}', [ManajemenAdminController::class, 'destroy'])->name('superadmin.admin.destroy');
+    Route::post('/admin/{id}/toggle-status', [ManajemenAdminController::class, 'toggleStatus'])->name('superadmin.admin.toggle');
+
+    // Log Aktivitas (Audit Trail)
+    Route::get('/activity-log', [ActivityLogController::class, 'index'])->name('superadmin.activity-log');
+
+    // Laporan & Ekspor
     Route::get('/laporan', [LaporanController::class, 'index'])->name('superadmin.laporan');
+    Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('superadmin.laporan.pdf');
+    Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('superadmin.laporan.excel');
+
+    // Pengaturan
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('superadmin.pengaturan');
     Route::post('/pengaturan', [PengaturanController::class, 'update'])->name('superadmin.pengaturan.update');
+
+    // Pengaturan Pembayaran
+    Route::post('/pengaturan/payment', [PengaturanController::class, 'storePayment'])->name('superadmin.payment.store');
+    Route::put('/pengaturan/payment/{id}', [PengaturanController::class, 'updatePayment'])->name('superadmin.payment.update');
+    Route::delete('/pengaturan/payment/{id}', [PengaturanController::class, 'destroyPayment'])->name('superadmin.payment.destroy');
+    Route::post('/pengaturan/payment/{id}/toggle', [PengaturanController::class, 'togglePayment'])->name('superadmin.payment.toggle');
 });

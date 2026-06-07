@@ -11,7 +11,7 @@
 @section('content')
 <div class="konfirmasi-page">
     <!-- Stepper -->
-    @include('partials.checkout-stepper', ['currentStep' => 3])
+
 
     <!-- Background Mountain -->
     <div class="konfirmasi-hero">
@@ -75,7 +75,7 @@
             @endforeach
 
             @php
-                $biayaAdmin = 2500;
+                $biayaAdmin = 0;
                 $total = $transaction->total_biaya;
             @endphp
 
@@ -95,32 +95,28 @@
             </div>
 
             <div class="order-actions">
-                <a href="{{ route('pesanan.detail', $transaction->id) }}" class="btn-track-order">
-                    <i class="fas fa-search"></i> Lacak Pesanan Saya
-                </a>
+                @if($transaction->payment->metode_pembayaran === 'bayar_di_toko' && $transaction->metode_pengambilan !== 'deliver')
+                    <a href="{{ route('pesanan.nota', $transaction->id) }}" class="btn-track-order" target="_blank">
+                        <i class="fas fa-file-invoice"></i> Unduh Nota
+                    </a>
+                @else
+                    <a href="{{ route('pesanan.detail', $transaction->id) }}" class="btn-track-order">
+                        <i class="fas fa-search"></i> Lacak Pesanan Saya
+                    </a>
+                @endif
                 <a href="{{ route('riwayat') }}" class="btn-download-order">
                     <i class="fas fa-history"></i> Lihat Riwayat
                 </a>
             </div>
 
-            {{-- UPLOAD BUKTI PEMBAYARAN (jika status menunggu) --}}
-            @if($transaction->status_transaksi === 'menunggu')
+            {{-- UPLOAD BUKTI PEMBAYARAN (jika status menunggu dan bukan bayar di toko) --}}
+            @if($transaction->status_transaksi === 'menunggu' && $transaction->payment->metode_pembayaran !== 'bayar_di_toko')
             <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 16px;">
                     <i class="fas fa-upload" style="color: #e8a838;"></i> Upload Bukti Pembayaran
                 </h3>
 
-                {{-- Info Rekening --}}
-                <div style="background: rgba(232,168,56,0.08); border: 1px solid rgba(232,168,56,0.25); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                    <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Nomor Rekening</span>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
-                        <i class="fas fa-university" style="font-size: 1.3rem; color: #e8a838;"></i>
-                        <div>
-                            <span style="color: #fff; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px;">123-456-7890</span><br>
-                            <span style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">a/n GKDL OUTDOOR</span>
-                        </div>
-                    </div>
-                </div>
+
 
                 {{-- Form Upload --}}
                 <form action="{{ route('pembayaran.upload', $transaction->id) }}" method="POST" enctype="multipart/form-data">
@@ -145,6 +141,12 @@
                     <i class="fas fa-exclamation-circle" style="margin-top: 2px;"></i>
                     <span>Pesanan Anda akan diverifikasi secara manual oleh tim kami dalam waktu maksimal 1x24 jam setelah bukti transfer diunggah.</span>
                 </div>
+            </div>
+            @elseif($transaction->status_transaksi === 'menunggu' && $transaction->payment->metode_pembayaran === 'bayar_di_toko')
+            <div style="margin-top: 28px; padding: 20px; background: rgba(232,168,56,0.08); border: 1px solid rgba(232,168,56,0.2); border-radius: 12px; text-align: center;">
+                <i class="fas fa-store" style="font-size: 1.5rem; color: #e8a838; margin-bottom: 8px;"></i>
+                <p style="color: #e8a838; font-weight: 600; margin: 0;">Pembayaran Langsung di Toko</p>
+                <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 4px;">Silakan selesaikan pembayaran tunai saat Anda mengambil peralatan di Basecamp GKDL Outdoor.</p>
             </div>
             @elseif($transaction->status_transaksi === 'menunggu_admin')
             <div style="margin-top: 28px; padding: 20px; background: rgba(46,204,113,0.08); border: 1px solid rgba(46,204,113,0.2); border-radius: 12px; text-align: center;">

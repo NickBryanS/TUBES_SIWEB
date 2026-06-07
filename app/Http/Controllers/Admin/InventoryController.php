@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
@@ -92,6 +93,8 @@ class InventoryController extends Controller
 
         $product = Product::create($validated);
 
+        ActivityLog::catat('tambah_produk', 'Menambahkan produk baru: ' . $product->nama_produk, 'Product', $product->id);
+
         return response()->json([
             'success' => true,
             'message' => 'Produk berhasil ditambahkan!',
@@ -123,15 +126,20 @@ class InventoryController extends Controller
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'nama_produk' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'harga_sewa' => 'required|numeric|min:0',
-            'total_stok' => 'required|integer|min:1',
-            'stok_tersedia' => 'required|integer|min:0',
-            'deskripsi' => 'nullable|string',
+            'nama_produk'        => 'required|string|max:255',
+            'category_id'        => 'required|exists:categories,id',
+            'harga_sewa'         => 'required|numeric|min:0',
+            'total_stok'         => 'required|integer|min:1',
+            'stok_tersedia'      => 'nullable|integer|min:0',
+            'deskripsi'          => 'nullable|string',
             'spesifikasi_teknis' => 'nullable|string',
-            'url_gambar' => 'nullable|url',
+            'url_gambar'         => 'nullable|url',
         ]);
+
+        // Default stok_tersedia ke total_stok jika tidak diisi
+        if (!isset($validated['stok_tersedia']) || $validated['stok_tersedia'] === null) {
+            $validated['stok_tersedia'] = $validated['total_stok'];
+        }
 
         // Validasi: stok_tersedia tidak boleh melebihi total_stok
         if ($validated['stok_tersedia'] > $validated['total_stok']) {
@@ -142,6 +150,8 @@ class InventoryController extends Controller
         }
 
         $product->update($validated);
+
+        ActivityLog::catat('update_produk', 'Memperbarui produk: ' . $product->nama_produk . ' (Stok tersedia: ' . $product->stok_tersedia . ')', 'Product', $product->id);
 
         return response()->json([
             'success' => true,
@@ -155,7 +165,11 @@ class InventoryController extends Controller
      */
     public function destroy(Product $product)
     {
+        $nama = $product->nama_produk;
+        $id = $product->id;
         $product->delete();
+
+        ActivityLog::catat('hapus_produk', 'Menghapus produk: ' . $nama, 'Product', $id);
 
         return response()->json([
             'success' => true,
@@ -178,6 +192,8 @@ class InventoryController extends Controller
         }
 
         Product::whereIn('id', $ids)->delete();
+
+        ActivityLog::catat('bulk_hapus_produk', 'Menghapus massal ' . count($ids) . ' produk');
 
         return response()->json([
             'success' => true,
@@ -220,6 +236,8 @@ class InventoryController extends Controller
         rewind($handle);
         $csv = stream_get_contents($handle);
         fclose($handle);
+
+        ActivityLog::catat('export_inventaris', 'Mengekspor data inventaris produk ke CSV');
         
         return response($csv, 200, [
             'Content-Type' => 'text/csv',

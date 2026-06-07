@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use App\Models\Review;
+use App\Notifications\OrderStatusNotification;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -16,46 +18,67 @@ class AdminDashboardController extends Controller
      * Tampilkan halaman dashboard admin.
      * Menyediakan semua data statistik untuk dashboard.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // ── STAT CARDS ──────────────────────────────────────────
+        $period = $request->get('period', 'bulanan'); // mingguan | bulanan | tahunan
 
-        // Total Pendapatan (dari transaksi yang sudah selesai/diproses)
+        // ── DATE RANGE ───────────────────────────────────────────
+        $now = Carbon::now();
+        [$dateFrom, $dateTo] = match($period) {
+            'mingguan' => [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()],
+            'tahunan'  => [$now->copy()->startOfYear(), $now->copy()->endOfYear()],
+            default    => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()], // bulanan
+        };
+
+        [$prevFrom, $prevTo] = match($period) {
+            'mingguan' => [$now->copy()->subWeek()->startOfWeek(), $now->copy()->subWeek()->endOfWeek()],
+            'tahunan'  => [$now->copy()->subYear()->startOfYear(), $now->copy()->subYear()->endOfYear()],
+            default    => [$now->copy()->subMonth()->startOfMonth(), $now->copy()->subMonth()->endOfMonth()],
+        };
+
+        // ── TOTAL PENDAPATAN ─────────────────────────────────────
         $totalPendapatan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
+            ->whereBetween('created_at', [$dateFrom, $dateTo])
             ->sum('total_biaya');
 
-        // Persentase perubahan pendapatan (bandingkan minggu ini vs minggu lalu)
-        $pendapatanMingguIni = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
-            ->where('created_at', '>=', Carbon::now()->startOfWeek())
+        $prevPendapatan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
+            ->whereBetween('created_at', [$prevFrom, $prevTo])
             ->sum('total_biaya');
-        $pendapatanMingguLalu = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
-            ->whereBetween('created_at', [Carbon::now()->subWeek()->startOfWeek(), Carbon::now()->startOfWeek()])
-            ->sum('total_biaya');
-        $persenPerubahan = $pendapatanMingguLalu > 0
-            ? round((($pendapatanMingguIni - $pendapatanMingguLalu) / $pendapatanMingguLalu) * 100)
+
+        $persenPerubahan = $prevPendapatan > 0
+            ? round((($totalPendapatan - $prevPendapatan) / $prevPendapatan) * 100, 1)
             : 0;
 
-        // Penyewaan Aktif
-        $penyewaanAktif = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim'])->count();
-        $menungguPesanan = Transaction::where('status_transaksi', 'menunggu')->count();
+        // ── PESANAN SELESAI ──────────────────────────────────────
+        $pesananSelesai = Transaction::where('status_transaksi', 'selesai')
+            ->whereBetween('created_at', [$dateFrom, $dateTo])
+            ->count();
 
-        // Menunggu Verifikasi
+        // Tingkat kepuasan (dari ulasan bintang >= 4)
+        $totalUlasan = \App\Models\Review::whereBetween('created_at', [$dateFrom, $dateTo])->count();
+        $ulasanPositif = \App\Models\Review::whereBetween('created_at', [$dateFrom, $dateTo])
+            ->where('rating', '>=', 4)->count();
+        $tingkatKepuasan = $totalUlasan > 0 ? round(($ulasanPositif / $totalUlasan) * 100) : 98;
+
+        // ── SALDO TERSEDIA (kas masuk periode ini) ───────────────
+        $saldoTersedia = Transaction::where('status_transaksi', 'selesai')
+            ->sum('total_biaya');
+
+        // ── PENYEWAAN AKTIF & STATUS ─────────────────────────────
+        $penyewaanAktif    = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim'])->count();
+        $menungguPesanan   = Transaction::where('status_transaksi', 'menunggu')->count();
         $menungguVerifikasi = Transaction::where('status_transaksi', 'menunggu_admin')->count();
+        $stokTipis         = Product::where('stok_tersedia', '<=', 3)->count();
 
-        // Stok Tipis (produk dengan stok_tersedia <= 3)
-        $stokTipis = Product::where('stok_tersedia', '<=', 3)->count();
-
-        // ── CHART: TREN PENDAPATAN 7 HARI ───────────────────────
+        // ── CHART: ALIRAN KAS ─────────────────────────────────────
         $chartData = [];
         $hariLabel = ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'];
-
         for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
-            $dayOfWeek = $date->dayOfWeekIso; // 1=Monday ... 7=Sunday
+            $date = $now->copy()->subDays($i);
+            $dayOfWeek = $date->dayOfWeekIso;
             $pendapatan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
                 ->whereDate('created_at', $date->toDateString())
                 ->sum('total_biaya');
-
             $chartData[] = [
                 'label' => $hariLabel[$dayOfWeek - 1],
                 'value' => (float) $pendapatan,
@@ -65,8 +88,7 @@ class AdminDashboardController extends Controller
 
         // ── BARANG TERLARIS ─────────────────────────────────────
         $barangTerlaris = TransactionDetail::select(
-                'product_id',
-                DB::raw('SUM(jumlah) as total_sewa')
+                'product_id', DB::raw('SUM(jumlah) as total_sewa')
             )
             ->groupBy('product_id')
             ->orderByDesc('total_sewa')
@@ -74,14 +96,42 @@ class AdminDashboardController extends Controller
             ->with('product')
             ->get();
 
-        // ── TRANSAKSI PERLU TINDAKAN ────────────────────────────
+        // ── RINCIAN TRANSAKSI (recent) ───────────────────────────
+        $recentTransaksi = Transaction::with(['user', 'payment'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+
+        // ── METODE PEMBAYARAN BREAKDOWN ──────────────────────────
+        $totalPayments = \App\Models\Payment::count() ?: 1;
+        $paymentBreakdown = [
+            [
+                'label'   => 'Transfer Bank',
+                'count'   => \App\Models\Payment::where('metode_pembayaran', 'transfer_bank')->count(),
+                'fill'    => '',
+            ],
+            [
+                'label'   => 'Tunai di Toko',
+                'count'   => \App\Models\Payment::where('metode_pembayaran', 'bayar_di_toko')->count(),
+                'fill'    => 'fill-2',
+            ],
+            [
+                'label'   => 'QRIS',
+                'count'   => \App\Models\Payment::where('metode_pembayaran', 'qris')->count(),
+                'fill'    => 'fill-3',
+            ],
+        ];
+        foreach ($paymentBreakdown as &$pb) {
+            $pb['pct'] = round(($pb['count'] / $totalPayments) * 100);
+        }
+        unset($pb);
+
+        // ── TRANSAKSI PERLU TINDAKAN (untuk modal quick-action) ──
         $transaksiMenunggu = Transaction::with(['user', 'details.product'])
             ->whereIn('status_transaksi', ['menunggu', 'menunggu_admin'])
             ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+            ->limit(5)->get();
 
-        // ── JADWAL PENGEMBALIAN HARI INI ────────────────────────
+        // ── JADWAL PENGEMBALIAN ───────────────────────────────────
         $today = Carbon::today();
         $jadwalPengembalian = Transaction::with(['user', 'details.product', 'payment'])
             ->whereIn('status_transaksi', ['diproses', 'dikirim'])
@@ -90,14 +140,20 @@ class AdminDashboardController extends Controller
             ->get();
 
         return view('admin.dashboard', compact(
+            'period',
             'totalPendapatan',
             'persenPerubahan',
+            'pesananSelesai',
+            'tingkatKepuasan',
+            'saldoTersedia',
             'penyewaanAktif',
             'menungguPesanan',
             'menungguVerifikasi',
             'stokTipis',
             'chartData',
             'barangTerlaris',
+            'recentTransaksi',
+            'paymentBreakdown',
             'transaksiMenunggu',
             'jadwalPengembalian'
         ));
@@ -121,6 +177,12 @@ class AdminDashboardController extends Controller
             $transaction->payment->update(['status_pembayaran' => 'terverifikasi']);
         }
 
+        // Kirim notifikasi ke user
+        $transaction->user->notify(new OrderStatusNotification(
+            $transaction,
+            'Pesanan Anda #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah disetujui dan sedang diproses.'
+        ));
+
         return redirect()->route('admin.dashboard')->with('success', 'Transaksi #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' berhasil disetujui.');
     }
 
@@ -141,6 +203,12 @@ class AdminDashboardController extends Controller
         }
 
         $transaction->update(['status_transaksi' => 'dibatalkan']);
+
+        // Kirim notifikasi ke user
+        $transaction->user->notify(new OrderStatusNotification(
+            $transaction,
+            'Pesanan Anda #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah ditolak dan dibatalkan.'
+        ));
 
         return redirect()->route('admin.dashboard')->with('success', 'Transaksi #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' ditolak.');
     }

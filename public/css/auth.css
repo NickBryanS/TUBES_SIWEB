@@ -9,7 +9,7 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #f0ece4;
+    background: #ECEDE3;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -201,13 +201,13 @@ body {
 }
 
 .auth-input:focus {
-    border-color: #2D5A27;
+    border-color: #173624;
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+    box-shadow: 0 0 0 3px rgba(23, 54, 36, 0.1);
 }
 
 .auth-input-wrapper:focus-within i.input-icon {
-    color: #2D5A27;
+    color: #173624;
 }
 
 /* Password toggle */
@@ -224,7 +224,7 @@ body {
 }
 
 .toggle-password:hover {
-    color: #2D5A27;
+    color: #173624;
 }
 
 /* Remember me */
@@ -245,7 +245,7 @@ body {
 .auth-remember input[type="checkbox"] {
     width: 16px;
     height: 16px;
-    accent-color: #2D5A27;
+    accent-color: #173624;
     border-radius: 4px;
     cursor: pointer;
 }
@@ -257,14 +257,14 @@ body {
 
 .auth-forgot-link {
     font-size: 0.78rem;
-    color: #2D5A27;
+    color: #173624;
     font-weight: 500;
     text-decoration: none;
     transition: color 0.25s ease;
 }
 
 .auth-forgot-link:hover {
-    color: #1a3a17;
+    color: #0f2a1b;
     text-decoration: underline;
 }
 
@@ -274,7 +274,7 @@ body {
     padding: 13px;
     border: none;
     border-radius: 10px;
-    background: #2D5A27;
+    background: #173624;
     color: #ffffff;
     font-size: 0.88rem;
     font-weight: 600;
@@ -300,9 +300,9 @@ body {
 }
 
 .auth-btn-submit:hover {
-    background: #1a3a17;
+    background: #0f2a1b;
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(45, 90, 39, 0.3);
+    box-shadow: 0 4px 16px rgba(23, 54, 36, 0.3);
 }
 
 .auth-btn-submit:hover::before {
@@ -385,14 +385,14 @@ body {
 }
 
 .auth-footer-link {
-    color: #2D5A27;
+    color: #173624;
     font-weight: 600;
     text-decoration: none;
     transition: color 0.25s ease;
 }
 
 .auth-footer-link:hover {
-    color: #1a3a17;
+    color: #0f2a1b;
     text-decoration: underline;
 }
 

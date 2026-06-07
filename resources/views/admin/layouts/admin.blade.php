@@ -16,36 +16,37 @@
 <body>
     {{-- SIDEBAR --}}
     @include('admin.partials.sidebar')
+    <div class="admin-sidebar-overlay" id="admin-sidebar-overlay"></div>
 
     {{-- MAIN WRAPPER --}}
     <div class="admin-main">
-        {{-- TOP BAR --}}
-        <header class="admin-topbar" id="admin-topbar">
-            <div class="topbar-left">
-                <div class="topbar-search">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Cari transaksi atau barang..." id="admin-search">
-                </div>
-            </div>
-            <div class="topbar-right">
-                <button class="topbar-icon" id="btn-notification" aria-label="Notifikasi">
-                    <i class="fas fa-bell"></i>
-                    <span class="topbar-badge">3</span>
-                </button>
-                <button class="topbar-icon" id="btn-settings" aria-label="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
-                <a href="#" class="btn-ekspor" id="btn-ekspor">
-                    <i class="fas fa-download"></i> Ekspor Data
-                </a>
-                <form action="{{ route('admin.logout') }}" method="POST" style="display: inline-block;">
-                    @csrf
-                    <button type="submit" class="btn-logout" aria-label="Logout" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
-            </div>
-        </header>
+    {{-- TOP BAR --}}
+    <header class="admin-topbar" id="admin-topbar">
+        <div class="topbar-left">
+            <button class="admin-sidebar-toggle" id="admin-sidebar-toggle" aria-label="Toggle Sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="topbar-section-label">Store Management</span>
+
+        </div>
+        <div class="topbar-right">
+            @php
+                // Hitung notifikasi aktif secara dinamis
+                $notifCount = \App\Models\Transaction::whereIn('status_transaksi', ['menunggu', 'menunggu_admin'])->count()
+                            + \App\Models\Payment::where('status_pembayaran', 'menunggu')->count();
+            @endphp
+            <a href="{{ route('admin.notifikasi.index') }}" class="topbar-icon" id="btn-notification"
+               aria-label="Notifikasi" title="Pusat Notifikasi" style="text-decoration:none; position:relative;">
+                <i class="fas fa-bell"></i>
+                @if($notifCount > 0)
+                    <span class="topbar-badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
+                @endif
+            </a>
+            <a href="{{ route('admin.pengguna.export') }}" class="btn-ekspor" id="btn-ekspor">
+                <i class="fas fa-download"></i> Ekspor Data
+            </a>
+        </div>
+    </header>
 
         {{-- PAGE CONTENT --}}
         <div class="admin-content">
@@ -70,5 +71,41 @@
     </div>
 
     @yield('scripts')
+
+    {{-- Admin Sidebar Toggle Script --}}
+    <script>
+    (function() {
+        var toggleBtn = document.getElementById('admin-sidebar-toggle');
+        var sidebar = document.getElementById('admin-sidebar');
+        var overlay = document.getElementById('admin-sidebar-overlay');
+
+        function openSidebar() {
+            if (sidebar) sidebar.classList.add('open');
+            if (overlay) overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                if (sidebar && sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+        }
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) closeSidebar();
+        });
+    })();
+    </script>
 </body>
 </html>

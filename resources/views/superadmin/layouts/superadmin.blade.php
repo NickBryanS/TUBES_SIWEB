@@ -16,32 +16,21 @@
 <body>
     {{-- SIDEBAR --}}
     @include('superadmin.partials.sidebar')
+    <div class="admin-sidebar-overlay" id="admin-sidebar-overlay"></div>
 
     {{-- MAIN WRAPPER --}}
     <div class="admin-main">
         {{-- TOP BAR --}}
         <header class="admin-topbar" id="admin-topbar">
             <div class="topbar-left">
-                <div class="topbar-breadcrumb">
-                    <i class="fas fa-crown sa-crown-icon"></i>
-                    <span class="sa-topbar-label">EXECUTIVE DASHBOARD</span>
-                </div>
-                <div class="topbar-search">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Cari data penyewaan..." id="admin-search">
-                </div>
+                <button class="admin-sidebar-toggle" id="admin-sidebar-toggle" aria-label="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="topbar-section-label">Store Management</span>
+
             </div>
             <div class="topbar-right">
-                <button class="topbar-icon" aria-label="Notifikasi">
-                    <i class="fas fa-bell"></i>
-                    <span class="topbar-badge">3</span>
-                </button>
-                <button class="topbar-icon" aria-label="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
-                <div class="sa-topbar-avatar">
-                    <span>{{ strtoupper(substr(Auth::user()->nama_lengkap ?? 'P', 0, 1)) }}</span>
-                </div>
+
             </div>
         </header>
 
@@ -66,5 +55,41 @@
     </div>
 
     @yield('scripts')
+
+    {{-- SuperAdmin Sidebar Toggle Script --}}
+    <script>
+    (function() {
+        var toggleBtn = document.getElementById('admin-sidebar-toggle');
+        var sidebar = document.getElementById('admin-sidebar');
+        var overlay = document.getElementById('admin-sidebar-overlay');
+
+        function openSidebar() {
+            if (sidebar) sidebar.classList.add('open');
+            if (overlay) overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                if (sidebar && sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+        }
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) closeSidebar();
+        });
+    })();
+    </script>
 </body>
 </html>

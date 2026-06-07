@@ -9,13 +9,17 @@
 .sa-set-actions { display: flex; gap: 10px; flex-shrink: 0; }
 
 /* Buttons */
-.sa-btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #1a3a17; color: #fff; border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+.sa-btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #1a3a17; color: #fff; border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; text-decoration: none; }
 .sa-btn-primary:hover { background: #2D5A27; transform: translateY(-1px); }
 .sa-btn-sm { padding: 8px 14px; font-size: 0.78rem; }
 .sa-btn-secondary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #fff; color: #374151; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
 .sa-btn-secondary:hover { border-color: #9ca3af; }
-.sa-btn-icon { width: 34px; height: 34px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #6b7280; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.sa-btn-icon { width: 34px; height: 34px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #6b7280; cursor: pointer; font-size: 0.78rem; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; }
 .sa-btn-icon:hover { border-color: #2D5A27; color: #2D5A27; }
+.sa-btn-edit:hover { border-color: #1565c0; color: #1565c0; }
+.sa-btn-danger:hover { border-color: #c62828; color: #c62828; background: #fff5f5; }
+.sa-btn-warn:hover { border-color: #e65100; color: #e65100; }
+.sa-btn-success:hover { border-color: #2D5A27; color: #2D5A27; background: #f0faf0; }
 
 /* Cards / Sections */
 .sa-card { background: #fff; border: 1px solid #e8e5df; border-radius: 14px; padding: 24px; }
@@ -32,7 +36,7 @@
 .sa-form-group.full { grid-column: 1 / -1; }
 .sa-form-label { font-size: 0.65rem; font-weight: 700; color: #9ca3af; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
 .sa-form-input { padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 0.85rem; font-family: inherit; color: #374151; background: #fafaf8; transition: all 0.2s; }
-.sa-form-input:focus { outline: none; border-color: #2D5A27; box-shadow: 0 0 0 3px rgba(45,90,39,0.08); }
+.sa-form-input:focus { outline: none; border-color: #2D5A27; box-shadow: 0 0 0 3px rgba(45,90,39,0.08); background: #fff; }
 .sa-form-textarea { padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 0.85rem; font-family: inherit; color: #374151; background: #fafaf8; resize: vertical; }
 
 /* Counter */
@@ -47,18 +51,27 @@
 .sa-link-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: none; color: #2D5A27; font-size: 0.78rem; font-weight: 600; cursor: pointer; padding: 0; font-family: inherit; }
 .sa-link-btn:hover { text-decoration: underline; }
 
-/* Payment */
-.sa-pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.sa-check-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-.sa-check-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #374151; cursor: pointer; }
-.sa-check-item input { accent-color: #2D5A27; width: 16px; height: 16px; }
+/* Payment Cards Grid */
+.sa-pay-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 
-.sa-bank-card { background: linear-gradient(135deg, #2d3820, #1a3a17); border-radius: 14px; padding: 24px; color: #fff; position: relative; }
+.sa-bank-card-wrapper { position: relative; }
+.sa-bank-card-wrapper.inactive { opacity: 0.5; }
+.sa-bank-card-wrapper.inactive:hover { opacity: 0.8; }
+
+.sa-bank-card { background: linear-gradient(135deg, #2d3820, #1a3a17); border-radius: 14px; padding: 22px; color: #fff; position: relative; min-height: 180px; }
+.sa-bank-card-top { display: flex; justify-content: space-between; align-items: center; }
 .sa-bank-chip { font-size: 1.2rem; color: #c8a951; margin-bottom: 14px; }
+.sa-bank-inactive-badge { font-size: 0.6rem; font-weight: 700; background: rgba(198,40,40,0.8); color: #fff; padding: 2px 8px; border-radius: 8px; letter-spacing: 0.05em; }
 .sa-bank-label { font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; margin-bottom: 10px; }
-.sa-bank-number { font-size: 1.15rem; font-weight: 600; letter-spacing: 0.15em; margin-bottom: 14px; font-family: 'Inter', monospace; }
+.sa-bank-number { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.12em; margin-bottom: 12px; font-family: 'Inter', monospace; }
 .sa-bank-name { font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.8); letter-spacing: 0.06em; margin-bottom: 10px; }
 .sa-bank-status { font-size: 0.72rem; color: #8bc34a; display: flex; align-items: center; gap: 5px; }
+
+.sa-bank-actions { display: flex; gap: 6px; margin-top: 10px; justify-content: flex-end; }
+
+.sa-empty-payment { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 40px; color: #9ca3af; grid-column: 1 / -1; }
+.sa-empty-payment i { font-size: 2rem; color: #d1d5db; }
+.sa-empty-payment p { font-size: 0.85rem; margin: 0; }
 
 /* Team Table */
 .sa-team-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
@@ -75,7 +88,26 @@
 .role-owner { background: #e8f5e9; color: #2D5A27; }
 .role-admin { background: #f3f4f6; color: #6b7280; }
 .sa-team-active { font-size: 0.82rem; color: #6b7280; }
+.sa-status-dot { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 600; }
+.sa-status-dot::before { content: ''; width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.dot-aktif { color: #2D5A27; }
+.dot-aktif::before { background: #2D5A27; }
+.dot-nonaktif { color: #c62828; }
+.dot-nonaktif::before { background: #c62828; }
 .sa-empty-text { text-align: center; color: #9ca3af; padding: 20px; font-size: 0.82rem; }
+
+/* Modal */
+.sa-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.sa-modal-overlay.show { display: flex; }
+.sa-modal { background: #fff; border-radius: 16px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: modalSlide 0.3s ease; }
+@keyframes modalSlide { from { opacity: 0; transform: translateY(-20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.sa-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #e8e5df; }
+.sa-modal-header h2 { font-size: 1.05rem; font-weight: 700; color: #0f1419; display: flex; align-items: center; gap: 8px; }
+.sa-modal-header h2 i { color: #6b7280; font-size: 0.9rem; }
+.sa-modal-close { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #9ca3af; cursor: pointer; transition: all 0.2s; background: none; border: none; }
+.sa-modal-close:hover { background: #f3f4f6; color: #374151; }
+.sa-modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.sa-modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid #e8e5df; background: #fafaf8; border-radius: 0 0 16px 16px; }
 
 /* Responsive */
 @media (max-width: 900px) { .sa-set-grid-2, .sa-pay-grid { grid-template-columns: 1fr; } .sa-set-header { flex-direction: column; } .sa-form-grid { grid-template-columns: 1fr; } }

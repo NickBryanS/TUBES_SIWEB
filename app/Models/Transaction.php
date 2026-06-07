@@ -24,14 +24,22 @@ class Transaction extends Model
         'tanggal_kembali_aktual',
         'total_biaya',
         'denda',
+        'keterangan_denda',
         'perpanjangan_hari',
         'status_perpanjangan',
         'status_transaksi',
         'metode_pengambilan',
+        'siap_kirim',
+        'barang_diterima',
         'alamat_pengiriman',
+        'nama_penerima',
+        'telepon_penerima',
         'foto_ktp',
         'jenis_jaminan',
         'status_jaminan',
+        'rekening_pengembalian',
+        'bank_pengembalian',
+        'atas_nama_pengembalian',
     ];
 
     /**
@@ -48,6 +56,8 @@ class Transaction extends Model
             'total_biaya'            => 'decimal:2',
             'denda'                  => 'decimal:2',
             'perpanjangan_hari'      => 'integer',
+            'siap_kirim'             => 'boolean',
+            'barang_diterima'        => 'boolean',
         ];
     }
 

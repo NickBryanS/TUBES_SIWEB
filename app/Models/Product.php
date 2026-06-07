@@ -56,4 +56,28 @@ class Product extends Model
     {
         return $this->hasMany(TransactionDetail::class);
     }
+
+    /**
+     * Relasi: Product memiliki banyak Review.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Hitung rata-rata rating.
+     */
+    public function averageRating(): float
+    {
+        return (float) $this->reviews()->avg('rating') ?: 0;
+    }
+
+    /**
+     * Hitung jumlah ulasan.
+     */
+    public function reviewCount(): int
+    {
+        return $this->reviews()->count();
+    }
 }

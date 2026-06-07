@@ -75,14 +75,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Helper: cek apakah user adalah super admin.
-     */
-    public function isSuperAdmin(): bool
-    {
-        return $this->peran === 'superadmin';
-    }
-
-    /**
      * Relasi: User memiliki banyak Transaction.
      */
     public function transactions(): HasMany
@@ -90,7 +82,6 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
-    /**
      * Relasi: User memiliki banyak Address.
      */
     public function addresses(): HasMany
@@ -110,5 +101,13 @@ class User extends Authenticatable
             return $this->avatar;
         }
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->nama_lengkap) . '&background=2D5A27&color=fff&size=200';
+    }
+
+    /**
+     * Relasi: User memiliki banyak Review.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 }

@@ -15,15 +15,6 @@ use Carbon\Carbon;
 
 class OrderController extends Controller
 {
-    /**
-     * Helper: Ambil user ID yang sedang login.
-     * Jika belum ada sistem auth, gunakan user pertama sebagai fallback (development only).
-     * TODO: Hapus fallback saat sistem login sudah tersedia.
-     */
-    private function getUserId()
-    {
-        return Auth::id() ?? \App\Models\User::first()?->id;
-    }
 
     /**
      * Tampilkan halaman dashboard user.
@@ -31,7 +22,7 @@ class OrderController extends Controller
      */
     public function dashboard()
     {
-        $userId = $this->getUserId();
+        $userId = Auth::id();
 
         // Query semua transaksi milik user
         $allTransactions = Transaction::where('user_id', $userId)
@@ -66,7 +57,7 @@ class OrderController extends Controller
      */
     public function checkout()
     {
-        $userId = $this->getUserId();
+        $userId = Auth::id();
         $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
 
         $subtotal = 0;
@@ -88,15 +79,28 @@ class OrderController extends Controller
             'tanggal_mulai'      => 'required|date|after_or_equal:today',
             'tanggal_selesai'    => 'required|date|after:tanggal_mulai',
             'metode_pengambilan' => 'required|in:pickup,deliver',
+            'nama_penerima'      => 'required|string|max:255',
+            'telepon_penerima'   => 'required|string|max:30',
             'alamat_pengiriman'  => 'nullable|required_if:metode_pengambilan,deliver|string',
+            'jarak_tempuh'       => 'nullable|required_if:metode_pengambilan,deliver|numeric|min:0',
+            'foto_ktp'           => 'nullable|required_if:metode_pengambilan,deliver|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
+
+        $fotoKtpPath = null;
+        if ($request->hasFile('foto_ktp')) {
+            $fotoKtpPath = $request->file('foto_ktp')->store('jaminan', 'public');
+        }
 
         // Simpan data checkout ke session (belum buat transaksi)
         $request->session()->put('checkout_data', [
             'tanggal_mulai'      => $request->tanggal_mulai,
             'tanggal_selesai'    => $request->tanggal_selesai,
             'metode_pengambilan' => $request->metode_pengambilan,
+            'nama_penerima'      => $request->nama_penerima,
+            'telepon_penerima'   => $request->telepon_penerima,
             'alamat_pengiriman'  => $request->alamat_pengiriman,
+            'jarak_tempuh'       => $request->jarak_tempuh,
+            'foto_ktp'           => $fotoKtpPath,
         ]);
 
         // Redirect ke halaman pembayaran (Step 2)
@@ -114,7 +118,7 @@ class OrderController extends Controller
             return redirect()->route('checkout')->with('error', 'Silakan isi data pemesanan terlebih dahulu.');
         }
 
-        $userId = $this->getUserId();
+        $userId = Auth::id();
         $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
 
         if ($carts->isEmpty()) {
@@ -126,12 +130,20 @@ class OrderController extends Controller
             $subtotal += $cart->product->harga_sewa * $cart->quantity * $cart->days;
         }
 
-        $biayaAdmin = 2500;
-        $total = $subtotal + $biayaAdmin;
-
+        $biayaAdmin = 0;
         $checkoutData = $request->session()->get('checkout_data');
+        
+        $ongkosKirim = 0;
+        if (isset($checkoutData['metode_pengambilan']) && $checkoutData['metode_pengambilan'] === 'deliver' && isset($checkoutData['jarak_tempuh'])) {
+            $ongkosKirim = $checkoutData['jarak_tempuh'] * 5000;
+        }
 
-        return view('user.pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'total', 'checkoutData'));
+        $total = $subtotal + $biayaAdmin + $ongkosKirim;
+
+        // Ambil daftar rekening aktif dari pengaturan admin
+        $paymentSettings = \App\Models\PaymentSetting::where('is_active', true)->get();
+
+        return view('user.pembayaran', compact('carts', 'subtotal', 'biayaAdmin', 'ongkosKirim', 'total', 'checkoutData', 'paymentSettings'));
     }
 
     /**
@@ -152,8 +164,12 @@ class OrderController extends Controller
             return redirect()->route('checkout')->with('error', 'Sesi checkout telah berakhir. Silakan ulangi pemesanan.');
         }
 
+        if ($request->metode_pembayaran === 'bayar_di_toko' && isset($checkoutData['metode_pengambilan']) && $checkoutData['metode_pengambilan'] === 'deliver') {
+            return redirect()->back()->with('error', 'Pembayaran di toko tidak tersedia untuk metode pengiriman ke alamat.');
+        }
+
         // Ambil keranjang dari database
-        $userId = $this->getUserId();
+        $userId = Auth::id();
         $carts = \App\Models\Cart::where('user_id', $userId)->with('product')->get();
 
         if ($carts->isEmpty()) {
@@ -168,10 +184,16 @@ class OrderController extends Controller
             foreach ($carts as $cart) {
                 $totalBiaya += $cart->product->harga_sewa * $cart->quantity * $cart->days;
             }
-            $totalBiaya += 2500; // Biaya admin
+            $totalBiaya += 0; // Biaya admin dihapus
+
+            $ongkosKirim = 0;
+            if ($checkoutData['metode_pengambilan'] === 'deliver' && isset($checkoutData['jarak_tempuh'])) {
+                $ongkosKirim = $checkoutData['jarak_tempuh'] * 5000;
+            }
+            $totalBiaya += $ongkosKirim;
 
             // 1. Simpan transaksi utama
-            $transaction = Transaction::create([
+            $transactionData = [
                 'user_id'            => $userId,
                 'tanggal_mulai'      => $checkoutData['tanggal_mulai'],
                 'tanggal_selesai'    => $checkoutData['tanggal_selesai'],
@@ -179,7 +201,19 @@ class OrderController extends Controller
                 'status_transaksi'   => 'menunggu',
                 'metode_pengambilan' => $checkoutData['metode_pengambilan'],
                 'alamat_pengiriman'  => $checkoutData['alamat_pengiriman'],
-            ]);
+                'jarak_tempuh'       => $checkoutData['jarak_tempuh'] ?? null,
+                'ongkos_kirim'       => $ongkosKirim,
+                'nama_penerima'      => $checkoutData['nama_penerima'],
+                'telepon_penerima'   => $checkoutData['telepon_penerima'],
+            ];
+
+            if (isset($checkoutData['foto_ktp'])) {
+                $transactionData['foto_ktp'] = $checkoutData['foto_ktp'];
+                $transactionData['jenis_jaminan'] = 'ktp';
+                $transactionData['status_jaminan'] = 'pending';
+            }
+
+            $transaction = Transaction::create($transactionData);
 
             // 2. Simpan detail transaksi (setiap item di keranjang)
             foreach ($carts as $cart) {
@@ -288,6 +322,7 @@ class OrderController extends Controller
     public function riwayat()
     {
         $transactions = Transaction::with(['details.product', 'payment'])
+            ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -302,6 +337,11 @@ class OrderController extends Controller
         $transaction = Transaction::with(['details.product', 'payment', 'user'])
             ->findOrFail($id);
 
+        // Pastikan transaksi hanya bisa dilihat oleh pemiliknya
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
         return view('user.pesanan-detail', compact('transaction'));
     }
 
@@ -314,8 +354,7 @@ class OrderController extends Controller
             ->findOrFail($id);
 
         // Pastikan transaksi milik user yang login
-        $userId = $this->getUserId();
-        if ($transaction->user_id !== $userId) {
+        if ($transaction->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
@@ -325,17 +364,29 @@ class OrderController extends Controller
     /**
      * User membatalkan pesanan.
      */
-    public function batalkanPesanan($id)
+    public function batalkanPesanan(Request $request, $id)
     {
         $transaction = Transaction::with('details.product', 'user')->findOrFail($id);
 
-        $userId = $this->getUserId();
-        if ($transaction->user_id !== $userId) {
+        if ($transaction->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
         if (!in_array($transaction->status_transaksi, ['menunggu', 'menunggu_admin'])) {
             return redirect()->back()->with('error', 'Pesanan ini tidak dapat dibatalkan.');
+        }
+
+        // Validasi input form refund jika status menunggu_admin
+        if ($transaction->status_transaksi === 'menunggu_admin') {
+            $request->validate([
+                'bank_pengembalian' => 'required|string|max:100',
+                'rekening_pengembalian' => 'required|string|max:100',
+                'atas_nama_pengembalian' => 'required|string|max:255',
+            ], [
+                'bank_pengembalian.required' => 'Nama Bank / E-Wallet wajib diisi.',
+                'rekening_pengembalian.required' => 'Nomor Rekening wajib diisi.',
+                'atas_nama_pengembalian.required' => 'Nama Pemilik Rekening wajib diisi.',
+            ]);
         }
 
         // Kembalikan stok
@@ -344,7 +395,10 @@ class OrderController extends Controller
         }
 
         $transaction->update([
-            'status_transaksi' => 'dibatalkan',
+            'status_transaksi'       => 'dibatalkan',
+            'bank_pengembalian'      => $request->bank_pengembalian,
+            'rekening_pengembalian'  => $request->rekening_pengembalian,
+            'atas_nama_pengembalian' => $request->atas_nama_pengembalian,
         ]);
 
         $transaction->user->notify(new OrderStatusUpdated($transaction));
@@ -466,8 +520,7 @@ class OrderController extends Controller
         $transaction = Transaction::findOrFail($id);
 
         // Pastikan transaksi milik user yang login
-        $userId = $this->getUserId();
-        if ($transaction->user_id !== $userId) {
+        if ($transaction->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
@@ -516,6 +569,17 @@ class OrderController extends Controller
             'status_perpanjangan'  => 'approved',
         ]);
 
+        // Notify user
+        try {
+            $transaction->user->notify(new \App\Notifications\OrderStatusUpdated($transaction));
+        } catch (\Exception $e) {}
+
+        // Redirect: admin ke notifikasi, user ke detail pesanan
+        if (auth()->user()->peran === 'admin' || auth()->user()->peran === 'superadmin') {
+            return redirect()->route('admin.notifikasi.index')
+                             ->with('success', 'Perpanjangan ' . $hariTambahan . ' hari disetujui. Biaya tambahan: Rp ' . number_format($biayaTambahan, 0, ',', '.'));
+        }
+
         return redirect()->route('pesanan.detail', $transaction->id)
                          ->with('success', 'Perpanjangan ' . $hariTambahan . ' hari disetujui. Biaya tambahan: Rp ' . number_format($biayaTambahan, 0, ',', '.'));
     }
@@ -536,7 +600,36 @@ class OrderController extends Controller
             'status_perpanjangan'  => 'rejected',
         ]);
 
+        // Redirect: admin ke notifikasi, user ke detail pesanan
+        if (auth()->user()->peran === 'admin' || auth()->user()->peran === 'superadmin') {
+            return redirect()->route('admin.notifikasi.index')
+                             ->with('info', 'Pengajuan perpanjangan ditolak.');
+        }
+
         return redirect()->route('pesanan.detail', $transaction->id)
                          ->with('info', 'Pengajuan perpanjangan ditolak.');
+    }
+
+    /**
+     * User mengonfirmasi bahwa pesanan (pengantaran) telah diterima.
+     */
+    public function terimaPesanan($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+
+        // Pastikan transaksi milik user yang login
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        if ($transaction->status_transaksi === 'dikirim' && $transaction->metode_pengambilan === 'deliver') {
+            $transaction->update([
+                'barang_diterima' => true
+            ]);
+            return redirect()->route('pesanan.detail', $transaction->id)
+                             ->with('success', 'Terima kasih, Anda telah mengonfirmasi penerimaan barang.');
+        }
+
+        return redirect()->back()->with('error', 'Status pesanan tidak valid untuk tindakan ini.');
     }
 }

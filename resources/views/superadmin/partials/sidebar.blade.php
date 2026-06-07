@@ -17,6 +17,14 @@
             <i class="fas fa-chart-pie"></i>
             <span>Dashboard</span>
         </a>
+        <a href="{{ route('superadmin.admin.index') }}" class="sidebar-link @yield('sidebar-admin')" id="nav-sa-admin">
+            <i class="fas fa-users-gear"></i>
+            <span>Manajemen Admin</span>
+        </a>
+        <a href="{{ route('superadmin.activity-log') }}" class="sidebar-link @yield('sidebar-log')" id="nav-sa-log">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Log Aktivitas</span>
+        </a>
         <a href="{{ route('superadmin.laporan') }}" class="sidebar-link @yield('sidebar-laporan')" id="nav-sa-laporan">
             <i class="fas fa-file-lines"></i>
             <span>Laporan</span>

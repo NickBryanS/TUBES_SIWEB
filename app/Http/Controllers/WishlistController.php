@@ -12,14 +12,14 @@ class WishlistController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id() ?? 1;
+        $userId = Auth::id();
         $wishlists = Wishlist::where('user_id', $userId)->with('product')->get();
         return view('user.wishlist', compact('wishlists'));
     }
 
     public function toggle(Request $request, Product $product)
     {
-        $userId = Auth::id() ?? 1;
+        $userId = Auth::id();
         $wishlist = Wishlist::where('user_id', $userId)->where('product_id', $product->id)->first();
 
         if ($wishlist) {
