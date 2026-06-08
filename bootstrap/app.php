@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'redirect_if_admin' => \App\Http\Middleware\RedirectIfAdmin::class,
             'is_superadmin' => \App\Http\Middleware\IsSuperAdmin::class,
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'payment/callback',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

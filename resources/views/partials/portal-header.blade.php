@@ -69,10 +69,10 @@
             @endif
         </a>
 
-        {{-- User Profile Avatar & Name --}}
+        {{-- User Profile Name Only --}}
         <a href="/dashboard" class="portal-profile-trigger">
+            <i class="fas fa-user-circle" style="font-size: 1.1rem;"></i>
             <span class="portal-profile-name">{{ explode(' ', Auth::user()->nama_lengkap ?? Auth::user()->name ?? 'Petualang')[0] }}</span>
-            <img src="{{ Auth::user()->url_avatar ?? asset('images/avatar-default.png') }}" alt="Profile" class="portal-profile-img">
         </a>
     </div>
 </header>

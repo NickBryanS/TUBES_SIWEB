@@ -21,6 +21,7 @@ class Payment extends Model
         'status_pembayaran',
         'jumlah_bayar',
         'bukti_pembayaran',
+        'snap_token',
     ];
 
     /**
