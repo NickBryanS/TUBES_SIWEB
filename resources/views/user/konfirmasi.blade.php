@@ -109,14 +109,26 @@
                 </a>
             </div>
 
-            {{-- UPLOAD BUKTI PEMBAYARAN (jika status menunggu dan bukan bayar di toko) --}}
-            @if($transaction->status_transaksi === 'menunggu' && $transaction->payment->metode_pembayaran !== 'bayar_di_toko')
+            {{-- PEMBAYARAN MIDTRANS QRIS --}}
+            @if($transaction->status_transaksi === 'menunggu' && $transaction->payment->metode_pembayaran === 'qris')
+            <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.1); text-align: center;">
+                @if(isset($snapToken) && $snapToken)
+                    <button id="pay-button"
+                            style="width: 100%; padding: 14px; background: linear-gradient(135deg, #2d5a27, #3a7d32); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                        <i class="fas fa-wallet"></i> Bayar Sekarang
+                    </button>
+                @else
+                    <div style="padding: 12px; background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); border-radius: 8px; color: #e74c3c; font-size: 0.9rem;">
+                        <i class="fas fa-exclamation-circle"></i> Gagal memuat token pembayaran. Hubungi admin atau silakan muat ulang halaman.
+                    </div>
+                @endif
+            </div>
+            {{-- UPLOAD BUKTI PEMBAYARAN TRANSFER BANK --}}
+            @elseif($transaction->status_transaksi === 'menunggu' && $transaction->payment->metode_pembayaran === 'transfer_bank')
             <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 16px;">
                     <i class="fas fa-upload" style="color: #e8a838;"></i> Upload Bukti Pembayaran
                 </h3>
-
-
 
                 {{-- Form Upload --}}
                 <form action="{{ route('pembayaran.upload', $transaction->id) }}" method="POST" enctype="multipart/form-data">
@@ -165,6 +177,46 @@
 @endsection
 
 @section('scripts')
+@if(isset($snapToken) && $snapToken)
+<script src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
+<script>
+// Buka popup Snap otomatis saat halaman selesai dimuat
+window.addEventListener('DOMContentLoaded', (event) => {
+    window.snap.pay('{{ $snapToken }}', {
+        onSuccess: function(result) {
+            window.location.reload();
+        },
+        onPending: function(result) {
+            window.location.reload();
+        },
+        onError: function(result) {
+            alert("Pembayaran gagal! Silakan coba lagi.");
+        },
+        onClose: function() {
+            // Pengguna menutup popup, biarkan mereka di halaman ini agar bisa klik "Bayar Sekarang" nanti
+        }
+    });
+});
+
+document.getElementById('pay-button')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.snap.pay('{{ $snapToken }}', {
+        onSuccess: function(result) {
+            window.location.reload();
+        },
+        onPending: function(result) {
+            window.location.reload();
+        },
+        onError: function(result) {
+            alert("Pembayaran gagal! Silakan coba lagi.");
+        },
+        onClose: function() {
+            alert('Anda menutup popup pembayaran sebelum menyelesaikan transaksi.');
+        }
+    });
+});
+</script>
+@endif
 <script>
 document.getElementById('bukti-file-konfirmasi')?.addEventListener('change', function() {
     var textEl = document.getElementById('upload-text-konfirmasi');

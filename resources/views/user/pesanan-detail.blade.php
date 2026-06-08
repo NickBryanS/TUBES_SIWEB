@@ -386,6 +386,20 @@
                 <div class="pesanan-section-card">
                     <h3><i class="fas fa-cogs"></i> Aksi</h3>
                     <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+                        {{-- Tombol Bayar Sekarang (Midtrans QRIS) --}}
+                        @if($transaction->status_transaksi === 'menunggu' && $transaction->payment && $transaction->payment->metode_pembayaran === 'qris')
+                            @if(isset($snapToken) && $snapToken)
+                            <button id="pay-button"
+                                    style="display: block; width: 100%; border: none; text-align: center; padding: 12px; background: linear-gradient(135deg, #2d5a27, #3a7d32); color: #fff; border-radius: 10px; font-weight: 600; cursor: pointer; transition: transform 0.2s;">
+                                <i class="fas fa-wallet"></i> Bayar Sekarang (QRIS)
+                            </button>
+                            @else
+                            <div style="padding: 10px; background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); border-radius: 8px; color: #e74c3c; font-size: 0.85rem; text-align: center;">
+                                <i class="fas fa-exclamation-circle"></i> Gagal memuat token pembayaran.
+                            </div>
+                            @endif
+                        @endif
+
                         {{-- Tombol Perpanjangan (FR-USR-033) --}}
                         @if(in_array($transaction->status_transaksi, ['diproses', 'dikirim']) && $transaction->status_perpanjangan !== 'pending')
                         <a href="{{ route('perpanjangan.form', $transaction->id) }}"
@@ -468,6 +482,28 @@
 @endsection
 
 @section('scripts')
+@if(isset($snapToken) && $snapToken)
+<script src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
+<script>
+document.getElementById('pay-button')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.snap.pay('{{ $snapToken }}', {
+        onSuccess: function(result) {
+            window.location.reload();
+        },
+        onPending: function(result) {
+            window.location.reload();
+        },
+        onError: function(result) {
+            alert("Pembayaran gagal! Silakan coba lagi.");
+        },
+        onClose: function() {
+            alert('Anda menutup popup pembayaran sebelum menyelesaikan transaksi.');
+        }
+    });
+});
+</script>
+@endif
 <script>
 function confirmBatal(id, status) {
     if (status === 'menunggu_admin') {

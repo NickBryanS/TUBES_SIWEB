@@ -264,6 +264,15 @@ class OrderController extends Controller
 
         $transaction->user->notify(new OrderStatusUpdated($transaction));
 
+        if ($request->expectsJson()) {
+            $snapToken = $this->getOrCreateSnapToken($transaction);
+            return response()->json([
+                'success' => true,
+                'snap_token' => $snapToken,
+                'redirect_url' => route('konfirmasi', $transaction->id)
+            ]);
+        }
+
         // Redirect ke halaman konfirmasi (Step 3)
         return redirect()->route('konfirmasi', $transaction->id)
                          ->with('success', 'Pesanan berhasil dibuat!');
@@ -323,7 +332,9 @@ class OrderController extends Controller
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
-        return view('user.konfirmasi', compact('transaction'));
+        $snapToken = $this->getOrCreateSnapToken($transaction);
+
+        return view('user.konfirmasi', compact('transaction', 'snapToken'));
     }
 
     /**
@@ -352,7 +363,9 @@ class OrderController extends Controller
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
-        return view('user.pesanan-detail', compact('transaction'));
+        $snapToken = $this->getOrCreateSnapToken($transaction);
+
+        return view('user.pesanan-detail', compact('transaction', 'snapToken'));
     }
 
     /**
@@ -641,5 +654,58 @@ class OrderController extends Controller
         }
 
         return redirect()->back()->with('error', 'Status pesanan tidak valid untuk tindakan ini.');
+    }
+
+    /**
+     * Inisialisasi konfigurasi Midtrans.
+     */
+    private function initMidtrans()
+    {
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production');
+        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+    }
+
+    /**
+     * Dapatkan snap token yang sudah ada atau buat baru jika belum ada.
+     */
+    private function getOrCreateSnapToken(Transaction $transaction)
+    {
+        $payment = $transaction->payment;
+        if (!$payment || $payment->metode_pembayaran !== 'qris') {
+            return null;
+        }
+
+        if ($payment->snap_token) {
+            return $payment->snap_token;
+        }
+
+        // Buat snap token baru
+        $this->initMidtrans();
+        
+        $params = [
+            'transaction_details' => [
+                'order_id' => 'GK-' . str_pad($transaction->id, 4, '0', STR_PAD_LEFT) . '-' . time(),
+                'gross_amount' => (int) $payment->jumlah_bayar,
+            ],
+            'customer_details' => [
+                'first_name' => $transaction->nama_penerima,
+                'email' => Auth::user()->email,
+                'phone' => $transaction->telepon_penerima,
+            ],
+            // 'enabled_payments' => ['qris'],
+        ];
+
+        try {
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $payment->update([
+                'snap_token' => $snapToken
+            ]);
+            return $snapToken;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Midtrans Snap Error: ' . $e->getMessage());
+            return null;
+        }
     }
 }

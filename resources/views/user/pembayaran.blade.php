@@ -16,7 +16,7 @@
 
         <form id="pembayaran-form" action="{{ route('pembayaran.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <input type="hidden" name="metode_pembayaran" id="metode_pembayaran" value="transfer_bank">
+            <input type="hidden" name="metode_pembayaran" id="metode_pembayaran" value="qris">
         </form>
 
         <div class="checkout-grid">
@@ -26,11 +26,8 @@
 
                 <!-- Payment Tabs -->
                 <div class="payment-tabs" id="payment-tabs">
-                    <button class="payment-tab active" data-tab="transfer" data-value="transfer_bank">
-                        <i class="fas fa-university"></i> Transfer Bank
-                    </button>
-                    <button class="payment-tab" data-tab="qris" data-value="qris">
-                        <i class="fas fa-qrcode"></i> QRIS
+                    <button class="payment-tab active" data-tab="midtrans" data-value="qris">
+                        <i class="fas fa-credit-card"></i> Bayar Online
                     </button>
                     @if(isset($checkoutData['metode_pengambilan']) && $checkoutData['metode_pengambilan'] === 'pickup')
                     <button class="payment-tab" data-tab="cod" data-value="bayar_di_toko">
@@ -39,60 +36,36 @@
                     @endif
                 </div>
 
-                <!-- Transfer Bank Content -->
-                <div class="payment-content" id="tab-transfer">
-                    @if(isset($paymentSettings) && $paymentSettings->count() > 0)
-                        @foreach($paymentSettings as $ps)
-                        <div class="bank-info-card" style="margin-bottom: 12px;">
-                            <div class="bank-header">
-                                <span class="bank-label">{{ $ps->nama_bank }}</span>
-                            </div>
-                            <div class="bank-number-row">
-                                <div class="bank-icon"><i class="fas fa-university"></i></div>
-                                <div>
-                                    <span class="bank-number">{{ $ps->nomor_rekening }}</span>
-                                    <span class="bank-name">a/n {{ $ps->atas_nama }}</span>
+                <!-- Midtrans (QRIS + VA + E-Wallet) Content -->
+                <div class="payment-content" id="tab-midtrans">
+                    <div style="text-align: center; padding: 20px 0 8px;">
+                        <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                                <div style="width: 56px; height: 56px; background: #f0f7f0; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-qrcode" style="font-size: 1.6rem; color: #2d5a27;"></i>
                                 </div>
-                                <button type="button" class="copy-btn" onclick="copyToClipboard('{{ $ps->nomor_rekening }}', this)"><i class="fas fa-copy"></i> Salin</button>
+                                <span style="font-size: 0.75rem; color: #666; font-weight: 500;">QRIS</span>
                             </div>
-                        </div>
-                        @endforeach
-                    @else
-                        <div class="bank-info-card">
-                            <div class="bank-header">
-                                <span class="bank-label">NOMOR REKENING</span>
-                            </div>
-                            <div class="bank-number-row">
-                                <div class="bank-icon"><i class="fas fa-university"></i></div>
-                                <div>
-                                    <span class="bank-number">Hubungi Admin</span>
-                                    <span class="bank-name">Belum ada rekening aktif</span>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                                <div style="width: 56px; height: 56px; background: #f0f7f0; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-university" style="font-size: 1.6rem; color: #2d5a27;"></i>
                                 </div>
+                                <span style="font-size: 0.75rem; color: #666; font-weight: 500;">Virtual Account</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                                <div style="width: 56px; height: 56px; background: #f0f7f0; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-wallet" style="font-size: 1.6rem; color: #2d5a27;"></i>
+                                </div>
+                                <span style="font-size: 0.75rem; color: #666; font-weight: 500;">E-Wallet</span>
                             </div>
                         </div>
-                    @endif
-
-                    <h4 class="upload-title">Upload Bukti Transfer</h4>
-                    <div class="upload-area" id="upload-proof" onclick="document.getElementById('bukti-file').click()">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p id="upload-text"><strong>Klik atau seret file ke sini</strong></p>
-                        <span>Format: JPG, PNG, PDF (maks. 5MB). Pastikan detail transfer terlihat jelas.</span>
-                        <input type="file" name="bukti_pembayaran" id="bukti-file" form="pembayaran-form" accept=".jpg,.jpeg,.png,.pdf" style="display:none;">
-                    </div>
-
-                    <div class="payment-warning">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span>Pesanan Anda akan diverifikasi secara manual oleh tim kami dalam waktu maksimal 1x24 jam setelah bukti transfer diunggah.</span>
-                    </div>
-                </div>
-
-                <!-- QRIS Content -->
-                <div class="payment-content" id="tab-qris" style="display:none;">
-                    <div class="qris-info">
-                        <div class="qris-placeholder">
-                            <i class="fas fa-qrcode"></i>
-                            <p>Scan QR code di bawah untuk melakukan pembayaran</p>
-                        </div>
+                        <p style="color: #555; font-size: 0.9rem; margin: 0 0 6px;">
+                            Pilih metode pembayaranmu setelah mengklik <strong>"Buat Pesanan"</strong>.
+                        </p>
+                        <p style="color: #888; font-size: 0.8rem; margin: 0;">
+                            Mendukung <strong>QRIS</strong>, <strong>Transfer Bank (Virtual Account)</strong>, dan <strong>E-Wallet</strong>.<br>
+                            Pembayaran terverifikasi otomatis — tanpa perlu kirim bukti manual.
+                        </p>
                     </div>
                 </div>
 
@@ -157,6 +130,7 @@
 @endsection
 
 @section('scripts')
+<script src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
 <script>
 // Payment tab switching
 document.querySelectorAll('.payment-tab').forEach(function(tab) {
@@ -192,7 +166,7 @@ document.getElementById('bukti-file')?.addEventListener('change', function() {
     }
 });
 
-// Validation on submit
+// Validation on submit / AJAX for QRIS
 document.getElementById('pembayaran-form').addEventListener('submit', function(e) {
     let method = document.getElementById('metode_pembayaran').value;
     if (method === 'transfer_bank') {
@@ -202,6 +176,64 @@ document.getElementById('pembayaran-form').addEventListener('submit', function(e
             alert('Peringatan: Anda harus mengupload bukti transfer pembayaran sebelum membuat pesanan.');
             return false;
         }
+    } else if (method === 'qris') {
+        e.preventDefault();
+        
+        const btn = document.getElementById('btn-create-order');
+        const originalText = btn.innerHTML;
+        
+        // Disable button & show spinner
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+        
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.snap_token) {
+                // Tampilkan popup Midtrans Snap
+                window.snap.pay(data.snap_token, {
+                    onSuccess: function(result) {
+                        window.location.href = data.redirect_url;
+                    },
+                    onPending: function(result) {
+                        window.location.href = data.redirect_url;
+                    },
+                    onError: function(result) {
+                        alert("Pembayaran gagal! Silakan coba lagi.");
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    },
+                    onClose: function() {
+                        // Jika popup ditutup, tetap redirect ke halaman konfirmasi agar user bisa bayar nanti
+                        window.location.href = data.redirect_url;
+                    }
+                });
+            } else {
+                alert("Gagal membuat token pembayaran. Silakan coba lagi.");
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Terjadi kesalahan sistem saat memproses pembayaran. Silakan coba lagi.");
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        });
     }
 });
 </script>

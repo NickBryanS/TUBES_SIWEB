@@ -68,6 +68,9 @@ Route::middleware('redirect_if_admin')->group(function () {
     })->name('produk.detail');
 });
 
+// Midtrans Callback Webhook (Public route, must be excluded from CSRF protection)
+Route::post('/payment/callback', [\App\Http\Controllers\MidtransCallbackController::class, 'callback'])->name('midtrans.callback');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes (dilindungi middleware auth)
