@@ -199,6 +199,11 @@ class TransactionController extends Controller
         ]);
 
         $transaction = Transaction::findOrFail($id);
+
+        if ($request->status === 'selesai' && !$transaction->tanggal_kembali_aktual) {
+            return redirect()->back()->with('error', 'Tidak bisa menyelesaikan transaksi: Barang belum dikembalikan oleh pelanggan.');
+        }
+
         $transaction->update(['status_transaksi' => $request->status]);
 
         $label = str_replace('_', ' ', ucfirst($request->status));

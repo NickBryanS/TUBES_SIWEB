@@ -160,56 +160,56 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * Approve transaksi (ubah status dari menunggu_admin ke diproses).
+     * Ekspor laporan ke PDF (halaman HTML printable) dengan filter tanggal custom.
      */
-    public function approveTransaksi($id)
+    public function exportPdf(Request $request)
     {
-        $transaction = Transaction::findOrFail($id);
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+        $periode = $request->get('period', 'bulanan');
 
-        if (!in_array($transaction->status_transaksi, ['menunggu', 'menunggu_admin'])) {
-            return redirect()->back()->with('error', 'Transaksi tidak bisa diproses.');
+        $now = Carbon::now();
+
+        if ($start_date && $end_date) {
+            $start = Carbon::parse($start_date)->startOfDay();
+            $end = Carbon::parse($end_date)->endOfDay();
+            $periodeLabel = $start->format('d M Y') . ' - ' . $end->format('d M Y');
+        } else {
+            [$start, $end] = match($periode) {
+                'mingguan' => [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()],
+                'tahunan'  => [$now->copy()->startOfYear(), $now->copy()->endOfYear()],
+                default    => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()], // bulanan
+            };
+            
+            $periodeLabel = match($periode) {
+                'mingguan' => 'Minggu Ini (' . $start->format('d M') . ' - ' . $end->format('d M Y') . ')',
+                'tahunan'  => 'Tahun ' . $now->year,
+                default    => 'Bulan ' . $now->translatedFormat('F Y'),
+            };
         }
 
-        $transaction->update(['status_transaksi' => 'diproses']);
+        $transactions = Transaction::with(['user', 'details.product', 'payment'])
+            ->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai', 'dibatalkan'])
+            ->whereBetween('created_at', [$start, $end])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        // Juga update status pembayaran jika ada
-        if ($transaction->payment) {
-            $transaction->payment->update(['status_pembayaran' => 'terverifikasi']);
-        }
+        $totalPendapatan = $transactions->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])->sum('total_biaya');
+        $totalDenda      = $transactions->where('denda', '>', 0)->sum('denda');
+        $jumlahTransaksi = $transactions->count();
 
-        // Kirim notifikasi ke user
-        $transaction->user->notify(new OrderStatusNotification(
-            $transaction,
-            'Pesanan Anda #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah disetujui dan sedang diproses.'
+        // Statistik tambahan
+        $totalItem = $transactions->flatMap->details->sum('jumlah');
+        $metodePembayaranSummary = $transactions->groupBy(fn($t) => $t->payment->metode_pembayaran ?? 'Lainnya')
+            ->map(fn($group, $key) => ['label' => $key, 'count' => $group->count(), 'total' => $group->sum('total_biaya')]);
+
+        \App\Models\ActivityLog::catat('export_pdf', 'Mengekspor laporan PDF periode ' . $periodeLabel);
+        
+        $exportedBy = auth()->user()->nama_lengkap . ' (' . ucfirst(auth()->user()->peran) . ')';
+
+        return view('superadmin.exports.laporan-pdf', compact(
+            'transactions', 'periodeLabel', 'totalPendapatan', 'totalDenda',
+            'jumlahTransaksi', 'totalItem', 'metodePembayaranSummary', 'exportedBy'
         ));
-
-        return redirect()->route('admin.dashboard')->with('success', 'Transaksi #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' berhasil disetujui.');
-    }
-
-    /**
-     * Reject transaksi (ubah status ke dibatalkan).
-     */
-    public function rejectTransaksi($id)
-    {
-        $transaction = Transaction::with('details.product')->findOrFail($id);
-
-        if (!in_array($transaction->status_transaksi, ['menunggu', 'menunggu_admin'])) {
-            return redirect()->back()->with('error', 'Transaksi tidak bisa ditolak.');
-        }
-
-        // Kembalikan stok
-        foreach ($transaction->details as $detail) {
-            $detail->product->increment('stok_tersedia', $detail->jumlah);
-        }
-
-        $transaction->update(['status_transaksi' => 'dibatalkan']);
-
-        // Kirim notifikasi ke user
-        $transaction->user->notify(new OrderStatusNotification(
-            $transaction,
-            'Pesanan Anda #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah ditolak dan dibatalkan.'
-        ));
-
-        return redirect()->route('admin.dashboard')->with('success', 'Transaksi #TRX-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' ditolak.');
     }
 }

@@ -133,9 +133,29 @@
             font-size: 9.5px; color: #9ca3af;
             border-top: 1px solid #e5e7eb; padding-top: 12px;
         }
+
+        /* ── Watermark ── */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 140px;
+            color: rgba(26, 58, 23, 0.09); /* Warna hijau gelap khas Gardakala dengan opacity lebih tinggi */
+            z-index: -1;
+            white-space: nowrap;
+            pointer-events: none;
+            font-weight: 900;
+            font-family: 'Inter', Arial, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 20px;
+            -webkit-text-stroke: 2px rgba(26, 58, 23, 0.15); /* Memberikan efek garis tepi agar semakin tebal */
+        }
     </style>
 </head>
 <body>
+    <div class="watermark">GARKADALA</div>
+
     <button class="print-btn" onclick="window.print()">
         🖨️ Cetak / Simpan PDF
     </button>
@@ -149,7 +169,8 @@
         <h1>Laporan Keuangan Penyewaan Alat Outdoor</h1>
         <div class="meta">
             Periode: <strong>{{ $periodeLabel }}</strong> &nbsp;|&nbsp;
-            Dicetak: {{ now()->translatedFormat('d F Y, H:i') }} WIB
+            Dicetak: {{ now()->translatedFormat('d F Y, H:i') }} WIB &nbsp;|&nbsp;
+            Diekspor Oleh: <strong>{{ $exportedBy ?? 'Sistem' }}</strong>
         </div>
     </div>
 

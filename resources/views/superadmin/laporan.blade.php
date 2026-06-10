@@ -16,20 +16,42 @@
             <h1 class="sa-lap-title">Ringkasan Performa Toko</h1>
         </div>
         <div class="sa-lap-actions">
-            <a href="{{ route('superadmin.laporan.excel', ['periode' => $periode]) }}" class="sa-export-btn">
+            @php
+                $exportParams = ['periode' => $periode];
+                if ($periode === 'custom') {
+                    $exportParams['start_date'] = request('start_date');
+                    $exportParams['end_date'] = request('end_date');
+                }
+            @endphp
+            <a href="{{ route('superadmin.laporan.excel', $exportParams) }}" class="sa-export-btn">
                 <i class="fas fa-file-excel"></i> Ekspor Excel
             </a>
-            <a href="{{ route('superadmin.laporan.pdf', ['periode' => $periode]) }}" target="_blank" class="sa-export-btn sa-export-pdf">
+            <a href="{{ route('superadmin.laporan.pdf', $exportParams) }}" target="_blank" class="sa-export-btn sa-export-pdf">
                 <i class="fas fa-file-pdf"></i> Ekspor PDF
             </a>
         </div>
     </div>
 
     {{-- PERIOD TABS --}}
-    <div class="sa-period-tabs">
-        <a href="{{ route('superadmin.laporan', ['periode' => 'mingguan']) }}" class="sa-period-tab {{ $periode === 'mingguan' ? 'active' : '' }}">Mingguan</a>
-        <a href="{{ route('superadmin.laporan', ['periode' => 'bulanan']) }}" class="sa-period-tab {{ $periode === 'bulanan' ? 'active' : '' }}">Bulanan</a>
-        <a href="{{ route('superadmin.laporan', ['periode' => 'tahunan']) }}" class="sa-period-tab {{ $periode === 'tahunan' ? 'active' : '' }}">Tahunan</a>
+    <div class="sa-period-tabs" style="display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; border-bottom: none; padding-bottom: 0;">
+        <div style="display: flex; gap: 4px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+            <a href="{{ route('superadmin.laporan', ['periode' => 'mingguan']) }}" class="sa-period-tab {{ $periode === 'mingguan' ? 'active' : '' }}" style="margin-bottom: -10px;">Mingguan</a>
+            <a href="{{ route('superadmin.laporan', ['periode' => 'bulanan']) }}" class="sa-period-tab {{ $periode === 'bulanan' ? 'active' : '' }}" style="margin-bottom: -10px;">Bulanan</a>
+            <a href="{{ route('superadmin.laporan', ['periode' => 'tahunan']) }}" class="sa-period-tab {{ $periode === 'tahunan' ? 'active' : '' }}" style="margin-bottom: -10px;">Tahunan</a>
+        </div>
+        
+        <form method="GET" action="{{ route('superadmin.laporan') }}" class="date-filter-form" style="display: flex; gap: 8px; align-items: center; padding-bottom: 8px;">
+            <input type="hidden" name="periode" value="custom">
+            <input type="date" name="start_date" value="{{ request('start_date') }}" class="date-filter-input" style="height: 36px; padding: 0 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: inherit; font-size: 13px; outline: none; transition: 0.2s; background: #fff;" required>
+            <span style="color: #6b7280; font-size: 13px;">-</span>
+            <input type="date" name="end_date" value="{{ request('end_date') }}" class="date-filter-input" style="height: 36px; padding: 0 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: inherit; font-size: 13px; outline: none; transition: 0.2s; background: #fff;" required>
+            <button type="submit" class="date-filter-btn" style="height: 36px; padding: 0 16px; background: #1a3a17; color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 13px; cursor: pointer; transition: 0.2s;">
+                Filter
+            </button>
+            @if(request('periode') == 'custom')
+                <a href="{{ route('superadmin.laporan') }}" style="height: 36px; display: flex; align-items: center; padding: 0 12px; color: #dc2626; text-decoration: none; font-size: 13px; font-weight: 600;">Reset</a>
+            @endif
+        </form>
     </div>
 
     {{-- STAT CARDS --}}

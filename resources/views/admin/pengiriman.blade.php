@@ -48,42 +48,26 @@
         <div class="ship-toolbar">
             <h2 class="ship-content-title">Antrean Pengiriman</h2>
             <div class="ship-toolbar-right">
-                <form method="GET" action="{{ route('admin.pengiriman.index') }}" class="ship-search-form" id="ship-search-form">
-                    @if(request('status'))
-                        <input type="hidden" name="status" value="{{ request('status') }}">
-                    @endif
-                    <div class="ship-search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pesanan..." class="ship-search-input" id="ship-search-input">
+                <form method="GET" action="{{ route('admin.pengiriman.index') }}" class="ship-search-form" id="ship-search-form" style="display: flex; gap: 12px; align-items: center;">
+                    <div class="ship-filter-group" style="margin: 0;">
+                        <select name="status" class="ship-filter-select" style="height: 40px; border-radius: 8px; border: 1px solid #e5e7eb; padding: 0 12px; background: #fff; cursor: pointer; outline: none; font-size: 13px; font-weight: 500; color: #374151;" onchange="this.form.submit()">
+                            <option value="">Semua Status</option>
+                            <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu Kirim</option>
+                            <option value="dikirim" {{ request('status') == 'dikirim' ? 'selected' : '' }}>Dalam Pengiriman</option>
+                            <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                        </select>
                     </div>
+                    <div class="ship-search-box" style="margin: 0; background: #fff; border: 1px solid #e5e7eb; height: 40px;">
+                        <i class="fas fa-search" style="color: #9ca3af;"></i>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pesanan..." class="ship-search-input" id="ship-search-input" style="height: 100%;">
+                    </div>
+                    @if(request('status') || request('search'))
+                    <a href="{{ route('admin.pengiriman.index') }}" class="ship-filter-reset" style="height: 40px; display: flex; align-items: center; justify-content: center; background: #fef2f2; color: #dc2626; border-radius: 8px; padding: 0 12px; font-size: 13px; font-weight: 500; text-decoration: none; transition: 0.2s;">
+                        <i class="fas fa-times" style="margin-right: 6px;"></i> Reset
+                    </a>
+                    @endif
                 </form>
-                <button class="ship-filter-btn" id="ship-filter-toggle" type="button">
-                    <i class="fas fa-sliders"></i> Filter
-                </button>
             </div>
-        </div>
-
-        {{-- Filter dropdown --}}
-        <div class="ship-filter-panel {{ request('status') || request('search') ? 'show' : '' }}" id="ship-filter-panel">
-            <form method="GET" action="{{ route('admin.pengiriman.index') }}" class="ship-filter-form" id="ship-filter-form">
-                @if(request('search'))
-                    <input type="hidden" name="search" value="{{ request('search') }}">
-                @endif
-                <div class="ship-filter-group">
-                    <label class="ship-filter-label">Status</label>
-                    <select name="status" class="ship-filter-select" onchange="document.getElementById('ship-filter-form').submit()">
-                        <option value="">Semua Status</option>
-                        <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu Kirim</option>
-                        <option value="dikirim" {{ request('status') == 'dikirim' ? 'selected' : '' }}>Dalam Pengiriman</option>
-                        <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                    </select>
-                </div>
-                @if(request('status') || request('search'))
-                <a href="{{ route('admin.pengiriman.index') }}" class="ship-filter-reset">
-                    <i class="fas fa-times"></i> Reset
-                </a>
-                @endif
-            </form>
         </div>
 
         {{-- Table --}}
@@ -255,15 +239,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.target === this) closeModal(this.id);
         });
     });
-
-    // ── Filter Toggle ──
-    const filterToggle = document.getElementById('ship-filter-toggle');
-    const filterPanel = document.getElementById('ship-filter-panel');
-    if (filterToggle && filterPanel) {
-        filterToggle.addEventListener('click', () => {
-            filterPanel.classList.toggle('show');
-        });
-    }
 
     // ── Search on Enter ──
     const searchInput = document.getElementById('ship-search-input');

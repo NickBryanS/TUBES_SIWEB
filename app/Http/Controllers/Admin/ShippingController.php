@@ -131,7 +131,8 @@ class ShippingController extends Controller
                 'nama_penerima' => 'required|string|max:255',
             ]);
 
-            $transaction->update(['status_transaksi' => 'selesai']);
+            // Pengiriman selesai tidak mengubah status transaksi menjadi selesai (barang masih disewa)
+            // Hanya mencatat aktivitas penerimaan pengiriman
 
             // Handle foto bukti pengiriman jika ada
             if ($request->hasFile('bukti_pengiriman')) {

@@ -152,6 +152,7 @@ Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
 */
 Route::middleware('auth', 'is_admin')->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/dashboard/export-pdf', [AdminDashboardController::class, 'exportPdf'])->name('admin.dashboard.export');
     Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
     // Inventory Routes (export & bulk-delete harus sebelum resource agar tidak konflik)
