@@ -8,7 +8,6 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Notifications\OrderStatusUpdated;
-use App\Notifications\RentalReminder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -332,6 +331,30 @@ class OrderController extends Controller
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
+        // Fallback untuk Localhost: Sinkronisasi status dari Midtrans jika ada indikasi redirect
+        if (request()->has('order_id') && request()->has('transaction_status')) {
+            try {
+                $this->initMidtrans();
+                $statusRes = \Midtrans\Transaction::status(request()->order_id);
+                
+                if (in_array($statusRes->transaction_status, ['settlement', 'capture'])) {
+                    if ($transaction->status_transaksi === 'menunggu') {
+                        $transaction->update([
+                            'status_transaksi' => 'diproses',
+                            'status_jaminan'   => 'verified'
+                        ]);
+                        if ($transaction->payment) {
+                            $transaction->payment->update(['status_pembayaran' => 'terverifikasi']);
+                        }
+                        // Refresh agar data terbaru dimuat
+                        $transaction->refresh();
+                    }
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Localhost Midtrans Sync Error: ' . $e->getMessage());
+            }
+        }
+
         $snapToken = $this->getOrCreateSnapToken($transaction);
 
         return view('user.konfirmasi', compact('transaction', 'snapToken'));
@@ -474,6 +497,11 @@ class OrderController extends Controller
      */
     public function konfirmasiPengembalian(Request $request, $id)
     {
+        $transaction = \App\Models\Transaction::findOrFail($id);
+        if ($transaction->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
         $request->validate([
             'tanggal_kembali_aktual' => 'required|date|after_or_equal:' . now()->format('Y-m-d'),
         ]);
@@ -516,6 +544,10 @@ class OrderController extends Controller
     {
         $transaction = Transaction::with(['details.product', 'payment'])
             ->findOrFail($id);
+
+        if ($transaction->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
 
         // Hanya bisa diperpanjang jika status masih aktif
         if (!in_array($transaction->status_transaksi, ['diproses', 'dikirim'])) {
@@ -694,7 +726,9 @@ class OrderController extends Controller
                 'email' => Auth::user()->email,
                 'phone' => $transaction->telepon_penerima,
             ],
-            // 'enabled_payments' => ['qris'],
+            'callbacks' => [
+                'finish' => route('konfirmasi', $transaction->id)
+            ]
         ];
 
         try {

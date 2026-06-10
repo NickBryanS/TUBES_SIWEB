@@ -182,7 +182,7 @@ class NotificationController extends Controller
 
         // ── 5. Sistem (pengguna baru, dll.) ──
         if (in_array($filter, ['semua', 'sistem'])) {
-            $newUsers = User::where('peran', 'pelanggan')
+            $newUsers = User::where('peran', 'user')
                 ->orderBy('created_at', 'desc')
                 ->take(5)
                 ->get();

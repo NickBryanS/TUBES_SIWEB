@@ -5,6 +5,94 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/admin/inventory.css') }}">
+<style>
+.file-upload-wrapper {
+    position: relative;
+    width: 100%;
+    border: 2px dashed #c8e6c9;
+    border-radius: 8px;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.file-upload-wrapper:hover, .file-upload-wrapper.dragover {
+    border-color: #2D5A27;
+    background: #f0fdf4;
+}
+.file-upload-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.file-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    padding: 20px;
+    text-align: center;
+}
+.file-upload-icon {
+    font-size: 28px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+.file-upload-text {
+    font-size: 13px;
+    color: #374151;
+    font-weight: 500;
+}
+.file-upload-text .text-primary {
+    color: #2D5A27;
+}
+.file-upload-hint {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 4px;
+}
+.file-upload-preview {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+    display: none;
+}
+.file-upload-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-height: 200px;
+}
+.btn-remove-file {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+}
+.btn-remove-file:hover {
+    background: rgba(220, 38, 38, 0.9);
+}
+</style>
 @endsection
 
 @section('content')
@@ -258,8 +346,20 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">URL Gambar</label>
-                    <input type="url" class="form-control" id="url_gambar" name="url_gambar" placeholder="https://example.com/image.jpg">
+                    <label class="form-label">Gambar Produk</label>
+                    <div class="file-upload-wrapper" id="file-upload-wrapper">
+                        <input type="file" id="gambar_produk" name="gambar_produk" accept="image/jpeg,image/png,image/jpg,image/webp" class="file-upload-input">
+                        <div class="file-upload-content" id="file-upload-content">
+                            <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                            <div class="file-upload-text">Drag & drop gambar ke sini atau <span class="text-primary">Pilih File</span></div>
+                            <div class="file-upload-hint">Format: JPG, PNG, WEBP. Maks: 2MB.</div>
+                        </div>
+                        <div class="file-upload-preview" id="file-upload-preview">
+                            <img id="preview-img" src="" alt="Preview">
+                            <button type="button" class="btn-remove-file" id="btn-remove-file" title="Hapus Gambar"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <span class="form-error error-gambar_produk"></span>
                 </div>
             </div>
             <div class="modal-box-footer">
@@ -356,6 +456,63 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // ── Drag & Drop File Upload ──
+    const fileWrapper = document.getElementById('file-upload-wrapper');
+    const fileInput = document.getElementById('gambar_produk');
+    const fileContent = document.getElementById('file-upload-content');
+    const filePreview = document.getElementById('file-upload-preview');
+    const previewImg = document.getElementById('preview-img');
+    const btnRemoveFile = document.getElementById('btn-remove-file');
+
+    function showPreview(fileUrl) {
+        fileContent.style.display = 'none';
+        filePreview.style.display = 'block';
+        previewImg.src = fileUrl;
+    }
+
+    function resetFile() {
+        fileInput.value = '';
+        fileContent.style.display = 'flex';
+        filePreview.style.display = 'none';
+        previewImg.src = '';
+    }
+
+    btnRemoveFile.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        resetFile();
+    });
+
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) { showPreview(e.target.result); }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileWrapper.addEventListener(eventName, preventDefaults, false);
+    });
+    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileWrapper.addEventListener(eventName, () => fileWrapper.classList.add('dragover'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileWrapper.addEventListener(eventName, () => fileWrapper.classList.remove('dragover'), false);
+    });
+    fileWrapper.addEventListener('drop', handleDrop, false);
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length) {
+            fileInput.files = files;
+            const event = new Event('change');
+            fileInput.dispatchEvent(event);
+        }
+    }
+
     // ── Tambah Alat ──
     document.getElementById('btn-tambah-alat').addEventListener('click', () => {
         document.getElementById('form-product').reset();
@@ -363,6 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('form-method').value = 'POST';
         document.getElementById('modal-title').innerText = 'Tambah Alat Baru';
         document.getElementById('stok_tersedia').value = '';
+        resetFile();
         clearErrors();
         openModal('modal-form');
     });
@@ -382,7 +540,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('stok_tersedia').value = p.stok_tersedia;
                     document.getElementById('deskripsi').value = p.deskripsi || '';
                     document.getElementById('spesifikasi_teknis').value = p.spesifikasi_teknis || '';
-                    document.getElementById('url_gambar').value = p.url_gambar || '';
+                    if (p.url_gambar) {
+                        showPreview(p.url_gambar);
+                    } else {
+                        resetFile();
+                    }
                     document.getElementById('form-method').value = 'PUT';
                     document.getElementById('modal-title').innerText = 'Edit Alat';
                     clearErrors();
@@ -487,14 +649,15 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.set('stok_tersedia', formData.get('total_stok'));
         }
 
-        // Build JSON body for proper method handling
-        const body = {};
-        formData.forEach((v, k) => { if (k !== '_token' && k !== '_method' && k !== 'product_id') body[k] = v; });
+        if (method === 'PUT') {
+            formData.set('_method', 'PUT');
+        }
 
+        // Send via fetch without manual Content-Type header so browser handles boundary for multipart
         fetch(url, {
-            method: method === 'PUT' ? 'PUT' : 'POST',
-            headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+            method: 'POST', // always POST for form data, _method tells Laravel it's PUT
+            headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+            body: formData
         })
         .then(r => r.json())
         .then(data => {
@@ -513,7 +676,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ── Export ──
     document.getElementById('btn-export').addEventListener('click', () => {
-        window.location.href = `{{ route('admin.inventory.export') }}`;
+        const urlParams = new URLSearchParams(window.location.search);
+        window.location.href = `{{ route('admin.inventory.export') }}?` + urlParams.toString();
     });
 
     // ── Keyboard shortcuts ──

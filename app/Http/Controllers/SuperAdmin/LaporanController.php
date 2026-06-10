@@ -18,7 +18,12 @@ class LaporanController extends Controller
         $now = Carbon::now();
 
         // Periode filter
-        [$start, $end] = $this->getDateRange($periode, $now);
+        if ($periode === 'custom' && $request->filled('start_date') && $request->filled('end_date')) {
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            $end = Carbon::parse($request->end_date)->endOfDay();
+        } else {
+            [$start, $end] = $this->getDateRange($periode, $now);
+        }
 
         // Stat Cards
         $totalPendapatan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
@@ -73,7 +78,13 @@ class LaporanController extends Controller
         $periode = $request->get('periode', 'bulanan');
         $now = Carbon::now();
 
-        [$start, $end, $periodeLabel] = $this->getDateRangeWithLabel($periode, $now);
+        if ($periode === 'custom' && $request->filled('start_date') && $request->filled('end_date')) {
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            $end = Carbon::parse($request->end_date)->endOfDay();
+            $periodeLabel = 'Custom (' . $start->format('d M Y') . ' - ' . $end->format('d M Y') . ')';
+        } else {
+            [$start, $end, $periodeLabel] = $this->getDateRangeWithLabel($periode, $now);
+        }
 
         // Ambil SEMUA transaksi (tidak dibatasi periode agar data muncul)
         // Jika ada periode spesifik yang diminta, gunakan filter, tapi fallback ke semua data jika kosong
@@ -102,11 +113,13 @@ class LaporanController extends Controller
         $metodePembayaranSummary = $transactions->groupBy(fn($t) => $t->payment->metode_pembayaran ?? 'Lainnya')
             ->map(fn($group, $key) => ['label' => $key, 'count' => $group->count(), 'total' => $group->sum('total_biaya')]);
 
+        $exportedBy = auth()->user()->nama_lengkap . ' (' . ucfirst(auth()->user()->peran) . ')';
+
         ActivityLog::catat('export_pdf', 'Mengekspor laporan PDF periode ' . $periodeLabel);
 
         return view('superadmin.exports.laporan-pdf', compact(
             'transactions', 'periodeLabel', 'totalPendapatan', 'totalDenda',
-            'jumlahTransaksi', 'totalItem', 'metodePembayaranSummary'
+            'jumlahTransaksi', 'totalItem', 'metodePembayaranSummary', 'exportedBy'
         ));
     }
 
@@ -118,7 +131,13 @@ class LaporanController extends Controller
         $periode = $request->get('periode', 'bulanan');
         $now = Carbon::now();
 
-        [$start, $end, $periodeLabel] = $this->getDateRangeWithLabel($periode, $now);
+        if ($periode === 'custom' && $request->filled('start_date') && $request->filled('end_date')) {
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            $end = Carbon::parse($request->end_date)->endOfDay();
+            $periodeLabel = 'Custom (' . $start->format('d M Y') . ' - ' . $end->format('d M Y') . ')';
+        } else {
+            [$start, $end, $periodeLabel] = $this->getDateRangeWithLabel($periode, $now);
+        }
 
         $transactions = Transaction::with(['user', 'details.product', 'payment'])
             ->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai', 'dibatalkan'])
@@ -149,8 +168,9 @@ class LaporanController extends Controller
         $html .= '<body><table border="1" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px;">';
 
         // Title rows
+        $exportedBy = auth()->user()->nama_lengkap . ' (' . ucfirst(auth()->user()->peran) . ')';
         $html .= '<tr><td colspan="11" style="background:#1a3a17;color:#fff;font-size:14px;font-weight:bold;padding:10px;text-align:center;">LAPORAN KEUANGAN GARDAKALA OUTDOOR</td></tr>';
-        $html .= '<tr><td colspan="11" style="background:#f0f4f0;padding:6px;text-align:center;">Periode: ' . htmlspecialchars($periodeLabel) . ' | Dicetak: ' . $now->format('d/m/Y H:i') . ' WIB</td></tr>';
+        $html .= '<tr><td colspan="11" style="background:#f0f4f0;padding:6px;text-align:center;">Periode: ' . htmlspecialchars($periodeLabel) . ' | Dicetak: ' . $now->format('d/m/Y H:i') . ' WIB | Diekspor Oleh: ' . htmlspecialchars($exportedBy) . '</td></tr>';
         $html .= '<tr><td colspan="11" style="padding:4px;"></td></tr>';
 
         // Summary row

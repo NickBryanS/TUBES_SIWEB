@@ -14,7 +14,7 @@ class ActivityLogController extends Controller
     public function index(Request $request)
     {
         $query = ActivityLog::whereHas('user', function ($q) {
-            $q->where('peran', 'admin');
+            $q->whereIn('peran', ['admin', 'superadmin']);
         })->with('user')->orderBy('created_at', 'desc');
 
         if ($request->filled('search')) {
@@ -34,9 +34,9 @@ class ActivityLogController extends Controller
 
         $logs = $query->paginate(15);
 
-        // Daftar aksi unik untuk filter (hanya aksi milik admin)
+        // Daftar aksi unik untuk filter (hanya aksi milik admin & superadmin)
         $aksiList = ActivityLog::whereHas('user', function ($q) {
-            $q->where('peran', 'admin');
+            $q->whereIn('peran', ['admin', 'superadmin']);
         })->select('aksi')->distinct()->pluck('aksi');
 
         return view('superadmin.activity-log', compact('logs', 'aksiList'));

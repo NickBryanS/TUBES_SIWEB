@@ -180,7 +180,8 @@
 @if(isset($snapToken) && $snapToken)
 <script src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
 <script>
-// Buka popup Snap otomatis saat halaman selesai dimuat
+// Buka popup Snap otomatis saat halaman selesai dimuat (jika belum ada indikasi callback redirect)
+@if(!request()->has('transaction_status') && !request()->has('order_id'))
 window.addEventListener('DOMContentLoaded', (event) => {
     window.snap.pay('{{ $snapToken }}', {
         onSuccess: function(result) {
@@ -197,6 +198,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
     });
 });
+@endif
 
 document.getElementById('pay-button')?.addEventListener('click', function(e) {
     e.preventDefault();

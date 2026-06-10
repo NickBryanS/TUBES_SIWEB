@@ -16,19 +16,32 @@
             <h1 class="dash-page-label">Laporan Keuangan</h1>
             <p class="dash-page-sub">Pantau performa bisnis dan arus kas Gardakala Outdoor secara real-time.</p>
         </div>
-        <a href="{{ route('admin.transaksi.index') }}" class="dash-btn-ekspor">
-            <i class="fas fa-download"></i> Ekspor Laporan
+        <a href="{{ route('admin.dashboard.export', ['period' => $period]) }}" class="dash-btn-ekspor">
+            <i class="fas fa-download"></i> Ekspor {{ ucfirst($period) }}
         </a>
     </div>
 
-    {{-- ── PERIOD TABS ── --}}
-    <div class="period-tabs">
-        <a href="{{ route('admin.dashboard', ['period' => 'mingguan']) }}"
-           class="period-tab {{ $period === 'mingguan' ? 'active' : '' }}">Mingguan</a>
-        <a href="{{ route('admin.dashboard', ['period' => 'bulanan']) }}"
-           class="period-tab {{ $period === 'bulanan' ? 'active' : '' }}">Bulanan</a>
-        <a href="{{ route('admin.dashboard', ['period' => 'tahunan']) }}"
-           class="period-tab {{ $period === 'tahunan' ? 'active' : '' }}">Tahunan</a>
+    {{-- ── PERIOD TABS & FILTER TANGGAL ── --}}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div class="period-tabs" style="margin-bottom: 0;">
+            <a href="{{ route('admin.dashboard', ['period' => 'mingguan']) }}"
+               class="period-tab {{ $period === 'mingguan' ? 'active' : '' }}">Mingguan</a>
+            <a href="{{ route('admin.dashboard', ['period' => 'bulanan']) }}"
+               class="period-tab {{ $period === 'bulanan' ? 'active' : '' }}">Bulanan</a>
+            <a href="{{ route('admin.dashboard', ['period' => 'tahunan']) }}"
+               class="period-tab {{ $period === 'tahunan' ? 'active' : '' }}">Tahunan</a>
+        </div>
+
+        <form action="{{ route('admin.dashboard.export') }}" method="GET" style="display: flex; gap: 8px; align-items: center;">
+            <div style="display: flex; align-items: center; background: #fff; padding: 6px 12px; border-radius: 8px; border: 1px solid #e5e7eb; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                <input type="date" name="start_date" style="border:none; background:transparent; font-size:13px; outline:none; color: #4b5563; font-family: inherit;" required>
+                <span style="color:#9ca3af; font-size:13px;">s/d</span>
+                <input type="date" name="end_date" style="border:none; background:transparent; font-size:13px; outline:none; color: #4b5563; font-family: inherit;" required>
+            </div>
+            <button type="submit" class="dash-btn-ekspor" style="padding: 8px 16px; border:none; cursor:pointer; font-size:13px; height: 36px;">
+                <i class="fas fa-file-pdf"></i> Ekspor Custom
+            </button>
+        </form>
     </div>
 
     {{-- ── STAT CARDS ROW ── --}}

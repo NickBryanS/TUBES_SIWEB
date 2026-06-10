@@ -26,12 +26,12 @@ class InventoryController extends Controller
         if ($request->filled('status')) {
             $status = $request->status;
             if ($status === 'tersedia') {
-                $query->where('stok_tersedia', '>', 3);
+                $query->where('stok_tersedia', '>', 5);
             } elseif ($status === 'habis') {
                 $query->where('stok_tersedia', '<=', 0);
             } elseif ($status === 'stok_tipis') {
                 $query->where('stok_tersedia', '>', 0)
-                    ->where('stok_tersedia', '<=', 3);
+                    ->where('stok_tersedia', '<=', 5);
             }
         }
 
@@ -85,8 +85,15 @@ class InventoryController extends Controller
             'total_stok' => 'required|integer|min:1',
             'deskripsi' => 'nullable|string',
             'spesifikasi_teknis' => 'nullable|string',
-            'url_gambar' => 'nullable|url',
+            'gambar_produk' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+
+        if ($request->hasFile('gambar_produk')) {
+            $file = $request->file('gambar_produk');
+            $filename = 'product_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/products'), $filename);
+            $validated['url_gambar'] = asset('uploads/products/' . $filename);
+        }
 
         // Set stok tersedia = total stok saat membuat produk baru
         $validated['stok_tersedia'] = $validated['total_stok'];
@@ -133,8 +140,23 @@ class InventoryController extends Controller
             'stok_tersedia'      => 'nullable|integer|min:0',
             'deskripsi'          => 'nullable|string',
             'spesifikasi_teknis' => 'nullable|string',
-            'url_gambar'         => 'nullable|url',
+            'gambar_produk'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+
+        if ($request->hasFile('gambar_produk')) {
+            // Hapus gambar lama jika ada dan merupakan file lokal
+            if ($product->url_gambar && str_contains($product->url_gambar, asset('uploads/products'))) {
+                $oldFile = str_replace(asset('uploads/products') . '/', '', $product->url_gambar);
+                if (file_exists(public_path('uploads/products/' . $oldFile))) {
+                    unlink(public_path('uploads/products/' . $oldFile));
+                }
+            }
+
+            $file = $request->file('gambar_produk');
+            $filename = 'product_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/products'), $filename);
+            $validated['url_gambar'] = asset('uploads/products/' . $filename);
+        }
 
         // Default stok_tersedia ke total_stok jika tidak diisi
         if (!isset($validated['stok_tersedia']) || $validated['stok_tersedia'] === null) {
@@ -204,9 +226,38 @@ class InventoryController extends Controller
     /**
      * Export inventaris ke CSV.
      */
-    public function export()
+    public function export(Request $request)
     {
-        $products = Product::with('category')->get();
+        $query = Product::with('category');
+
+        // Filter berdasarkan kategori
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Filter berdasarkan status stok
+        if ($request->filled('status')) {
+            $status = $request->status;
+            if ($status === 'tersedia') {
+                $query->where('stok_tersedia', '>', 5);
+            } elseif ($status === 'habis') {
+                $query->where('stok_tersedia', '<=', 0);
+            } elseif ($status === 'stok_tipis') {
+                $query->where('stok_tersedia', '>', 0)
+                    ->where('stok_tersedia', '<=', 5);
+            }
+        }
+
+        // Search produk
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_produk', 'like', "%$search%")
+                  ->orWhere('deskripsi', 'like', "%$search%");
+            });
+        }
+
+        $products = $query->get();
         
         $filename = 'inventaris_' . date('Y-m-d_H-i-s') . '.csv';
         

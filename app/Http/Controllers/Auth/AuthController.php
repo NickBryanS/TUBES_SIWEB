@@ -44,8 +44,20 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
             $user = Auth::user();
+
+            // Cek jika akun nonaktif atau dibanned
+            if ($user->status_akun !== 'aktif') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()
+                    ->withInput($request->only('email', 'remember'))
+                    ->withErrors(['email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.']);
+            }
+
+            $request->session()->regenerate();
 
             // Jika user adalah superadmin (pemilik), redirect ke executive dashboard
             if ($user->isSuperAdmin()) {
