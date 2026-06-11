@@ -188,7 +188,7 @@
                         if ($product->stok_tersedia <= 0) {
                             $status = 'Habis';
                             $status_class = 'status-habis';
-                        } elseif ($product->stok_tersedia <= 5) {
+                        } elseif ($product->stok_tersedia < $product->total_stok && $product->stok_tersedia <= max(3, ceil($product->total_stok * 0.3))) {
                             $status = 'Stok Tipis';
                             $status_class = 'status-stok-tipis';
                         } else {

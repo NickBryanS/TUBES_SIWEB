@@ -15,11 +15,6 @@
             <h1 class="pengguna-title">Manajemen Pengguna</h1>
             <p class="pengguna-subtitle">Pantau aktivitas pengguna Gardakala, verifikasi identitas, dan kelola status akses dalam satu dashboard terintegrasi.</p>
         </div>
-        <div class="header-actions">
-            <button class="btn-tambah-pengguna" id="btn-tambah-pengguna">
-                <i class="fas fa-plus"></i> Tambah Pengguna
-            </button>
-        </div>
     </div>
 
     {{-- STAT CARDS --}}
@@ -248,10 +243,7 @@
 {{-- TOAST CONTAINER --}}
 <div class="toast-container" id="toast-container"></div>
 
-{{-- FAB --}}
-<button class="fab-button" id="fab-tambah" title="Tambah Pengguna">
-    <i class="fas fa-plus"></i>
-</button>
+
 
 @endsection
 

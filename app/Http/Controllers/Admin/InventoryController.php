@@ -26,12 +26,14 @@ class InventoryController extends Controller
         if ($request->filled('status')) {
             $status = $request->status;
             if ($status === 'tersedia') {
-                $query->where('stok_tersedia', '>', 5);
+                $query->where('stok_tersedia', '>', 0)
+                    ->whereRaw('stok_tersedia >= total_stok OR stok_tersedia > GREATEST(3, CEIL(total_stok * 0.3))');
             } elseif ($status === 'habis') {
                 $query->where('stok_tersedia', '<=', 0);
             } elseif ($status === 'stok_tipis') {
                 $query->where('stok_tersedia', '>', 0)
-                    ->where('stok_tersedia', '<=', 5);
+                    ->whereRaw('stok_tersedia < total_stok')
+                    ->whereRaw('stok_tersedia <= GREATEST(3, CEIL(total_stok * 0.3))');
             }
         }
 
@@ -239,12 +241,14 @@ class InventoryController extends Controller
         if ($request->filled('status')) {
             $status = $request->status;
             if ($status === 'tersedia') {
-                $query->where('stok_tersedia', '>', 5);
+                $query->where('stok_tersedia', '>', 0)
+                    ->whereRaw('stok_tersedia >= total_stok OR stok_tersedia > GREATEST(3, CEIL(total_stok * 0.3))');
             } elseif ($status === 'habis') {
                 $query->where('stok_tersedia', '<=', 0);
             } elseif ($status === 'stok_tipis') {
                 $query->where('stok_tersedia', '>', 0)
-                    ->where('stok_tersedia', '<=', 5);
+                    ->whereRaw('stok_tersedia < total_stok')
+                    ->whereRaw('stok_tersedia <= GREATEST(3, CEIL(total_stok * 0.3))');
             }
         }
 
