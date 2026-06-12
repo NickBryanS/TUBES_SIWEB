@@ -40,6 +40,16 @@ class MidtransCallbackController extends Controller
         $orderStatus = 'menunggu';
         $statusJaminan = $transaction->status_jaminan;
 
+        // Definisi urutan status untuk mencegah downgrade
+        $statusPriority = [
+            'dibatalkan' => 0,
+            'menunggu' => 1,
+            'menunggu_admin' => 2,
+            'diproses' => 3,
+            'dikirim' => 4,
+            'selesai' => 5,
+        ];
+
         if ($transactionStatus == 'capture') {
             if ($request->payment_type == 'credit_card') {
                 if ($request->fraud_status == 'challenge') {
@@ -73,6 +83,25 @@ class MidtransCallbackController extends Controller
             }
         }
 
+        // Idempotency check: jika status sudah sama, skip
+        if ($transaction->status_transaksi === $orderStatus) {
+            return response()->json(['message' => 'Already processed']);
+        }
+
+        // Cegah downgrade status (kecuali pembatalan dari status menunggu)
+        $currentPriority = $statusPriority[$transaction->status_transaksi] ?? 0;
+        $newPriority = $statusPriority[$orderStatus] ?? 0;
+        if ($newPriority < $currentPriority && $orderStatus !== 'dibatalkan') {
+            Log::info('Midtrans Webhook: Skipping status downgrade from ' . $transaction->status_transaksi . ' to ' . $orderStatus);
+            return response()->json(['message' => 'Status downgrade prevented']);
+        }
+
+        // Jangan batalkan transaksi yang sudah diproses/dikirim/selesai
+        if ($orderStatus === 'dibatalkan' && in_array($transaction->status_transaksi, ['diproses', 'dikirim', 'selesai'])) {
+            Log::info('Midtrans Webhook: Cannot cancel transaction in status ' . $transaction->status_transaksi);
+            return response()->json(['message' => 'Cannot cancel active transaction']);
+        }
+
         // Update Payment
         if ($transaction->payment) {
             $transaction->payment->update([
@@ -91,7 +120,7 @@ class MidtransCallbackController extends Controller
             if (class_exists(\App\Notifications\OrderStatusUpdated::class)) {
                 $transaction->user->notify(new \App\Notifications\OrderStatusUpdated($transaction));
             } elseif (class_exists(\App\Notifications\OrderStatusNotification::class)) {
-                $transaction->user->notify(new \App\Notifications\OrderStatusNotification($transaction, 'Status pesanan Anda #WB-' . str_pad($transaction->id, 8, '0', STR_PAD_LEFT) . ' telah diperbarui.'));
+                $transaction->user->notify(new \App\Notifications\OrderStatusNotification($transaction, 'Status pesanan Anda #GK-' . str_pad($transaction->id, 4, '0', STR_PAD_LEFT) . ' telah diperbarui.'));
             }
         } catch (\Exception $e) {
             Log::error('Midtrans Webhook: Notification failed: ' . $e->getMessage());

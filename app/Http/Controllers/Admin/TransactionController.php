@@ -152,12 +152,12 @@ class TransactionController extends Controller
             $transaction->payment->update(['status_pembayaran' => 'terverifikasi']);
         }
 
-        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah divalidasi dan sedang diproses.'));
+        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah divalidasi dan sedang diproses.'));
 
-        ActivityLog::catat('konfirmasi_transaksi', 'Menyetujui transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+        ActivityLog::catat('konfirmasi_transaksi', 'Menyetujui transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
 
         return redirect()->route('admin.transaksi.index')
-            ->with('success', 'Transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' berhasil divalidasi.');
+            ->with('success', 'Transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' berhasil divalidasi.');
     }
 
     /**
@@ -181,12 +181,12 @@ class TransactionController extends Controller
             'status_jaminan' => 'rejected',
         ]);
 
-        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah ditolak dan dibatalkan.'));
+        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah ditolak dan dibatalkan.'));
 
-        ActivityLog::catat('tolak_transaksi', 'Menolak transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+        ActivityLog::catat('tolak_transaksi', 'Menolak transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
 
         return redirect()->route('admin.transaksi.index')
-            ->with('success', 'Transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' ditolak.');
+            ->with('success', 'Transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' ditolak.');
     }
 
     /**
@@ -207,9 +207,9 @@ class TransactionController extends Controller
         $transaction->update(['status_transaksi' => $request->status]);
 
         $label = str_replace('_', ' ', ucfirst($request->status));
-        $transaction->user->notify(new OrderStatusNotification($transaction, 'Status pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah diperbarui menjadi ' . $label . '.'));
+        $transaction->user->notify(new OrderStatusNotification($transaction, 'Status pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah diperbarui menjadi ' . $label . '.'));
 
-        ActivityLog::catat('update_status_transaksi', 'Mengubah status transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' menjadi ' . strtoupper($request->status), 'Transaction', $transaction->id);
+        ActivityLog::catat('update_status_transaksi', 'Mengubah status transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' menjadi ' . strtoupper($request->status), 'Transaction', $transaction->id);
 
         return redirect()->route('admin.transaksi.index')
             ->with('success', "Status transaksi diubah ke \"{$label}\".");
@@ -238,7 +238,7 @@ class TransactionController extends Controller
             'keterangan_denda' => $request->keterangan_denda,
         ]);
 
-        ActivityLog::catat('set_denda_transaksi', 'Menetapkan denda Rp ' . number_format($request->denda, 0, ',', '.') . ' pada transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+        ActivityLog::catat('set_denda_transaksi', 'Menetapkan denda Rp ' . number_format($request->denda, 0, ',', '.') . ' pada transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
 
         return response()->json([
             'success' => true,
@@ -264,12 +264,12 @@ class TransactionController extends Controller
                 'status_transaksi' => 'diproses',
                 'status_jaminan' => 'verified',
             ]);
-            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah dikonfirmasi dan pesanan sedang diproses.'));
+            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah dikonfirmasi dan pesanan sedang diproses.'));
         } else {
-            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' telah dikonfirmasi.'));
+            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah dikonfirmasi.'));
         }
 
-        ActivityLog::catat('konfirmasi_lunas_transaksi', 'Mengonfirmasi pelunasan transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+        ActivityLog::catat('konfirmasi_lunas_transaksi', 'Mengonfirmasi pelunasan transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
 
         return redirect()->route('admin.transaksi.index')
             ->with('success', 'Pembayaran dikonfirmasi lunas.');

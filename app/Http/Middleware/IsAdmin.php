@@ -27,12 +27,8 @@ class IsAdmin
                 ->with('error', 'Silakan login sebagai admin terlebih dahulu.');
         }
 
-        // Jika sudah login tapi bukan admin
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('login')
+        // Jika sudah login tapi bukan admin, redirect ke dashboard user
+        return redirect('/dashboard')
             ->with('error', 'Anda tidak memiliki akses admin.');
     }
 }

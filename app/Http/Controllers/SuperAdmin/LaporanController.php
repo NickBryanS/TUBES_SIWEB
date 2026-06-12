@@ -58,9 +58,10 @@ class LaporanController extends Controller
             ->groupBy('payments.metode_pembayaran')
             ->get();
 
-        // Log Penyewaan Detail — tampilkan SEMUA data, bukan hanya periode ini
+        // Log Penyewaan Detail — difilter berdasarkan periode yang dipilih
         $logs = Transaction::with(['user', 'details.product'])
             ->whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai', 'dibatalkan'])
+            ->whereBetween('created_at', [$start, $end])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
@@ -212,7 +213,7 @@ class LaporanController extends Controller
 
             $html .= '<tr style="background:' . $bgColor . ';">';
             $html .= '<td style="padding:7px;text-align:center;">' . $no++ . '</td>';
-            $html .= '<td style="padding:7px;font-weight:bold;">#GKD-' . str_pad($trx->id, 5, '0', STR_PAD_LEFT) . '</td>';
+            $html .= '<td style="padding:7px;font-weight:bold;">#GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '</td>';
             $html .= '<td style="padding:7px;">' . $trx->created_at->format('d/m/Y H:i') . '</td>';
             $html .= '<td style="padding:7px;">' . htmlspecialchars($trx->user->nama_lengkap ?? '-') . '</td>';
             $html .= '<td style="padding:7px;">' . htmlspecialchars($trx->user->email ?? '-') . '</td>';

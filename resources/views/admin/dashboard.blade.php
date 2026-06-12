@@ -113,7 +113,7 @@
                 @endphp
                 <tr>
                     <td class="trx-date">{{ \Carbon\Carbon::parse($t->created_at)->translatedFormat('d M Y') }}</td>
-                    <td class="trx-id">#GKD-{{ str_pad($t->id, 5, '0', STR_PAD_LEFT) }}</td>
+                    <td class="trx-id">#GK-{{ str_pad($t->id, 4, '0', STR_PAD_LEFT) }}</td>
                     <td>{{ $t->user->nama_lengkap ?? '-' }}</td>
                     <td class="trx-total">Rp {{ number_format($t->total_biaya, 0, ',', '.') }}</td>
                     <td><span class="trx-status {{ $st['class'] }}">{{ $st['label'] }}</span></td>

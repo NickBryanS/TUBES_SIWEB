@@ -72,7 +72,7 @@ class SuperAdminDashboardController extends Controller
                 'color'   => $info['color'],
                 'label'   => $info['label'],
                 'message' => ($trx->user->nama_lengkap ?? 'Pelanggan') . ' — ' . $itemCount . ' alat',
-                'order_id' => '#GKD-' . str_pad($trx->id, 5, '0', STR_PAD_LEFT),
+                'order_id' => '#GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
                 'total'   => $trx->total_biaya,
                 'time'    => $trx->created_at,
             ]);

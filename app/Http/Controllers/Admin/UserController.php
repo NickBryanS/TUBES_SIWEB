@@ -160,6 +160,16 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+
+        // Cek apakah user masih punya transaksi aktif
+        $activeTransactions = $user->transactions()
+            ->whereIn('status_transaksi', ['menunggu', 'menunggu_admin', 'diproses', 'dikirim'])
+            ->count();
+
+        if ($activeTransactions > 0) {
+            return back()->with('error', "Pengguna {$user->nama_lengkap} tidak bisa dihapus karena masih memiliki {$activeTransactions} transaksi aktif.");
+        }
+
         $name = $user->nama_lengkap;
         $uid = $user->id;
         $user->delete();

@@ -31,6 +31,7 @@ class Transaction extends Model
         'metode_pengambilan',
         'siap_kirim',
         'barang_diterima',
+        'bukti_pengiriman',
         'alamat_pengiriman',
         'nama_penerima',
         'telepon_penerima',

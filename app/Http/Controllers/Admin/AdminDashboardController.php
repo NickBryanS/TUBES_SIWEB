@@ -7,7 +7,6 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\Review;
-use App\Notifications\OrderStatusNotification;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -68,7 +67,9 @@ class AdminDashboardController extends Controller
         $penyewaanAktif    = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim'])->count();
         $menungguPesanan   = Transaction::where('status_transaksi', 'menunggu')->count();
         $menungguVerifikasi = Transaction::where('status_transaksi', 'menunggu_admin')->count();
-        $stokTipis         = Product::where('stok_tersedia', '<=', 3)->count();
+        $stokTipis         = Product::where('stok_tersedia', '>', 0)
+            ->whereRaw('stok_tersedia <= GREATEST(3, CEIL(total_stok * 0.3))')->count()
+            + Product::where('stok_tersedia', '<=', 0)->count();
 
         // ── CHART: ALIRAN KAS ─────────────────────────────────────
         $chartData = [];

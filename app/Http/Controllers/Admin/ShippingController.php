@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\ActivityLog;
+use App\Notifications\OrderStatusNotification;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -100,6 +101,9 @@ class ShippingController extends Controller
             'tanggal_selesai'    => Carbon::parse($transaction->tanggal_selesai)->translatedFormat('d M Y'),
             'total_biaya'        => $transaction->total_biaya,
             'status_transaksi'   => $transaction->status_transaksi,
+            'barang_diterima'    => $transaction->barang_diterima,
+            'nama_penerima'      => $transaction->nama_penerima,
+            'bukti_pengiriman'   => $transaction->bukti_pengiriman,
             'items'              => $items,
             'created_at'         => $transaction->created_at->translatedFormat('d M, H:i'),
         ]);
@@ -116,32 +120,41 @@ class ShippingController extends Controller
 
         if ($action === 'siapkan' && $transaction->status_transaksi === 'diproses') {
             $transaction->update(['siap_kirim' => true]);
-            ActivityLog::catat('siapkan_pengiriman', 'Menyiapkan pengiriman untuk transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+            ActivityLog::catat('siapkan_pengiriman', 'Menyiapkan pengiriman untuk transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+            try { $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' sedang disiapkan untuk pengiriman.')); } catch (\Exception $e) {}
             return back()->with('success', 'Pesanan #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' siap dikirim.');
         }
 
         if ($action === 'kirim' && in_array($transaction->status_transaksi, ['diproses'])) {
             $transaction->update(['status_transaksi' => 'dikirim']);
-            ActivityLog::catat('kirim_pesanan', 'Mengirim pesanan transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+            ActivityLog::catat('kirim_pesanan', 'Mengirim pesanan transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
+            try { $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' sedang dalam pengiriman.')); } catch (\Exception $e) {}
             return back()->with('success', 'Pesanan #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' sedang dalam pengiriman.');
         }
 
         if ($action === 'selesai' && $transaction->status_transaksi === 'dikirim') {
             $request->validate([
                 'nama_penerima' => 'required|string|max:255',
+                'bukti_pengiriman' => 'required|image|max:5120',
             ]);
 
             // Pengiriman selesai tidak mengubah status transaksi menjadi selesai (barang masih disewa)
-            // Hanya mencatat aktivitas penerimaan pengiriman
+            // Hanya mencatat aktivitas penerimaan pengiriman dan menandai barang_diterima = true
+            $updateData = [
+                'nama_penerima' => $request->nama_penerima,
+                'barang_diterima' => true,
+            ];
 
             // Handle foto bukti pengiriman jika ada
             if ($request->hasFile('bukti_pengiriman')) {
                 $path = $request->file('bukti_pengiriman')->store('bukti-pengiriman', 'public');
-                // Simpan path jika ada kolom — jika belum, skip saja
+                $updateData['bukti_pengiriman'] = $path;
             }
 
-            ActivityLog::catat('selesai_pengiriman', 'Menyelesaikan pengiriman transaksi #WB-' . str_pad($id, 8, '0', STR_PAD_LEFT) . ' (Penerima: ' . $request->nama_penerima . ')', 'Transaction', $transaction->id);
+            $transaction->update($updateData);
 
+            ActivityLog::catat('selesai_pengiriman', 'Menyelesaikan pengiriman transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' (Penerima: ' . $request->nama_penerima . ')', 'Transaction', $transaction->id);
+            try { $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah diterima oleh ' . $request->nama_penerima . '.')); } catch (\Exception $e) {}
             return back()->with('success', 'Pengiriman #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' dikonfirmasi selesai. Penerima: ' . $request->nama_penerima);
         }
 
