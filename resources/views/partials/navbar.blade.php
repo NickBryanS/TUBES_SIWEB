@@ -1,0 +1,135 @@
+{{-- Partials: Navbar Redesign --}}
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        {{-- Left: Logo --}}
+        <a href="/" class="nav-logo" id="nav-logo">
+            <i class="fas fa-mountain"></i>
+            <span>Gardakala Outdoor</span>
+        </a>
+
+        {{-- Right: Icons --}}
+        <div class="nav-icons" id="nav-icons">
+            {{-- Wishlist Icon --}}
+            <a href="/wishlist" class="nav-icon-link" aria-label="Wishlist" title="Wishlist">
+                <i class="far fa-heart"></i>
+                @php
+                    $userId = \Illuminate\Support\Facades\Auth::id() ?? 1;
+                    $wishlistCount = \App\Models\Wishlist::where('user_id', $userId)->count();
+                @endphp
+                @if($wishlistCount > 0)
+                    <span class="nav-badge badge-red">{{ $wishlistCount }}</span>
+                @endif
+            </a>
+
+            {{-- Notification Icon --}}
+            @auth
+                <div class="nav-dropdown-wrapper">
+                    <button class="nav-icon-link" aria-label="Notifikasi" id="notification-toggle" onclick="toggleNotificationMenu()">
+                        <i class="far fa-bell"></i>
+                        @php $unreadCount = Auth::user()->unreadNotifications->count(); @endphp
+                        @if($unreadCount > 0)
+                            <span class="nav-badge badge-red">{{ $unreadCount }}</span>
+                        @endif
+                    </button>
+                    <div class="notification-dropdown-menu" id="notification-menu">
+                        <div class="dropdown-header">
+                            <span>Notifikasi</span>
+                            @if($unreadCount > 0)
+                                <form action="{{ route('notifikasi.read') }}" method="POST" style="margin:0;">
+                                    @csrf
+                                    <button type="submit" class="btn-mark-read">Tandai Dibaca</button>
+                                </form>
+                            @endif
+                        </div>
+                        <div class="dropdown-body">
+                            @forelse(Auth::user()->notifications()->limit(5)->get() as $notification)
+                                <div class="dropdown-item {{ $notification->read_at ? '' : 'unread' }}">
+                                    <p>{{ $notification->data['message'] ?? 'Ada pembaruan pesanan.' }}</p>
+                                    <small>{{ $notification->created_at->diffForHumans() }}</small>
+                                </div>
+                            @empty
+                                <div class="dropdown-empty">Tidak ada notifikasi</div>
+                            @endforelse
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="{{ route('riwayat') }}">Lihat Semua Pesanan</a>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <a href="/login" class="nav-icon-link" aria-label="Notifikasi" title="Notifikasi">
+                    <i class="far fa-bell"></i>
+                </a>
+            @endauth
+
+            {{-- Cart Icon --}}
+            <a href="/keranjang" class="nav-icon-link" aria-label="Keranjang" title="Keranjang">
+                <i class="fas fa-shopping-cart"></i>
+                @php
+                    $cartCount = \App\Models\Cart::where('user_id', $userId)->sum('quantity');
+                @endphp
+                @if($cartCount > 0)
+                    <span class="nav-badge badge-red">{{ $cartCount }}</span>
+                @endif
+            </a>
+
+            {{-- Profile / Login --}}
+            @auth
+                <div class="nav-profile-dropdown" style="position: relative;">
+                    <button class="nav-icon" aria-label="User" id="profile-toggle" onclick="toggleProfileMenu()" style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;padding:0;">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div class="profile-dropdown-menu" id="profile-menu" style="display:none;position:absolute;right:0;top:calc(100% + 10px);background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.12);min-width:180px;z-index:100;overflow:hidden;">
+                        <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;">
+                            <div style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">{{ Auth::user()->nama_lengkap ?? Auth::user()->email }}</div>
+                            <div style="font-size:0.75rem;color:#9ca3af;margin-top:2px;">{{ Auth::user()->email }}</div>
+                        </div>
+                        <a href="{{ route('user.profil') }}" style="display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:0.84rem;color:#374151;transition:background 0.2s;text-decoration:none;">
+                            <i class="fas fa-user-cog"></i> Profil & Pengaturan
+                        </a>
+                        <a href="{{ route('user.alamat') }}" style="display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:0.84rem;color:#374151;transition:background 0.2s;text-decoration:none;border-bottom:1px solid #f0f0f0;">
+                            <i class="fas fa-map-marker-alt"></i> Alamat Saya
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" style="width:100%;padding:12px 16px;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.84rem;color:#dc2626;font-family:inherit;transition:background 0.2s;">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <script>
+                    function toggleProfileMenu() {
+                        var menu = document.getElementById('profile-menu');
+                        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+                    }
+                    document.addEventListener('click', function(e) {
+                        var dropdown = document.querySelector('.nav-profile-dropdown');
+                        if (dropdown && !dropdown.contains(e.target)) {
+                            document.getElementById('profile-menu').style.display = 'none';
+                        }
+                    });
+                </script>
+            @else
+                <a href="/login" class="btn-nav-login">Masuk</a>
+            @endauth
+        </div>
+    </div>
+</nav>
+
+<script>
+    function toggleNotificationMenu() {
+        var menu = document.getElementById('notification-menu');
+        if (menu) {
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+    }
+    document.addEventListener('click', function(e) {
+        var notifWrapper = document.querySelector('.nav-dropdown-wrapper');
+        if (notifWrapper && !notifWrapper.contains(e.target)) {
+            var menu = document.getElementById('notification-menu');
+            if (menu) menu.style.display = 'none';
+        }
+    });
+</script>
+

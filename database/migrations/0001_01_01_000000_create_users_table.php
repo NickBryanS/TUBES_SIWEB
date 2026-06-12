@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('nama_lengkap');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('nomor_telepon', 20)->nullable();
             $table->string('password');
+            $table->enum('peran', ['user', 'admin'])->default('user');
+            $table->boolean('status_verifikasi')->default(false);
+            $table->string('dokumen_identitas')->nullable(); // path ke file KTP/SIM
+            $table->enum('status_akun', ['aktif', 'nonaktif', 'banned'])->default('aktif');
+            $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

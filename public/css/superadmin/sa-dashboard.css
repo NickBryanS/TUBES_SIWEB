@@ -1,0 +1,553 @@
+/* ===================================================
+   SUPERADMIN DASHBOARD — Ringkasan Bisnis Hari Ini
+   =================================================== */
+
+.sa-dash { max-width: 1140px; padding-bottom: 40px; }
+
+/* ── Header ── */
+.sa-dash-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.sa-dash-greeting {
+    font-size: 0.84rem;
+    color: var(--admin-text-lt);
+    margin-bottom: 4px;
+}
+
+.sa-dash-title {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: var(--admin-text);
+    letter-spacing: -0.03em;
+    margin-bottom: 2px;
+}
+
+.sa-dash-sub {
+    font-size: 0.82rem;
+    color: var(--admin-text-muted);
+}
+
+.sa-dash-btn-laporan {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--admin-green);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+
+.sa-dash-btn-laporan:hover {
+    background: var(--admin-green-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(26, 58, 23, 0.2);
+}
+
+/* ── Stat Cards ── */
+.sa-dash-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.sa-stat-card {
+    background: #fff;
+    border: 1px solid #e8ebe7;
+    border-radius: 14px;
+    padding: 22px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.sa-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Revenue card special style */
+.sa-stat-card.sa-stat-revenue {
+    background: linear-gradient(135deg, #1c2b1a 0%, #2D5A27 100%);
+    border-color: transparent;
+    color: #fff;
+}
+
+.sa-stat-revenue .sa-stat-label { color: rgba(255,255,255,0.6); }
+.sa-stat-revenue .sa-stat-value { color: #fff; }
+.sa-stat-revenue .sa-stat-vs { color: rgba(255,255,255,0.45); }
+
+/* Warning card */
+.sa-stat-card.sa-stat-warning {
+    border-color: #fff3e0;
+    background: linear-gradient(135deg, #fff 0%, #fff8e1 100%);
+}
+
+/* Icon wrap */
+.sa-stat-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+}
+
+.sa-stat-icon-wrap.revenue { background: rgba(255,255,255,0.12); color: #8bc34a; }
+.sa-stat-icon-wrap.aktif { background: #e3f2fd; color: #1565c0; }
+.sa-stat-icon-wrap.perhatian { background: #fff3e0; color: #e65100; }
+.sa-stat-icon-wrap.bulanan { background: #e8f5e9; color: #2e7d32; }
+
+/* Stat info */
+.sa-stat-info { flex: 1; min-width: 0; }
+
+.sa-stat-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--admin-text-muted);
+    margin-bottom: 6px;
+}
+
+.sa-stat-value {
+    display: block;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--admin-text);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.sa-stat-value small {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--admin-text-lt);
+    letter-spacing: 0;
+}
+
+.sa-stat-revenue .sa-stat-value small { color: rgba(255,255,255,0.5); }
+
+.sa-stat-sub {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--admin-text-lt);
+}
+
+.sa-stat-revenue .sa-stat-sub { color: rgba(255,255,255,0.45); }
+
+/* Compare badges */
+.sa-stat-compare {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sa-stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.sa-stat-badge.badge-up {
+    background: rgba(139, 195, 74, 0.18);
+    color: #8bc34a;
+}
+
+.sa-stat-badge.badge-down {
+    background: rgba(198, 40, 40, 0.12);
+    color: #ef5350;
+}
+
+.sa-stat-vs {
+    font-size: 0.72rem;
+    color: var(--admin-text-muted);
+}
+
+/* Detail tags (Perlu Perhatian) */
+.sa-stat-detail-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.sa-detail-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.sa-detail-tag.tag-ok {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* ── Main Grid ── */
+.sa-dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+}
+
+.sa-dash-left { display: flex; flex-direction: column; gap: 20px; }
+.sa-dash-right { display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Generic Card ── */
+.sa-card {
+    background: #fff;
+    border: 1px solid #e8ebe7;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.sa-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #f0f2ee;
+}
+
+.sa-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--admin-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sa-card-title i {
+    font-size: 0.85rem;
+    color: var(--admin-green-accent);
+}
+
+.sa-card-link {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--admin-green);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+
+.sa-card-link:hover {
+    color: var(--admin-green-light);
+}
+
+.sa-card-link i { font-size: 0.65rem; }
+
+/* ── Timeline (Aktivitas Terkini) ── */
+.sa-timeline {
+    padding: 8px 0;
+}
+
+.sa-timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 24px;
+    border-bottom: 1px solid #f8f9f7;
+    transition: background 0.2s ease;
+}
+
+.sa-timeline-item:last-child { border-bottom: none; }
+.sa-timeline-item:hover { background: #fafbf9; }
+
+.sa-timeline-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+}
+
+.sa-timeline-content { flex: 1; min-width: 0; }
+
+.sa-timeline-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+}
+
+.sa-timeline-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.sa-timeline-id {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--admin-text-lt);
+    background: #f3f4f2;
+    padding: 1px 7px;
+    border-radius: 5px;
+    font-family: monospace;
+}
+
+.sa-timeline-msg {
+    font-size: 0.82rem;
+    color: var(--admin-text-md);
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.sa-timeline-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sa-timeline-amount {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--admin-text);
+}
+
+.sa-timeline-time {
+    font-size: 0.7rem;
+    color: var(--admin-text-muted);
+}
+
+/* ── Chart ── */
+.sa-chart-wrap {
+    height: 200px;
+    padding: 16px 24px 0;
+    position: relative;
+}
+
+.sa-chart-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.sa-chart-labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 24px 16px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--admin-text-muted);
+}
+
+/* ── Jadwal Pengembalian ── */
+.sa-jadwal-section {
+    padding: 12px 20px;
+}
+
+.sa-jadwal-section + .sa-jadwal-section {
+    border-top: 1px solid #f0f2ee;
+}
+
+.sa-jadwal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.sa-jadwal-badge.badge-late {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.sa-jadwal-badge.badge-today {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.sa-jadwal-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f8f9f7;
+}
+
+.sa-jadwal-item:last-child { border-bottom: none; }
+
+.sa-jadwal-item.late {
+    background: #fff8f8;
+    margin: 0 -20px;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.sa-jadwal-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--admin-green);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.sa-jadwal-item.late .sa-jadwal-avatar {
+    background: #c62828;
+}
+
+.sa-jadwal-info { flex: 1; min-width: 0; }
+
+.sa-jadwal-name {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--admin-text);
+}
+
+.sa-jadwal-detail {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--admin-text-lt);
+    margin-top: 1px;
+}
+
+/* ── Barang Terlaris ── */
+.sa-terlaris-list {
+    padding: 8px 0;
+}
+
+.sa-terlaris-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    border-bottom: 1px solid #f8f9f7;
+    transition: background 0.2s ease;
+}
+
+.sa-terlaris-item:last-child { border-bottom: none; }
+.sa-terlaris-item:hover { background: #fafbf9; }
+
+.sa-terlaris-rank {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #f3f4f2;
+    color: var(--admin-text-lt);
+    flex-shrink: 0;
+}
+
+.sa-terlaris-rank.rank-top {
+    background: var(--admin-green);
+    color: #fff;
+}
+
+.sa-terlaris-info { flex: 1; min-width: 0; }
+
+.sa-terlaris-name {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--admin-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sa-terlaris-cat {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--admin-text-lt);
+    margin-top: 1px;
+}
+
+.sa-terlaris-count {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--admin-green-accent);
+    white-space: nowrap;
+}
+
+/* ── Empty State ── */
+.sa-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--admin-text-lt);
+}
+
+.sa-empty-state.small { padding: 28px 16px; }
+
+.sa-empty-state i {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+    opacity: 0.4;
+}
+
+.sa-empty-state p {
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+    .sa-dash-stats { grid-template-columns: repeat(2, 1fr); }
+    .sa-dash-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .sa-dash-header { flex-direction: column; gap: 12px; }
+    .sa-dash-stats { grid-template-columns: 1fr; }
+    .sa-dash-title { font-size: 1.3rem; }
+    .sa-timeline-item { padding: 12px 16px; }
+    .sa-terlaris-item { padding: 10px 16px; }
+    .sa-card-head { padding: 16px; }
+    .sa-chart-wrap { padding: 12px 16px 0; }
+    .sa-chart-labels { padding: 8px 16px 12px; }
+}
+
+@media (max-width: 480px) {
+    .sa-stat-card { padding: 16px; gap: 12px; }
+    .sa-stat-value { font-size: 1.2rem; }
+    .sa-stat-icon-wrap { width: 38px; height: 38px; font-size: 0.9rem; }
+}

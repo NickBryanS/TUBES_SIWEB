@@ -1,0 +1,595 @@
+/* ===== PREMIUM HOME PAGE STYLES (Gambar 1) ===== */
+.home-page-content {
+    padding: 0;
+    max-width: 100%;
+    margin: 0 auto;
+    background: var(--cream);
+}
+
+/* ===== HERO SECTION PREMIUM ===== */
+.hero-section-premium {
+    position: relative;
+    height: 640px;
+    width: 100%;
+    background-image: url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=1600');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 80px;
+    color: var(--white);
+    overflow: visible; /* Untuk meloloskan overlap stats */
+    margin-bottom: 120px;
+}
+
+.hero-premium-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(23, 54, 36, 0.85) 0%, rgba(23, 54, 36, 0.4) 100%);
+    z-index: 1;
+}
+
+.hero-premium-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.hero-premium-content {
+    max-width: 650px;
+}
+
+.hero-premium-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.hero-premium-subtitle {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    opacity: 0.9;
+    margin-bottom: 36px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.hero-premium-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.btn-hero-premium-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    background: var(--white);
+    color: var(--green-dark);
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    transition: var(--transition);
+}
+
+.btn-hero-premium-primary:hover {
+    background: var(--cream);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+}
+
+.btn-hero-premium-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    border: 2px solid var(--white);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: var(--radius-sm);
+    backdrop-filter: blur(4px);
+    transition: var(--transition);
+}
+
+.btn-hero-premium-outline:hover {
+    background: var(--white);
+    color: var(--green-dark);
+    transform: translateY(-2px);
+}
+
+/* OVERLAP STATS COUNTER */
+.hero-stats-overlap {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 160px);
+    max-width: 1200px;
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 30px 40px;
+    box-shadow: var(--shadow-lg);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    z-index: 3;
+    border: 1px solid var(--border);
+}
+
+.stat-overlap-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-right: 1px solid var(--border);
+}
+
+.stat-overlap-card:last-child {
+    border-right: none;
+}
+
+.stat-overlap-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--green-light);
+    color: var(--green-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.stat-overlap-info h3 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.2;
+}
+
+.stat-overlap-info p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+/* ===== HOME GENERAL SECTIONS ===== */
+.popular-equipment-section,
+.how-it-works-section,
+.security-priority-section {
+    max-width: 1200px;
+    margin: 0 auto 96px;
+    padding: 0 24px;
+}
+
+.home-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+}
+
+.center-header {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    margin-bottom: 48px;
+}
+
+.home-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.home-section-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin-top: 8px;
+}
+
+.home-see-all {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.home-see-all i {
+    font-size: 0.8rem;
+    transition: var(--transition);
+}
+
+.home-see-all:hover i {
+    transform: translateX(4px);
+}
+
+/* ===== POPULAR EQUIPMENT GRID ===== */
+.popular-equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.equipment-premium-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+}
+
+.equipment-premium-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(23, 54, 36, 0.12);
+}
+
+.equipment-card-image {
+    position: relative;
+    background: var(--green-light);
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.equipment-card-image img {
+    max-height: 100%;
+    object-fit: contain;
+    transition: var(--transition);
+}
+
+.equipment-premium-card:hover .equipment-card-image img {
+    transform: scale(1.05);
+}
+
+.equipment-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--white);
+    color: var(--green-dark);
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    box-shadow: var(--shadow-sm);
+}
+
+.equipment-card-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.equipment-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.equipment-rating {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.equipment-rating i {
+    color: var(--yellow-soft);
+}
+
+.equipment-reviews {
+    font-size: 0.78rem;
+    color: var(--text-light);
+}
+
+.equipment-title {
+    font-size: 1.15rem;
+    font-weight: 750;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+}
+
+.equipment-desc {
+    font-size: 0.85rem;
+    color: var(--text-medium);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex: 1;
+}
+
+.equipment-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+}
+
+.equipment-price {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--green-dark);
+}
+
+.equipment-price .price-unit {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-light);
+    margin-left: 2px;
+}
+
+.equipment-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-equipment-detail {
+    padding: 10px 20px;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-weight: 700;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.btn-equipment-detail:hover {
+    background: var(--border);
+}
+
+.btn-equipment-cart {
+    width: 38px;
+    height: 38px;
+    background: var(--green-dark);
+    color: var(--white);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.btn-equipment-cart:hover {
+    background: var(--green-darker);
+    transform: scale(1.05);
+}
+
+/* ===== CARA KERJA KAMI ===== */
+.how-it-works-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    padding: 60px 48px;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.step-card {
+    text-align: center;
+}
+
+.step-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--green-light);
+    color: var(--green-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 1.6rem;
+    box-shadow: 0 4px 12px rgba(23, 54, 36, 0.05);
+}
+
+.step-card h3 {
+    font-size: 1.15rem;
+    font-weight: 750;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.step-card p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    max-width: 280px;
+    margin: 0 auto;
+}
+
+/* ===== SECURITY & BENEFIT GRID ===== */
+.security-priority-section {
+    margin-bottom: 120px;
+}
+
+.security-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.security-benefits-block {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.benefit-modern-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    gap: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.benefit-modern-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(23, 54, 36, 0.08);
+}
+
+.benefit-card-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--green-light);
+    color: var(--green-dark);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.benefit-card-text h4 {
+    font-size: 1rem;
+    font-weight: 750;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.benefit-card-text p {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+.security-info-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.security-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+}
+
+.security-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+}
+
+.security-desc {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    line-height: 1.7;
+    margin-bottom: 36px;
+}
+
+.security-check-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.security-check-list li {
+    display: flex;
+    gap: 16px;
+}
+
+.check-bullet {
+    width: 28px;
+    height: 28px;
+    background: var(--green-dark);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.security-check-list li strong {
+    font-size: 1rem;
+    color: var(--text-dark);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.security-check-list li p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .hero-section-premium { padding: 0 40px; height: 580px; }
+    .hero-premium-title { font-size: 3rem; }
+    .hero-stats-overlap { width: calc(100% - 80px); padding: 24px 30px; }
+    .popular-equipment-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps-grid { grid-template-columns: 1fr; gap: 30px; }
+    .security-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+@media (max-width: 768px) {
+    .hero-section-premium { height: 500px; padding: 0 24px; margin-bottom: 240px; text-align: center; }
+    .hero-premium-title { font-size: 2.2rem; }
+    .hero-premium-subtitle { font-size: 0.95rem; }
+    .hero-premium-buttons { justify-content: center; }
+    .hero-stats-overlap {
+        grid-template-columns: 1fr;
+        bottom: -180px;
+        padding: 20px;
+        gap: 20px;
+    }
+    .stat-overlap-card { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    .stat-overlap-card:last-child { border-bottom: none; padding-bottom: 0; }
+    .popular-equipment-grid { grid-template-columns: 1fr; }
+    .how-it-works-section { padding: 40px 24px; }
+    .security-title { font-size: 1.8rem; }
+}
