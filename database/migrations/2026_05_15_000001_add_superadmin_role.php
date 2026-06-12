@@ -7,12 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    /**
-     * Menambah role 'superadmin' ke enum peran di tabel users.
-     */
     public function up(): void
     {
-        DB::statement("ALTER TABLE users MODIFY COLUMN peran ENUM('user', 'admin', 'superadmin') DEFAULT 'user'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN peran ENUM('user', 'admin', 'superadmin') DEFAULT 'user'");
+        }
     }
 
     /**
@@ -23,6 +22,8 @@ return new class extends Migration
         // Revert superadmin users back to admin first
         DB::table('users')->where('peran', 'superadmin')->update(['peran' => 'admin']);
 
-        DB::statement("ALTER TABLE users MODIFY COLUMN peran ENUM('user', 'admin') DEFAULT 'user'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN peran ENUM('user', 'admin') DEFAULT 'user'");
+        }
     }
 };
