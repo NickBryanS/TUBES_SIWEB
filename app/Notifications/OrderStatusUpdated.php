@@ -28,7 +28,24 @@ class OrderStatusUpdated extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        $orderCode = 'GK-' . str_pad($this->transaction->id, 4, '0', STR_PAD_LEFT);
+        $statusLabel = str_replace('_', ' ', $this->transaction->status_transaksi);
+        
+        return (new MailMessage)
+            ->subject('Update Status Pesanan Anda ' . $orderCode)
+            ->greeting('Halo, ' . ($notifiable->nama_lengkap ?? 'Pelanggan') . '!')
+            ->line('Status untuk pesanan Anda dengan kode referensi **' . $orderCode . '** telah diperbarui.')
+            ->line('Status Saat Ini: **' . strtoupper($statusLabel) . '**')
+            ->action('Lihat Detail Pesanan', url('/riwayat'))
+            ->line('Terima kasih telah menyewa peralatan outdoor di Gardakala Outdoor!');
     }
 
     /**

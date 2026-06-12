@@ -31,7 +31,22 @@ class OrderStatusNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        $orderCode = 'GK-' . str_pad($this->transaction->id, 4, '0', STR_PAD_LEFT);
+        
+        return (new MailMessage)
+            ->subject('Notifikasi Pesanan ' . $orderCode)
+            ->greeting('Halo, ' . ($notifiable->nama_lengkap ?? 'Pelanggan') . '!')
+            ->line($this->message)
+            ->action('Lihat Detail Pesanan', url('/riwayat'))
+            ->line('Terima kasih atas kepercayaan Anda menyewa di Gardakala Outdoor!');
     }
 
     /**
