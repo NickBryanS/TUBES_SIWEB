@@ -23,7 +23,14 @@ class IsSuperAdmin
                 ->with('error', 'Silakan login sebagai Super Admin.');
         }
 
-        return redirect()->route('admin.dashboard')
-            ->with('error', 'Anda tidak memiliki akses Super Admin.');
+        // Jika admin biasa, redirect ke admin dashboard
+        if (Auth::user()->isAdmin()) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Anda tidak memiliki akses Super Admin.');
+        }
+
+        // Jika user biasa, redirect ke dashboard user
+        return redirect('/dashboard')
+            ->with('error', 'Anda tidak memiliki akses.');
     }
 }

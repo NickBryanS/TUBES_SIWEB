@@ -177,6 +177,7 @@ class OrderController extends Controller
         }
 
         // Gunakan DB transaction untuk menjaga konsistensi data
+        try {
         $transaction = DB::transaction(function () use ($request, $carts, $userId, $checkoutData) {
 
             // Hitung total biaya
@@ -217,12 +218,18 @@ class OrderController extends Controller
 
             // 2. Simpan detail transaksi (setiap item di keranjang)
             foreach ($carts as $cart) {
+                // Lock product row untuk mencegah race condition stok
+                $product = Product::lockForUpdate()->find($cart->product_id);
+                if ($product->stok_tersedia < $cart->quantity) {
+                    throw new \Exception("Stok {$product->nama_produk} tidak mencukupi. Hanya tersedia {$product->stok_tersedia} unit.");
+                }
+
                 TransactionDetail::create([
                     'transaction_id' => $transaction->id,
                     'product_id'     => $cart->product_id,
                     'jumlah'         => $cart->quantity,
                 ]);
-                $cart->product->decrement('stok_tersedia', $cart->quantity);
+                $product->decrement('stok_tersedia', $cart->quantity);
             }
 
             // 3. Upload bukti pembayaran jika ada
@@ -256,6 +263,9 @@ class OrderController extends Controller
 
             return $transaction;
         });
+        } catch (\Exception $e) {
+            return redirect()->route('checkout')->with('error', $e->getMessage());
+        }
 
         // Kosongkan keranjang dan session checkout setelah berhasil
         \App\Models\Cart::where('user_id', $userId)->delete();
@@ -522,6 +532,11 @@ class OrderController extends Controller
             'status_transaksi'       => 'selesai',
         ]);
 
+        // Kembalikan stok produk setelah barang dikembalikan
+        foreach ($transaction->details as $detail) {
+            $detail->product->increment('stok_tersedia', $detail->jumlah);
+        }
+
         $transaction->user->notify(new OrderStatusUpdated($transaction));
 
         $message = 'Pengembalian barang berhasil dicatat.';
@@ -623,6 +638,13 @@ class OrderController extends Controller
             'total_biaya'          => $transaction->total_biaya + $biayaTambahan,
             'status_perpanjangan'  => 'approved',
         ]);
+
+        // Update jumlah bayar di payment agar konsisten
+        if ($transaction->payment) {
+            $transaction->payment->update([
+                'jumlah_bayar' => $transaction->total_biaya,
+            ]);
+        }
 
         // Notify user
         try {

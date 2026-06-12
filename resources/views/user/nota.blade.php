@@ -26,6 +26,28 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             overflow: hidden;
+            position: relative;
+        }
+
+        .nota-header, .nota-body, .nota-footer {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ── Watermark ── */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            color: rgba(45, 90, 39, 0.05); /* subtle brand green */
+            z-index: 1;
+            white-space: nowrap;
+            pointer-events: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 12px;
         }
 
         /* Header */
@@ -309,6 +331,7 @@
 </div>
 
 <div class="nota-container">
+    <div class="watermark">GARDAKALA</div>
     <!-- Header -->
     <div class="nota-header">
         <div class="nota-brand">

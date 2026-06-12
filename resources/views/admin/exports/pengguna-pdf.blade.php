@@ -182,6 +182,22 @@
             color: #9ca3af;
         }
 
+        /* ── Watermark ── */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 110px;
+            color: rgba(26, 58, 23, 0.06);
+            z-index: -1;
+            white-space: nowrap;
+            pointer-events: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 15px;
+        }
+
         /* ── Print styles ── */
         @media print {
             .print-bar { display: none !important; }
@@ -196,6 +212,7 @@
     </style>
 </head>
 <body>
+    <div class="watermark">GARDAKALA</div>
 
     {{-- Fixed Print Bar --}}
     <div class="print-bar">

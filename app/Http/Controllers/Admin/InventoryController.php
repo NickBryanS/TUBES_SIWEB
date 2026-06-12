@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\ActivityLog;
+use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
@@ -189,6 +190,18 @@ class InventoryController extends Controller
      */
     public function destroy(Product $product)
     {
+        // Cek apakah produk masih dalam transaksi aktif
+        $activeRentals = TransactionDetail::where('product_id', $product->id)
+            ->whereHas('transaction', fn($q) => $q->whereIn('status_transaksi', ['diproses', 'dikirim']))
+            ->exists();
+
+        if ($activeRentals) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk tidak dapat dihapus karena sedang dalam penyewaan aktif!',
+            ], 422);
+        }
+
         $nama = $product->nama_produk;
         $id = $product->id;
         $product->delete();
@@ -212,6 +225,20 @@ class InventoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Pilih produk terlebih dahulu!',
+            ], 422);
+        }
+
+        // Cek apakah ada produk yang masih dalam transaksi aktif
+        $activeProducts = TransactionDetail::whereIn('product_id', $ids)
+            ->whereHas('transaction', fn($q) => $q->whereIn('status_transaksi', ['diproses', 'dikirim']))
+            ->distinct('product_id')
+            ->pluck('product_id');
+
+        if ($activeProducts->isNotEmpty()) {
+            $names = Product::whereIn('id', $activeProducts)->pluck('nama_produk')->implode(', ');
+            return response()->json([
+                'success' => false,
+                'message' => 'Beberapa produk tidak dapat dihapus karena sedang dalam penyewaan aktif: ' . $names,
             ], 422);
         }
 

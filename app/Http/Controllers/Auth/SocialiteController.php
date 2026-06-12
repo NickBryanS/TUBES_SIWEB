@@ -56,7 +56,19 @@ class SocialiteController extends Controller
             ]);
         }
 
+        // Cek jika akun nonaktif atau dibanned
+        if ($user->status_akun !== 'aktif') {
+            return redirect('/login')
+                ->withErrors(['google' => 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.']);
+        }
+
         Auth::login($user, true);
+
+        // Jika user adalah superadmin, redirect ke superadmin dashboard
+        if ($user->isSuperAdmin()) {
+            return redirect('/superadmin/dashboard')
+                ->with('success', 'Selamat datang, Pemilik!');
+        }
 
         // Jika user adalah admin, redirect ke admin dashboard
         if ($user->isAdmin()) {

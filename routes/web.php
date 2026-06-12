@@ -126,8 +126,6 @@ Route::middleware(['auth', 'redirect_if_admin'])->group(function () {
     // Perpanjangan Sewa (FR-USR-033)
     Route::get('/pesanan/{id}/perpanjangan', [OrderController::class, 'formPerpanjangan'])->name('perpanjangan.form');
     Route::post('/pesanan/{id}/perpanjangan', [OrderController::class, 'ajukanPerpanjangan'])->name('perpanjangan.store');
-    Route::post('/pesanan/{id}/perpanjangan/approve', [OrderController::class, 'approvePerpanjangan'])->name('perpanjangan.approve');
-    Route::post('/pesanan/{id}/perpanjangan/reject', [OrderController::class, 'rejectPerpanjangan'])->name('perpanjangan.reject');
 
     // Konfirmasi Penerimaan Barang (Pesanan Diterima)
     Route::post('/pesanan/{id}/terima', [OrderController::class, 'terimaPesanan'])->name('pesanan.terima');

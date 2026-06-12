@@ -154,7 +154,7 @@
     </style>
 </head>
 <body>
-    <div class="watermark">GARKADALA</div>
+    <div class="watermark">GARDAKALA</div>
 
     <button class="print-btn" onclick="window.print()">
         🖨️ Cetak / Simpan PDF
@@ -243,7 +243,7 @@
             @endphp
             <tr>
                 <td style="text-align:center;">{{ $i + 1 }}</td>
-                <td class="trx-id">#GKD-{{ str_pad($trx->id, 5, '0', STR_PAD_LEFT) }}</td>
+                <td class="trx-id">#GK-{{ str_pad($trx->id, 4, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ $trx->created_at->format('d/m/Y') }}</td>
                 <td>{{ $trx->user->nama_lengkap ?? '-' }}</td>
                 <td>{{ Str::limit($produkList, 45) }}</td>

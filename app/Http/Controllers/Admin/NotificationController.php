@@ -35,7 +35,7 @@ class NotificationController extends Controller
                     'user_name'  => $trx->user->nama_lengkap ?? 'Pelanggan',
                     'user_avatar' => $trx->user->avatar ?? null,
                     'user_initial' => strtoupper(substr($trx->user->nama_lengkap ?? 'P', 0, 1)),
-                    'order_id'   => '#GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
+                    'order_id'   => '#GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
                     'message'    => 'Pesanan Baru (' . $trx->details()->count() . ' Alat) — Menunggu verifikasi dokumen identitas pelanggan.',
                     'actions'    => [
                         ['label' => 'Setujui', 'type' => 'primary', 'route' => route('admin.transaksi.approve', $trx->id)],
@@ -62,8 +62,8 @@ class NotificationController extends Controller
                     'user_name'  => $trx->user->nama_lengkap ?? 'Pelanggan',
                     'user_avatar' => $trx->user->avatar ?? null,
                     'user_initial' => strtoupper(substr($trx->user->nama_lengkap ?? 'P', 0, 1)),
-                    'order_id'   => '#GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
-                    'message'    => 'Foto Identitas (KTP) telah diunggah untuk Pesanan #GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '.',
+                    'order_id'   => '#GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
+                    'message'    => 'Foto Identitas (KTP) telah diunggah untuk Pesanan #GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '.',
                     'actions'    => [
                         ['label' => 'Setujui', 'type' => 'primary', 'route' => route('admin.transaksi.approve', $trx->id)],
                         ['label' => 'Lihat Detail', 'type' => 'secondary', 'route' => route('admin.transaksi.index', ['highlight' => $trx->id])],
@@ -92,8 +92,8 @@ class NotificationController extends Controller
                     'user_name'  => $trx->user->nama_lengkap ?? 'Pelanggan',
                     'user_avatar' => $trx->user->avatar ?? null,
                     'user_initial' => strtoupper(substr($trx->user->nama_lengkap ?? 'P', 0, 1)),
-                    'order_id'   => '#GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
-                    'message'    => 'Pembayaran ' . $metode . ' untuk Pesanan #GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '. Status diperbarui ke Dijadwalkan.',
+                    'order_id'   => '#GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
+                    'message'    => 'Pembayaran ' . $metode . ' untuk Pesanan #GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '. Status diperbarui ke Dijadwalkan.',
                     'actions'    => [
                         ['label' => 'Lihat Kwitansi', 'type' => 'secondary', 'route' => route('admin.transaksi.index', ['highlight' => $trx->id])],
                     ],
@@ -118,8 +118,8 @@ class NotificationController extends Controller
                     'user_name'  => $trx->user->nama_lengkap ?? 'Pelanggan',
                     'user_avatar' => $trx->user->avatar ?? null,
                     'user_initial' => strtoupper(substr($trx->user->nama_lengkap ?? 'P', 0, 1)),
-                    'order_id'   => '#GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
-                    'message'    => 'Permintaan Perpanjangan Sewa (' . $durasi . ' Hari) untuk Pesanan #GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '.',
+                    'order_id'   => '#GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
+                    'message'    => 'Permintaan Perpanjangan Sewa (' . $durasi . ' Hari) untuk Pesanan #GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '.',
                     'actions'    => [
                         ['label' => 'Konfirmasi', 'type' => 'primary', 'route' => route('admin.perpanjangan.approve', $trx->id)],
                         ['label' => 'Lihat Kalender', 'type' => 'secondary', 'route' => route('admin.transaksi.index', ['highlight' => $trx->id])],
@@ -144,8 +144,8 @@ class NotificationController extends Controller
                     'user_name'   => $trx->user->nama_lengkap ?? 'Pelanggan',
                     'user_avatar' => $trx->user->avatar ?? null,
                     'user_initial' => strtoupper(substr($trx->user->nama_lengkap ?? 'P', 0, 1)),
-                    'order_id'   => '#GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
-                    'message'    => 'Permintaan Refund: Pesanan #GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . ' dibatalkan. Kembalikan dana ke ' . ($trx->bank_pengembalian ?? '-') . ' - ' . ($trx->rekening_pengembalian ?? '-') . ' a/n ' . ($trx->atas_nama_pengembalian ?? '-') . '.',
+                    'order_id'   => '#GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
+                    'message'    => 'Permintaan Refund: Pesanan #GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . ' dibatalkan. Kembalikan dana ke ' . ($trx->bank_pengembalian ?? '-') . ' - ' . ($trx->rekening_pengembalian ?? '-') . ' a/n ' . ($trx->atas_nama_pengembalian ?? '-') . '.',
                     'actions'    => [
                         ['label' => 'Lihat Detail', 'type' => 'secondary', 'route' => route('admin.transaksi.index', ['highlight' => $trx->id])],
                     ],
@@ -169,8 +169,8 @@ class NotificationController extends Controller
                     'user_name'  => $trx->user->nama_lengkap ?? 'Pelanggan',
                     'user_avatar' => $trx->user->avatar ?? null,
                     'user_initial' => strtoupper(substr($trx->user->nama_lengkap ?? 'P', 0, 1)),
-                    'order_id'   => '#GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
-                    'message'    => 'Barang telah dikembalikan untuk Pesanan #GK-' . now()->format('Y') . '-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '.',
+                    'order_id'   => '#GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT),
+                    'message'    => 'Barang telah dikembalikan untuk Pesanan #GK-' . str_pad($trx->id, 4, '0', STR_PAD_LEFT) . '.',
                     'actions'    => [
                         ['label' => 'Cek Kondisi Barang', 'type' => 'secondary', 'route' => route('admin.transaksi.index', ['highlight' => $trx->id])],
                     ],

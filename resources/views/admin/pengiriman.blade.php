@@ -92,18 +92,23 @@
                         $colors = ['#1a3a17','#2D5A27','#5a9e50','#f57f17','#1565c0','#6a1b9a'];
                         $avatarColor = $colors[$s->id % count($colors)];
 
-                        $statusClass = match($s->status_transaksi) {
-                            'diproses' => 'status-menunggu',
-                            'dikirim'  => 'status-dikirim',
-                            'selesai'  => 'status-selesai',
-                            default    => 'status-menunggu',
-                        };
-                        $statusLabel = match($s->status_transaksi) {
-                            'diproses' => 'SIAP KIRIM',
-                            'dikirim'  => 'MENGANTAR / KURIR',
-                            'selesai'  => 'DITERIMA',
-                            default    => strtoupper($s->status_transaksi),
-                        };
+                        if ($s->status_transaksi === 'dikirim' && $s->barang_diterima) {
+                            $statusClass = 'status-selesai';
+                            $statusLabel = 'DITERIMA';
+                        } else {
+                            $statusClass = match($s->status_transaksi) {
+                                'diproses' => 'status-menunggu',
+                                'dikirim'  => 'status-dikirim',
+                                'selesai'  => 'status-selesai',
+                                default    => 'status-menunggu',
+                            };
+                            $statusLabel = match($s->status_transaksi) {
+                                'diproses' => 'SIAP KIRIM',
+                                'dikirim'  => 'MENGANTAR / KURIR',
+                                'selesai'  => 'DITERIMA',
+                                default    => strtoupper($s->status_transaksi),
+                            };
+                        }
                     @endphp
                     <tr>
                         <td>
@@ -132,9 +137,19 @@
                             </span>
                         </td>
                         <td>
-                            <button class="btn-antar-sekarang btn-detail-ship" data-id="{{ $s->id }}" type="button">
-                                <i class="fas fa-truck"></i> Antar Sekarang
-                            </button>
+                            @if($s->status_transaksi === 'diproses')
+                                <button class="btn-antar-sekarang btn-detail-ship" data-id="{{ $s->id }}" type="button">
+                                    <i class="fas fa-truck"></i> Antar Sekarang
+                                </button>
+                            @elseif($s->status_transaksi === 'dikirim' && !$s->barang_diterima)
+                                <button class="btn-antar-sekarang btn-detail-ship" data-id="{{ $s->id }}" type="button" style="background: #e65100;">
+                                    <i class="fas fa-check-circle"></i> Selesai Kirim
+                                </button>
+                            @else
+                                <button class="btn-antar-sekarang btn-detail-ship" data-id="{{ $s->id }}" type="button" style="background: #4b5563;">
+                                    <i class="fas fa-eye"></i> Lihat Detail
+                                </button>
+                            @endif
                         </td>
                     </tr>
                     @empty
@@ -265,14 +280,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(r => r.json())
                 .then(data => {
                     const isMenunggu = data.status_transaksi === 'diproses';
-                    const isDikirim = data.status_transaksi === 'dikirim';
-                    const isSelesai = data.status_transaksi === 'selesai';
+                    const isDikirim = data.status_transaksi === 'dikirim' && !data.barang_diterima;
+                    const isSelesai = data.status_transaksi === 'selesai' || data.barang_diterima;
 
                     let timelineSteps = [
                         { label: 'Pesanan Dibuat', date: data.created_at, done: true },
                         { label: 'Sedang Disiapkan', date: isMenunggu ? 'Menunggu...' : data.created_at, done: !isMenunggu },
-                        { label: 'Sedang Diantar Kurir', date: isDikirim ? 'Sedang dalam perjalanan' : (isSelesai ? 'Selesai' : 'Menunggu proses sebelumnya'), done: isDikirim || isSelesai },
-                        { label: 'Barang Diterima Pelanggan', date: isSelesai ? 'Diterima' : 'Menunggu konfirmasi', done: isSelesai },
+                        { label: 'Sedang Diantar Kurir', date: (data.status_transaksi === 'dikirim' || data.status_transaksi === 'selesai' || data.barang_diterima) ? 'Selesai' : 'Menunggu...', done: data.status_transaksi === 'dikirim' || data.status_transaksi === 'selesai' || data.barang_diterima },
+                        { label: 'Barang Diterima Pelanggan', date: (data.status_transaksi === 'selesai' || data.barang_diterima) ? 'Diterima' : 'Menunggu konfirmasi', done: data.status_transaksi === 'selesai' || data.barang_diterima },
                     ];
 
                     let timelineHtml = timelineSteps.map((s, i) => `
@@ -303,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     `).join('');
 
                     let actionHtml = '';
-                    if (!isSelesai) {
+                    if (!data.barang_diterima && data.status_transaksi !== 'selesai') {
                         actionHtml = `
                             <div class="modal-ship-action-card">
                                 <h4 class="modal-ship-action-title">Update Status Pengiriman</h4>
@@ -334,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <div class="ship-form-group">
                                         <label class="ship-form-label">UPLOAD BUKTI FOTO PENGIRIMAN (WAJIB)</label>
                                         <label class="ship-upload-area" id="upload-area-${data.id}">
-                                            <input type="file" name="bukti_pengiriman" accept="image/*" class="ship-upload-input" onchange="previewUpload(this, 'upload-area-${data.id}')">
+                                            <input type="file" name="bukti_pengiriman" accept="image/*" class="ship-upload-input" onchange="previewUpload(this, 'upload-area-${data.id}')" required>
                                             <div class="ship-upload-placeholder">
                                                 <i class="fas fa-camera"></i>
                                                 <span>Klik untuk ambil foto atau upload</span>
@@ -348,6 +363,22 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <p class="ship-action-note">Ini konfirmasi bahwa pesanan sudah diterima dengan baik oleh pelanggan dan telah di konfirmasi oleh kurir.</p>
                                 </form>
                                 ` : ''}
+                            </div>
+                        `;
+                    } else if (data.barang_diterima) {
+                        actionHtml = `
+                            <div class="modal-ship-action-card" style="background: #2d5a27;">
+                                <h4 class="modal-ship-action-title"><i class="fas fa-check-double" style="margin-right: 6px;"></i> Pengiriman Selesai</h4>
+                                <div style="font-size: 0.8rem; line-height: 1.6; margin-bottom: 12px; color: rgba(255, 255, 255, 0.9);">
+                                    <p style="margin: 0 0 6px 0;"><strong>Penerima:</strong> ${data.nama_penerima || '-'}</p>
+                                    <p style="margin: 0 0 6px 0;"><strong>Bukti Pengiriman:</strong></p>
+                                </div>
+                                <div style="border-radius: 8px; overflow: hidden; background: #fff; display: flex; align-items: center; justify-content: center; min-height: 120px;">
+                                    ${data.bukti_pengiriman
+                                        ? `<img src="/storage/${data.bukti_pengiriman}" style="width: 100%; max-height: 200px; object-fit: cover;">`
+                                        : `<span style="color: #9ca3af; font-size: 0.78rem;">Tidak ada foto bukti</span>`
+                                    }
+                                </div>
                             </div>
                         `;
                     }

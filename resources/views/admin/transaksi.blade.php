@@ -141,7 +141,7 @@
                     @endphp
                     <tr class="transaksi-row" data-id="{{ $trx->id }}">
                         <td>
-                            <span class="order-id">#WB-{{ str_pad($trx->id, 8, '0', STR_PAD_LEFT) }}</span>
+                            <span class="order-id">#GK-{{ str_pad($trx->id, 4, '0', STR_PAD_LEFT) }}</span>
                         </td>
                         <td>
                             <div class="customer-cell">
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(r => r.json())
                 .then(data => {
                     // Header info
-                    document.getElementById('modal-trx-id').textContent = '#WB-' + String(data.id).padStart(8, '0');
+                    document.getElementById('modal-trx-id').textContent = '#GK-' + String(data.id).padStart(4, '0');
 
                     const badge = document.getElementById('modal-status-badge');
                     badge.textContent = statusLabels[data.status_transaksi] || data.status_transaksi;
