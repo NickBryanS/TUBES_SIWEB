@@ -27,7 +27,7 @@
                     @foreach($carts as $cart)
                     <div class="checkout-item">
                         <div class="checkout-item-img">
-                            <img src="{{ $cart->product->url_gambar ?? asset('images/default.png') }}" alt="{{ $cart->product->nama_produk }}">
+                            <img src="{{ asset($cart->product->url_gambar ?? 'images/default.png') }}" alt="{{ $cart->product->nama_produk }}">
                         </div>
                         <div class="checkout-item-info">
                             <h4>{{ $cart->product->nama_produk }}</h4>
