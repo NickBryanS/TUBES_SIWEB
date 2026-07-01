@@ -18,9 +18,9 @@
                 <h4 class="footer-heading">Tautan Cepat</h4>
                 <ul class="footer-links">
                     <li><a href="/katalog">Sewa Alat</a></li>
-                    <li><a href="#">Paket Ekspedisi</a></li>
-                    <li><a href="#">Lokasi Toko</a></li>
-                    <li><a href="#">Blog Petualang</a></li>
+                    <li><a href="/faq">Tanya Jawab (FAQ)</a></li>
+                    <li><a href="/syarat-ketentuan">Syarat & Ketentuan</a></li>
+                    <li><a href="https://wa.me/6287715778007?text=Halo%20Gardakala%20Outdoor%2C%20saya%20ingin%20tanya%20tentang%20lokasi%20toko." target="_blank">Hubungi Kami</a></li>
                 </ul>
             </div>
             <div class="footer-col">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Category;
 use App\Models\ActivityLog;
 use App\Models\TransactionDetail;
@@ -89,6 +90,8 @@ class InventoryController extends Controller
             'deskripsi' => 'nullable|string',
             'spesifikasi_teknis' => 'nullable|string',
             'gambar_produk' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'galeri_produk' => 'nullable|array|max:5',
+            'galeri_produk.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('gambar_produk')) {
@@ -104,6 +107,19 @@ class InventoryController extends Controller
         $product = Product::create($validated);
 
         ActivityLog::catat('tambah_produk', 'Menambahkan produk baru: ' . $product->nama_produk, 'Product', $product->id);
+
+        // Upload galeri gambar tambahan
+        if ($request->hasFile('galeri_produk')) {
+            foreach ($request->file('galeri_produk') as $index => $file) {
+                $filename = 'gallery_' . $product->id . '_' . $index . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/products'), $filename);
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'url_gambar' => 'uploads/products/' . $filename,
+                    'urutan' => $index,
+                ]);
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -144,6 +160,8 @@ class InventoryController extends Controller
             'deskripsi'          => 'nullable|string',
             'spesifikasi_teknis' => 'nullable|string',
             'gambar_produk'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'galeri_produk'      => 'nullable|array|max:5',
+            'galeri_produk.*'    => 'image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('gambar_produk')) {
@@ -182,6 +200,54 @@ class InventoryController extends Controller
             'success' => true,
             'message' => 'Produk berhasil diperbarui!',
             'product' => $product,
+        ]);
+    }
+
+    /**
+     * Upload galeri gambar tambahan untuk produk.
+     */
+    public function uploadGallery(Request $request, Product $product)
+    {
+        $request->validate([
+            'galeri_produk' => 'required|array|max:5',
+            'galeri_produk.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        $lastOrder = $product->images()->max('urutan') ?? -1;
+
+        foreach ($request->file('galeri_produk') as $index => $file) {
+            $filename = 'gallery_' . $product->id . '_' . time() . '_' . $index . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/products'), $filename);
+            ProductImage::create([
+                'product_id' => $product->id,
+                'url_gambar' => 'uploads/products/' . $filename,
+                'urutan' => $lastOrder + $index + 1,
+            ]);
+        }
+
+        ActivityLog::catat('upload_galeri', 'Mengunggah ' . count($request->file('galeri_produk')) . ' gambar galeri untuk: ' . $product->nama_produk, 'Product', $product->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Galeri berhasil diunggah!',
+        ]);
+    }
+
+    /**
+     * Hapus satu gambar galeri.
+     */
+    public function deleteGalleryImage($imageId)
+    {
+        $image = ProductImage::findOrFail($imageId);
+        $filePath = public_path($image->url_gambar);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        $image->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Gambar galeri dihapus!',
         ]);
     }
 

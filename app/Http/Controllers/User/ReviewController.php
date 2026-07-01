@@ -21,6 +21,8 @@ class ReviewController extends Controller
         $product = Product::findOrFail($productId);
 
         // Validasi: user hanya bisa review produk yang pernah disewa dan sudah selesai
+        // (DIMATIKAN SEMENTARA UNTUK TESTING)
+        /*
         $pernakSewa = Transaction::where('user_id', Auth::id())
             ->where('status_transaksi', 'selesai')
             ->whereHas('details', function ($q) use ($productId) {
@@ -31,6 +33,7 @@ class ReviewController extends Controller
             return redirect()->back()
                 ->with('error', 'Anda hanya bisa mengulas produk yang sudah pernah disewa dan selesai.');
         }
+        */
 
         // Optional: Cek apakah user sudah pernah mereview produk ini
         $existingReview = Review::where('user_id', Auth::id())

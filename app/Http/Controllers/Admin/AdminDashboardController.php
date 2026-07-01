@@ -73,18 +73,47 @@ class AdminDashboardController extends Controller
 
         // ── CHART: ALIRAN KAS ─────────────────────────────────────
         $chartData = [];
-        $hariLabel = ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = $now->copy()->subDays($i);
-            $dayOfWeek = $date->dayOfWeekIso;
-            $pendapatan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
-                ->whereDate('created_at', $date->toDateString())
-                ->sum('total_biaya');
-            $chartData[] = [
-                'label' => $hariLabel[$dayOfWeek - 1],
-                'value' => (float) $pendapatan,
-                'date'  => $date->format('d M'),
-            ];
+        if ($period === 'tahunan') {
+            $bulanLabel = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
+            for ($i = 11; $i >= 0; $i--) {
+                $date = $now->copy()->subMonths($i);
+                $pendapatan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
+                    ->whereMonth('created_at', $date->month)
+                    ->whereYear('created_at', $date->year)
+                    ->sum('total_biaya');
+                $chartData[] = [
+                    'label' => $bulanLabel[$date->month - 1],
+                    'value' => (float) $pendapatan,
+                    'date'  => $date->format('M Y'),
+                ];
+            }
+        } elseif ($period === 'bulanan') {
+            for ($i = 3; $i >= 0; $i--) {
+                $startOfWeek = $now->copy()->subWeeks($i)->startOfWeek();
+                $endOfWeek = $now->copy()->subWeeks($i)->endOfWeek();
+                $pendapatan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
+                    ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                    ->sum('total_biaya');
+                $chartData[] = [
+                    'label' => 'W' . (4 - $i),
+                    'value' => (float) $pendapatan,
+                    'date'  => $startOfWeek->format('d M') . ' - ' . $endOfWeek->format('d M'),
+                ];
+            }
+        } else { // mingguan
+            $hariLabel = ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'];
+            for ($i = 6; $i >= 0; $i--) {
+                $date = $now->copy()->subDays($i);
+                $dayOfWeek = $date->dayOfWeekIso;
+                $pendapatan = Transaction::whereIn('status_transaksi', ['diproses', 'dikirim', 'selesai'])
+                    ->whereDate('created_at', $date->toDateString())
+                    ->sum('total_biaya');
+                $chartData[] = [
+                    'label' => $hariLabel[$dayOfWeek - 1],
+                    'value' => (float) $pendapatan,
+                    'date'  => $date->format('d M'),
+                ];
+            }
         }
 
         // ── BARANG TERLARIS ─────────────────────────────────────
@@ -126,6 +155,10 @@ class AdminDashboardController extends Controller
         }
         unset($pb);
 
+        // Cari metode pembayaran terpopuler
+        $maxPayment = collect($paymentBreakdown)->sortByDesc('count')->first();
+        $mayoritasMetode = $maxPayment['count'] > 0 ? strtolower($maxPayment['label']) : 'metode digital';
+
         // ── TRANSAKSI PERLU TINDAKAN (untuk modal quick-action) ──
         $transaksiMenunggu = Transaction::with(['user', 'details.product'])
             ->whereIn('status_transaksi', ['menunggu', 'menunggu_admin'])
@@ -156,7 +189,8 @@ class AdminDashboardController extends Controller
             'recentTransaksi',
             'paymentBreakdown',
             'transaksiMenunggu',
-            'jadwalPengembalian'
+            'jadwalPengembalian',
+            'mayoritasMetode'
         ));
     }
 

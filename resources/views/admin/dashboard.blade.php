@@ -51,7 +51,7 @@
             <div class="stat-label-sm">TOTAL PENDAPATAN</div>
             <div class="stat-big-value">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</div>
             @if($persenPerubahan != 0)
-            <div class="stat-growth">
+            <div class="stat-growth {{ $persenPerubahan < 0 ? 'down' : '' }}">
                 <i class="fas fa-arrow-{{ $persenPerubahan >= 0 ? 'up' : 'down' }}"></i>
                 {{ $persenPerubahan >= 0 ? '+' : '' }}{{ $persenPerubahan }}% dari periode lalu
             </div>
@@ -157,7 +157,7 @@
         {{-- Aliran Kas Chart --}}
         <div class="dash-chart-card" id="dash-chart-card">
             <div class="dash-chart-header">
-                <h2 class="dash-chart-title">Aliran Kas Bulanan</h2>
+                <h2 class="dash-chart-title">Aliran Kas {{ ucfirst($period) }}</h2>
                 <div class="dash-chart-period">
                     {{ \Carbon\Carbon::now()->translatedFormat('F Y') }} <i class="fas fa-chevron-down"></i>
                 </div>
@@ -187,7 +187,7 @@
                 @endforeach
             </div>
             <p class="dash-payment-quote">
-                "Mayoritas pelanggan lebih memilih transfer bank untuk transaksi yang lebih aman dan efisien."
+                "Mayoritas pelanggan lebih memilih {{ $mayoritasMetode }} untuk transaksi yang lebih aman dan efisien."
             </p>
         </div>
     </div>

@@ -62,14 +62,14 @@ class ProductSeeder extends Seeder
                 'url_gambar'        => 'images/sleepingbag-product.png',
             ],
             [
-                'category_id'       => $carrier,
+                'category_id'       => $alatTidur,
                 'nama_produk'       => 'AeroCore Pro',
                 'deskripsi'         => 'Matras angin otomatis dengan insulasi thermal tinggi. Memberikan kenyamanan tidur seperti di rumah di atas permukaan tanah berbatu.',
                 'spesifikasi_teknis'=> json_encode(['fitur' => 'Anti selip/slip', 'r_value' => 'R-Value 4.2']),
                 'harga_sewa'        => 40000,
                 'stok_tersedia'     => 7,
                 'total_stok'        => 7,
-                'url_gambar'        => 'images/carrier-product.png',
+                'url_gambar'        => 'images/sleeping-bag-product.png',
             ],
             [
                 'category_id'       => $aksesoris,

@@ -93,5 +93,20 @@
     })();
     </script>
     @endif
+    
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/6287715778007?text=Halo%20Gardakala%20Outdoor%2C%20saya%20ingin%20tanya%20tentang%20penyewaan%20alat." 
+       target="_blank" 
+       class="wa-float" 
+       style="position: fixed; width: 60px; height: 60px; bottom: 40px; right: 40px; background-color: #25d366; color: #FFF; border-radius: 50px; text-align: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.2); z-index: 100; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: transform 0.3s ease, background-color 0.3s ease;">
+        <i class="fab fa-whatsapp my-float"></i>
+    </a>
+    
+    <style>
+        .wa-float:hover {
+            transform: scale(1.1);
+            background-color: #128c7e;
+        }
+    </style>
 </body>
 </html>
