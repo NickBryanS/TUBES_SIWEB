@@ -24,18 +24,8 @@
         </nav>
     </div>
 
-    {{-- Bottom Section: Help Card & Logout --}}
+    {{-- Bottom Section: Logout --}}
     <div class="sidebar-bottom-wrapper">
-        {{-- Help Card --}}
-        <div class="sidebar-help-card">
-            <div class="help-icon-circle">
-                <i class="fas fa-headset"></i>
-            </div>
-            <h4>Butuh Bantuan?</h4>
-            <p>Tim support kami siap membantu kelancaran petualangan Anda.</p>
-            <a href="https://wa.me/6287715778007" target="_blank" class="btn-help-contact">WhatsApp Support</a>
-        </div>
-        
         {{-- Logout Form --}}
         <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">
             @csrf

@@ -15,22 +15,25 @@
         <div class="detail-top-grid">
             {{-- LEFT COLUMN: Main Image & Horizontal Thumbnails --}}
             <div class="left-column">
+                @php
+                    $galleryImages = $product->images;
+                    $mainImage = $product->url_gambar ?? 'images/tent-expedition.png';
+                @endphp
                 <div class="gallery-main">
-                    <img src="{{ asset($product->url_gambar ?? 'images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}" id="main-product-img">
+                    <img src="{{ asset($galleryImages->isNotEmpty() ? $galleryImages->first()->url_gambar : $mainImage) }}" alt="{{ $product->nama_produk }}" id="main-product-img">
                 </div>
                 <div class="gallery-thumbnails horizontal">
-                    <button class="thumb-btn active" onclick="changeImage(this)">
-                        <img src="{{ asset($product->url_gambar ?? 'images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}">
-                    </button>
-                    <button class="thumb-btn" onclick="changeImage(this)">
-                        <img src="{{ asset('images/tent-expedition.png') }}" alt="{{ $product->nama_produk }}">
-                    </button>
-                    <button class="thumb-btn" onclick="changeImage(this)">
-                        <img src="{{ asset('images/backpack-product.png') }}" alt="Outdoor Backpack">
-                    </button>
-                    <button class="thumb-btn" onclick="changeImage(this)">
-                        <img src="{{ asset('images/backpack-product.png') }}" alt="Outdoor Backpack 2">
-                    </button>
+                    @if($galleryImages->isNotEmpty())
+                        @foreach($galleryImages as $img)
+                        <button class="thumb-btn {{ $loop->first ? 'active' : '' }}" onclick="changeImage(this)">
+                            <img src="{{ asset($img->url_gambar) }}" alt="{{ $img->alt_text ?? $product->nama_produk }}">
+                        </button>
+                        @endforeach
+                    @else
+                        <button class="thumb-btn active" onclick="changeImage(this)">
+                            <img src="{{ asset($mainImage) }}" alt="{{ $product->nama_produk }}">
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -53,8 +56,13 @@
                         </div>
                     </div>
                     <div class="rating-box">
-                        <i class="fas fa-star"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '4.9' }}
-                        <span class="review-link">({{ $product->reviewCount() }} Ulasan)</span>
+                        @if($product->reviewCount() > 0)
+                            <i class="fas fa-star"></i> {{ number_format($product->averageRating(), 1) }}
+                            <span class="review-link">({{ $product->reviewCount() }} Ulasan)</span>
+                        @else
+                            <i class="fas fa-star" style="color: #ccc;"></i>
+                            <span style="color: #9ca3af;">Belum ada ulasan</span>
+                        @endif
                     </div>
                 </div>
 

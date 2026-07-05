@@ -66,6 +66,14 @@ class Product extends Model
     }
 
     /**
+     * Relasi: Product memiliki banyak Gambar (galeri).
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('urutan');
+    }
+
+    /**
      * Hitung rata-rata rating.
      */
     public function averageRating(): float

@@ -44,10 +44,16 @@
                     </div>
                     <div class="equipment-card-body">
                         <div class="equipment-card-meta">
+                            @if($product->reviewCount() > 0)
                             <span class="equipment-rating">
-                                <i class="fas fa-star"></i> {{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '4.8' }}
+                                <i class="fas fa-star"></i> {{ number_format($product->averageRating(), 1) }}
                             </span>
-                            <span class="equipment-reviews">({{ $product->reviewCount() > 0 ? $product->reviewCount() : '12' }} Ulasan)</span>
+                            <span class="equipment-reviews">({{ $product->reviewCount() }} Ulasan)</span>
+                            @else
+                            <span class="equipment-rating" style="color: #9ca3af;">
+                                <i class="fas fa-star" style="color: #ccc;"></i> Baru
+                            </span>
+                            @endif
                         </div>
                         <h3 class="equipment-title">{{ $productName }}</h3>
                         <p class="equipment-desc">{{ Str::limit($productDesc, 80) }}</p>

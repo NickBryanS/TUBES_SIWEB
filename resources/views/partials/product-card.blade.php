@@ -29,9 +29,14 @@
         <div class="katalog-card-title-row">
             <h3 class="product-name">{{ $productName }}</h3>
             <div class="katalog-rating">
-                <i class="fas fa-star"></i> 
-                <span>{{ $product->averageRating() > 0 ? number_format($product->averageRating(), 1) : '4.8' }}</span>
-                <span class="rating-count">({{ $product->reviewCount() > 0 ? $product->reviewCount() : '16' }})</span>
+                @if($product->reviewCount() > 0)
+                    <i class="fas fa-star"></i> 
+                    <span>{{ number_format($product->averageRating(), 1) }}</span>
+                    <span class="rating-count">({{ $product->reviewCount() }})</span>
+                @else
+                    <i class="fas fa-star" style="color: #ccc;"></i>
+                    <span style="color: #9ca3af;">Baru</span>
+                @endif
             </div>
         </div>
         <p class="katalog-card-desc">{{ Str::limit($productDesc, 72) }}</p>

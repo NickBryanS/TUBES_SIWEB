@@ -90,6 +90,9 @@
     font-size: 0.78rem; font-weight: 600;
     color: #8bc34a;
 }
+.card-dark .stat-growth.down {
+    color: #ff5252;
+}
 .card-dark .stat-growth i { font-size: 0.7rem; }
 
 /* Light card */

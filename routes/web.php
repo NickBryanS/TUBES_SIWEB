@@ -66,6 +66,14 @@ Route::middleware('redirect_if_admin')->group(function () {
     Route::get('/produk/{product}', function (Product $product) {
         return view('produk-detail', compact('product'));
     })->name('produk.detail');
+
+    Route::get('/faq', function () {
+        return view('faq');
+    })->name('faq');
+
+    Route::get('/syarat-ketentuan', function () {
+        return view('syarat-ketentuan');
+    })->name('syarat-ketentuan');
 });
 
 // Midtrans Callback Webhook (Public route, must be excluded from CSRF protection)

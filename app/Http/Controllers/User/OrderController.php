@@ -323,7 +323,9 @@ class OrderController extends Controller
             'status_transaksi' => 'menunggu_admin',
         ]);
 
-        $transaction->user->notify(new OrderStatusUpdated($transaction));
+        try {
+            $transaction->user->notify(new OrderStatusUpdated($transaction));
+        } catch (\Exception $e) {}
 
         return redirect()->route('konfirmasi', $transaction->id)
                          ->with('success', 'Bukti pembayaran berhasil diunggah!');
@@ -457,7 +459,9 @@ class OrderController extends Controller
             'atas_nama_pengembalian' => $request->atas_nama_pengembalian,
         ]);
 
-        $transaction->user->notify(new OrderStatusUpdated($transaction));
+        try {
+            $transaction->user->notify(new OrderStatusUpdated($transaction));
+        } catch (\Exception $e) {}
 
         return redirect()->route('pesanan.detail', $transaction->id)
                          ->with('success', 'Pesanan berhasil dibatalkan.');
@@ -537,7 +541,9 @@ class OrderController extends Controller
             $detail->product->increment('stok_tersedia', $detail->jumlah);
         }
 
-        $transaction->user->notify(new OrderStatusUpdated($transaction));
+        try {
+            $transaction->user->notify(new OrderStatusUpdated($transaction));
+        } catch (\Exception $e) {}
 
         $message = 'Pengembalian barang berhasil dicatat.';
         if ($denda > 0) {
