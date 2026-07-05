@@ -114,21 +114,24 @@ class TransactionController extends Controller
                 $hari = $transaction->tanggal_mulai->diffInDays($transaction->tanggal_selesai);
                 return [
                     'nama_produk' => $d->product->nama_produk ?? '-',
-                    'url_gambar' => $d->product->url_gambar ?? null,
-                    'jumlah' => $d->jumlah,
-                    'harga_sewa' => $d->product->harga_sewa ?? 0,
-                    'hari' => $hari,
-                    'subtotal' => ($d->product->harga_sewa ?? 0) * $d->jumlah * $hari,
+                    'url_gambar'  => $d->product->url_gambar ? asset($d->product->url_gambar) : null,
+                    'jumlah'      => $d->jumlah,
+                    'harga_sewa'  => $d->product->harga_sewa ?? 0,
+                    'hari'        => $hari,
+                    'subtotal'    => ($d->product->harga_sewa ?? 0) * $d->jumlah * $hari,
                 ];
             }),
             'payment' => $transaction->payment ? [
                 'metode_pembayaran' => $transaction->payment->metode_pembayaran,
                 'status_pembayaran' => $transaction->payment->status_pembayaran,
-                'jumlah_bayar' => $transaction->payment->jumlah_bayar,
-                'bukti_pembayaran' => $transaction->payment->bukti_pembayaran
+                'jumlah_bayar'      => $transaction->payment->jumlah_bayar,
+                'bukti_pembayaran'  => $transaction->payment->bukti_pembayaran
                     ? asset('storage/' . $transaction->payment->bukti_pembayaran)
                     : null,
             ] : null,
+            'perpanjangan_hari'   => $transaction->perpanjangan_hari,
+            'status_perpanjangan' => $transaction->status_perpanjangan,
+            'barang_diterima'     => $transaction->barang_diterima,
         ]);
     }
 
@@ -152,7 +155,7 @@ class TransactionController extends Controller
             $transaction->payment->update(['status_pembayaran' => 'terverifikasi']);
         }
 
-        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah divalidasi dan sedang diproses.'));
+        try { $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah divalidasi dan sedang diproses.')); } catch (\Exception $e) {}
 
         ActivityLog::catat('konfirmasi_transaksi', 'Menyetujui transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
 
@@ -181,7 +184,7 @@ class TransactionController extends Controller
             'status_jaminan' => 'rejected',
         ]);
 
-        $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah ditolak dan dibatalkan.'));
+        try { $transaction->user->notify(new OrderStatusNotification($transaction, 'Pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah ditolak dan dibatalkan.')); } catch (\Exception $e) {}
 
         ActivityLog::catat('tolak_transaksi', 'Menolak transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);
 
@@ -198,16 +201,45 @@ class TransactionController extends Controller
             'status' => 'required|in:diproses,dikirim,selesai',
         ]);
 
-        $transaction = Transaction::findOrFail($id);
+        $transaction = Transaction::with('details.product')->findOrFail($id);
 
-        if ($request->status === 'selesai' && !$transaction->tanggal_kembali_aktual) {
-            return redirect()->back()->with('error', 'Tidak bisa menyelesaikan transaksi: Barang belum dikembalikan oleh pelanggan.');
+        if ($request->status === 'selesai') {
+            // Set tanggal kembali aktual jika belum ada
+            if (!$transaction->tanggal_kembali_aktual) {
+                $transaction->tanggal_kembali_aktual = Carbon::now();
+            }
+
+            // Hitung denda keterlambatan jika belum dihitung atau 0
+            if ($transaction->denda == 0) {
+                $tanggalSelesai = Carbon::parse($transaction->tanggal_selesai);
+                $tanggalKembali = Carbon::parse($transaction->tanggal_kembali_aktual);
+                
+                if ($tanggalKembali->gt($tanggalSelesai)) {
+                    $hariTelat = $tanggalKembali->diffInDays($tanggalSelesai);
+                    $totalDenda = 0;
+                    foreach ($transaction->details as $detail) {
+                        $hargaHarian = $detail->product->harga_sewa;
+                        $totalDenda += ($hargaHarian * 0.5) * $detail->jumlah * $hariTelat;
+                    }
+                    $transaction->denda = $totalDenda;
+                }
+            }
+
+            // Kembalikan stok produk jika transaksinya belum berstatus selesai
+            if ($transaction->status_transaksi !== 'selesai') {
+                foreach ($transaction->details as $detail) {
+                    $detail->product->increment('stok_tersedia', $detail->jumlah);
+                }
+            }
         }
 
-        $transaction->update(['status_transaksi' => $request->status]);
+        $transaction->status_transaksi = $request->status;
+        $transaction->save();
 
         $label = str_replace('_', ' ', ucfirst($request->status));
-        $transaction->user->notify(new OrderStatusNotification($transaction, 'Status pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah diperbarui menjadi ' . $label . '.'));
+        try {
+            $transaction->user->notify(new OrderStatusNotification($transaction, 'Status pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah diperbarui menjadi ' . $label . '.'));
+        } catch (\Exception $e) {}
 
         ActivityLog::catat('update_status_transaksi', 'Mengubah status transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' menjadi ' . strtoupper($request->status), 'Transaction', $transaction->id);
 
@@ -264,9 +296,9 @@ class TransactionController extends Controller
                 'status_transaksi' => 'diproses',
                 'status_jaminan' => 'verified',
             ]);
-            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah dikonfirmasi dan pesanan sedang diproses.'));
+            try { $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah dikonfirmasi dan pesanan sedang diproses.')); } catch (\Exception $e) {}
         } else {
-            $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah dikonfirmasi.'));
+            try { $transaction->user->notify(new OrderStatusNotification($transaction, 'Pembayaran pesanan Anda #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT) . ' telah dikonfirmasi.')); } catch (\Exception $e) {}
         }
 
         ActivityLog::catat('konfirmasi_lunas_transaksi', 'Mengonfirmasi pelunasan transaksi #GK-' . str_pad($id, 4, '0', STR_PAD_LEFT), 'Transaction', $transaction->id);

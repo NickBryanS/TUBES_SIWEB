@@ -13,6 +13,20 @@
         {{-- STEPPER (partial) --}}
         @include('partials.checkout-stepper', ['currentStep' => 1])
 
+        @if($errors->any())
+        <div style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 12px; padding: 16px; margin-bottom: 24px; color: #991b1b; font-family: 'Inter', sans-serif;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: 700; font-size: 0.95rem;">
+                <i class="fas fa-exclamation-triangle" style="color: #dc2626;"></i>
+                Gagal Melanjutkan Pemesanan
+            </div>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.85rem; line-height: 1.5; list-style-type: disc;">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
         </form>
@@ -70,8 +84,8 @@
                 <div class="checkout-section">
                     <h3 class="checkout-section-title">Metode Pemenuhan</h3>
                     <div class="method-options">
-                        <label class="method-card" id="method-deliver">
-                            <input type="radio" name="metode_pengambilan" value="deliver" form="checkout-form">
+                        <label class="method-card {{ old('metode_pengambilan') === 'deliver' ? 'selected' : '' }}" id="method-deliver">
+                            <input type="radio" name="metode_pengambilan" value="deliver" form="checkout-form" {{ old('metode_pengambilan') === 'deliver' ? 'checked' : '' }}>
                             <div class="method-content">
                                 <i class="fas fa-truck"></i>
                                 <div>
@@ -80,8 +94,8 @@
                                 </div>
                             </div>
                         </label>
-                        <label class="method-card selected" id="method-pickup">
-                            <input type="radio" name="metode_pengambilan" value="pickup" checked form="checkout-form">
+                        <label class="method-card {{ old('metode_pengambilan', 'pickup') === 'pickup' ? 'selected' : '' }}" id="method-pickup">
+                            <input type="radio" name="metode_pengambilan" value="pickup" form="checkout-form" {{ old('metode_pengambilan', 'pickup') === 'pickup' ? 'checked' : '' }}>
                             <div class="method-content">
                                 <i class="fas fa-store"></i>
                                 <div>
@@ -112,11 +126,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">NAMA PENERIMA</label>
-                            <input type="text" class="form-input" name="nama_penerima" value="{{ Auth::user()->nama_lengkap ?? '' }}" id="nama-penerima" form="checkout-form" required>
+                            <input type="text" class="form-input" name="nama_penerima" value="{{ old('nama_penerima', Auth::user()->nama_lengkap ?? '') }}" id="nama-penerima" form="checkout-form" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">NOMOR HP</label>
-                            <input type="text" class="form-input" name="telepon_penerima" value="{{ Auth::user()->nomor_telepon ?? '' }}" id="nomor-hp" form="checkout-form" required>
+                            <input type="text" class="form-input" name="telepon_penerima" value="{{ old('telepon_penerima', Auth::user()->nomor_telepon ?? '') }}" id="nomor-hp" form="checkout-form" required>
                         </div>
                     </div>
                 </div>
@@ -126,11 +140,11 @@
                     <h3 class="checkout-section-title">Detail Pengiriman</h3>
                     <div class="form-group full-width">
                         <label class="form-label">ALAMAT LENGKAP</label>
-                        <textarea class="form-textarea" name="alamat_pengiriman" rows="3" form="checkout-form" placeholder="Masukkan alamat lengkap pengiriman..."></textarea>
+                        <textarea class="form-textarea" name="alamat_pengiriman" rows="3" form="checkout-form" placeholder="Masukkan alamat lengkap pengiriman...">{{ old('alamat_pengiriman') }}</textarea>
                     </div>
                     <div class="form-group full-width" style="margin-top: 15px;">
                         <label class="form-label">JARAK TEMPUH (KM)</label>
-                        <input type="number" step="0.1" min="0" class="form-input" name="jarak_tempuh" id="jarak-tempuh" form="checkout-form" placeholder="Masukkan jarak tempuh dari basecamp ke alamat Anda...">
+                        <input type="number" step="0.1" min="0" class="form-input" name="jarak_tempuh" value="{{ old('jarak_tempuh') }}" id="jarak-tempuh" form="checkout-form" placeholder="Masukkan jarak tempuh dari basecamp ke alamat Anda...">
                         <small style="color: #666; font-size: 0.8rem; margin-top: 5px; display: block;">Biaya pengiriman Rp 5.000 / km.</small>
                     </div>
                 </div>
@@ -183,25 +197,36 @@
 
 @section('scripts')
 <script>
-document.querySelectorAll('input[name="metode_pengambilan"]').forEach(function(radio) {
-    radio.addEventListener('change', function() {
-        document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
-        this.closest('.method-card').classList.add('selected');
-        
+document.addEventListener('DOMContentLoaded', function() {
+    function toggleSections(val) {
         const pickup = document.getElementById('pickup-info');
         const delivery = document.getElementById('delivery-address-section');
         const identity = document.getElementById('identity-section');
         
-        if (this.value === 'pickup') {
-            pickup.style.display = '';
-            delivery.style.display = 'none';
-            identity.style.display = 'none';
+        if (val === 'pickup') {
+            if (pickup) pickup.style.display = '';
+            if (delivery) delivery.style.display = 'none';
+            if (identity) identity.style.display = 'none';
         } else {
-            pickup.style.display = 'none';
-            delivery.style.display = '';
-            identity.style.display = '';
+            if (pickup) pickup.style.display = 'none';
+            if (delivery) delivery.style.display = '';
+            if (identity) identity.style.display = '';
         }
+    }
+
+    document.querySelectorAll('input[name="metode_pengambilan"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+            this.closest('.method-card').classList.add('selected');
+            toggleSections(this.value);
+        });
     });
+
+    // Run on initial load to preserve state after redirect
+    const initialChecked = document.querySelector('input[name="metode_pengambilan"]:checked');
+    if (initialChecked) {
+        toggleSections(initialChecked.value);
+    }
 });
 
 // Automatically update tanggal_selesai based on selected tanggal_mulai and cart duration
@@ -240,8 +265,8 @@ document.getElementById('foto_ktp')?.addEventListener('change', function() {
 
 // Validation on submit
 document.getElementById('checkout-form').addEventListener('submit', function(e) {
-    let method = document.querySelector('input[name="metode_pengambilan"]:checked').value;
-    if (method === 'deliver') {
+    let checkedRadio = document.querySelector('input[name="metode_pengambilan"]:checked');
+    if (checkedRadio && checkedRadio.value === 'deliver') {
         let foto = document.getElementById('foto_ktp').files.length;
         if (foto === 0) {
             e.preventDefault();

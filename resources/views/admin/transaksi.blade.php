@@ -597,6 +597,41 @@ document.addEventListener('DOMContentLoaded', function() {
                         html += `</div>`;
                     }
 
+                    // ── Perpanjangan Sewa ──
+                    if (data.status_perpanjangan === 'pending') {
+                        html += `
+                        <div class="modal-section" style="border: 1px solid rgba(241,196,15,0.4); background: rgba(241,196,15,0.05); border-radius: 12px; padding: 0; overflow: hidden;">
+                            <div class="modal-section-header" style="background: rgba(241,196,15,0.1); border-bottom: 1px solid rgba(241,196,15,0.2);">
+                                <h4><i class="fas fa-calendar-plus" style="color: #d97706;"></i> Pengajuan Perpanjangan</h4>
+                                <span style="background: #d97706; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em;">Menunggu</span>
+                            </div>
+                            <div style="padding: 16px;">
+                                <p style="font-size: 0.9rem; color: #555; margin: 0 0 14px;">Pelanggan mengajukan perpanjangan sewa sebesar <strong style="color: #d97706;">${data.perpanjangan_hari} hari</strong>.</p>
+                                <div style="display: flex; gap: 10px;">
+                                    <form action="{{ url('admin/pesanan') }}/${data.id}/perpanjangan/approve" method="POST" onsubmit="return confirm('Setujui perpanjangan ${data.perpanjangan_hari} hari?')" style="display:inline; flex:1;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-success" style="width: 100%;"><i class="fas fa-check"></i> Setujui</button>
+                                    </form>
+                                    <form action="{{ url('admin/pesanan') }}/${data.id}/perpanjangan/reject" method="POST" onsubmit="return confirm('Tolak pengajuan perpanjangan ini?')" style="display:inline; flex:1;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-danger" style="width: 100%;"><i class="fas fa-times"></i> Tolak</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>`;
+                    } else if (data.status_perpanjangan === 'approved' && data.perpanjangan_hari > 0) {
+                        html += `
+                        <div class="modal-section" style="border: 1px solid rgba(46,204,113,0.3); background: rgba(46,204,113,0.05); border-radius: 12px; padding: 0; overflow: hidden;">
+                            <div class="modal-section-header" style="background: rgba(46,204,113,0.1); border-bottom: 1px solid rgba(46,204,113,0.2);">
+                                <h4><i class="fas fa-calendar-check" style="color: #2ecc71;"></i> Perpanjangan Disetujui</h4>
+                                <span style="background: #2ecc71; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase;">Disetujui</span>
+                            </div>
+                            <div style="padding: 16px; font-size: 0.9rem; color: #555;">
+                                Perpanjangan <strong style="color: #2ecc71;">${data.perpanjangan_hari} hari</strong> telah disetujui.
+                            </div>
+                        </div>`;
+                    }
+
                     body.innerHTML = html;
 
                     // ── Bind denda button ──
@@ -644,6 +679,32 @@ document.addEventListener('DOMContentLoaded', function() {
                             <form action="{{ url('admin/transaksi') }}/${data.id}/lunas" method="POST" onsubmit="return confirm('${confirmMsg}')" style="display:inline;">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-success"><i class="fas ${btnIcon}"></i> ${btnLabel}</button>
+                            </form>
+                        `;
+                    }
+
+                    // Status transitions (diproses -> dikirim -> selesai) - Hanya jika pembayaran lunas (terverifikasi)
+                    const isLunas = data.payment && data.payment.status_pembayaran === 'terverifikasi';
+                    if (isLunas && data.status_transaksi === 'diproses') {
+                        const btnLabel = data.metode_pengambilan === 'pickup' ? 'KONFIRMASI DIAMBIL' : 'KONFIRMASI DIKIRIM';
+                        const btnIcon = data.metode_pengambilan === 'pickup' ? 'fa-box-open' : 'fa-truck';
+                        const confirmMsg = data.metode_pengambilan === 'pickup' 
+                            ? 'Konfirmasi bahwa pelanggan telah mengambil barang di toko?' 
+                            : 'Konfirmasi bahwa barang sedang dikirim ke alamat pelanggan?';
+                        
+                        footerRight.innerHTML += `
+                            <form action="{{ url('admin/transaksi') }}/${data.id}/status" method="POST" onsubmit="return confirm('${confirmMsg}')" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="status" value="dikirim">
+                                <button type="submit" class="btn" style="background:#2D5A27;color:#fff;margin-left:8px;"><i class="fas ${btnIcon}"></i> ${btnLabel}</button>
+                            </form>
+                        `;
+                    } else if (data.status_transaksi === 'dikirim') {
+                        footerRight.innerHTML += `
+                            <form action="{{ url('admin/transaksi') }}/${data.id}/status" method="POST" onsubmit="return confirm('Konfirmasi bahwa barang telah dikembalikan oleh pelanggan?')" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="status" value="selesai">
+                                <button type="submit" class="btn btn-success" style="margin-left:8px;"><i class="fas fa-undo"></i> KONFIRMASI KEMBALI</button>
                             </form>
                         `;
                     }
